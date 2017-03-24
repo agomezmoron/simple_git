@@ -1,0 +1,7 @@
+name: Simple Git Module
+type: module
+description: "Module to handle Git accounts"
+package: Web services
+core: 8.x
+configure: simple_git.form
+dependencies:

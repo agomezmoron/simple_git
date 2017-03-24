@@ -1,0 +1,13 @@
+simple_git.admin_form:
+  path: '/admin/config/services/simple_git'
+  defaults:
+    _form: '\Drupal\simple_git\Form\SimpleGitSettingsForm'
+  requirements:
+    _permission: 'administer simple_git'
+
+simple_git.user_repositories:
+  path: '/user/{user}/simple_git/repositories'
+  defaults:
+    _controller: '\Drupal\simple_git\Controller\SimpleGitController::repositories'
+  requirements:
+    _permission: 'administer simple_git'
