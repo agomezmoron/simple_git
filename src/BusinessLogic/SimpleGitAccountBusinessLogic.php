@@ -11,9 +11,11 @@ abstract class SimpleGitAccountBusinessLogic {
   /**
    * Returns an account using the account Id.
    *
-   * @param $account_id
+   * @param int $account_id
+   *   A id of account.
    *
-   * @return array
+   * @return array $result
+   *   An associative array with element 'account_id'.
    */
   static function getAccountByAccountId($user, $account_id) {
 
@@ -40,13 +42,12 @@ abstract class SimpleGitAccountBusinessLogic {
   /**
    * Create account.
    *
-   * @param $accounts
+   * @param array $accounts
+   *   An associative array containing structure account.
    *
-   * @param $git_account
-   *
-   * @param $connector_type
-   *
-   * @return array
+   * @return array $account
+   *   An associative array with element 'account_id', 'type', 'name',
+   *   'access_info' for create account.
    */
   static function createAccount($accounts, $request_account) {
     // getting the maximim account_id
@@ -65,9 +66,11 @@ abstract class SimpleGitAccountBusinessLogic {
   /**
    * Modify access info.
    *
-   * @param $account
+   * @param array $account
+   *   An associative array containing structure account.
    *
-   * @return array
+   * @return array $access_info
+   *   An associative array with element 'token', 'expires_in', 'refresh_token'.
    */
   static function setAccessInfo($account) {
     $access_info = array();
@@ -96,7 +99,8 @@ abstract class SimpleGitAccountBusinessLogic {
   /**
    * Returns accounts.
    *
-   * @param $user
+   * @param array $user
+   *   An associative array containing structure user.
    *
    * @return mixed
    */
@@ -108,9 +112,11 @@ abstract class SimpleGitAccountBusinessLogic {
   /**
    * Modify account.
    *
-   * @param $user
+   * @param array $user
+   *   An associative array containing structure user.
    *
-   * @param $accounts
+   * @param array $account
+   *   An associative array containing structure account.
    *
    * @return mixed
    */
@@ -128,9 +134,11 @@ abstract class SimpleGitAccountBusinessLogic {
   /**
    * Modify multiple accounts.
    *
-   * @param $user
+   * @param array $user
+   *   An associative array containing structure user.
    *
-   * @param $accounts
+   * @param array $accounts
+   *   An associative array containing structure account.
    *
    * @return mixed
    */
@@ -144,11 +152,14 @@ abstract class SimpleGitAccountBusinessLogic {
   /**
    * Check for the user data.
    *
-   * @param $db_users
+   * @param array $db_users
+   *  A user account object of the database.
    *
-   * @param $new_user
+   * @param array $new_user
+   *    A new user account object.
    *
-   * @return array
+   * @return array $db_users
+   *   Contains the new user.
    */
   static function checkUserData($db_users, $new_user) {
     $exist = FALSE;
@@ -175,11 +186,15 @@ abstract class SimpleGitAccountBusinessLogic {
   /**
    * Check the information of the access data.
    *
-   * @param $db_user
+   * @param array $db_user
+   *  A user account object of the database.
    *
-   * @param $new_user
+   * @param array $new_user
+   *   A new user account object.
    *
-   * @return null
+   * @return array $db_user
+   *   An associative array with user.
+   *
    */
   static function checkAccessInfo($db_user, $new_user) {
     switch ($new_user['type']) {

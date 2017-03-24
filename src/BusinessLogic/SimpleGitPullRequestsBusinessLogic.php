@@ -20,11 +20,17 @@ class SimpleGitPullRequestsBusinessLogic {
   /**
    * Get pull requests.
    *
-   * @param $account_id
+   * @param int $account_id
+   *   A id account.
    *
-   * @param $repo
+   * @param string $repo
+   *   A string with URL of the repositories.
    *
-   * @return array
+   * @param array $user
+   *   An associative array containing structure user.
+   *
+   * @return array $pr
+   *  Contains user's pull request.
    */
   function getPullRequests($account_id, $repo, $user) {
     $pr = array();
@@ -41,13 +47,19 @@ class SimpleGitPullRequestsBusinessLogic {
   /**
    * Get pull request.
    *
-   * @param $account_id
+   * @param int $account_id
+   *   A id account.
    *
-   * @param $repo
+   * @param string $repo
+   *   A string with URL of the repositories.
    *
-   * @param $id
+   * @param int $id
    *
-   * @return array
+   * @param array $user
+   *   An associative array containing structure user.
+   *
+   * @return array $pr
+   *   Contains user's pull request.
    */
   function getPullRequest($account_id, $repo, $id, $user) {
     $pr = array();
