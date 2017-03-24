@@ -21,9 +21,11 @@ abstract class SimpleGitAuthorizationBusinessLogic extends SimpleGitDataBaseBusi
   /**
    * Check user authorization.
    *
-   * @param $user
+   * @param array $user
+   *   A user object.
    *
-   * @param $params
+   * @param array $params
+   *   An associative array containing params service.
    *
    * @return array|mixed
    */

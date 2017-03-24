@@ -19,9 +19,14 @@ class SimpleGitRepositoriesBusinessLogic {
   /**
    * Get multiple repositories.
    *
-   * @param $account_id
+   * @param int $account_id
+   *    A id account.
    *
-   * @return array|mixed
+   * @param array $user
+   *   An associative array containing structure user.
+   *
+   * @return array $repositories
+   *   Contains user's repository.
    */
   function getRepositories($user, $account_id) {
     $repositories = array();
@@ -38,11 +43,17 @@ class SimpleGitRepositoriesBusinessLogic {
   /**
    * Get repository.
    *
-   * @param $account_id
+   * @param int $account_id
+   *    A id account.
    *
-   * @param $repo
+   * @param string $repo
+   *   A string with URL of the repositories.
    *
-   * @return array|mixed
+   * @param array $user
+   *   An associative array containing structure user.
+   *
+   * @return array $repository
+   *   Contains user's repository.
    */
   function getRepository($account_id, $repo, $user) {
     $repository = array();
