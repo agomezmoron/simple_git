@@ -17,7 +17,7 @@ use Drupal\simple_git\BusinessLogic\SimpleGitAuthorizationBusinessLogic;
 use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
 
 /**
- * Provides a Connector Resource
+ * Provides a Connector Resource.
  *
  * @RestResource(
  *   id = "simple_git_account_resource",
@@ -56,12 +56,16 @@ class AccountResource extends ResourceBase {
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
+   *
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
+   *
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
+   *
    * @param array $serializer_formats
    *   The available serialization formats.
+   *
    * @param \Psr\Log\ $logger
    *   A logger instance.
    */
@@ -70,7 +74,7 @@ class AccountResource extends ResourceBase {
     $this->current_user = $current_user;
   }
 
-  /*
+  /**
    * Responds to POST requests.
    *
    * It conneccuado ts with the Git Service given using the given information, returning the account data.
@@ -93,7 +97,7 @@ class AccountResource extends ResourceBase {
 
   }
 
-  /*
+  /**
    * Responds to DELETE requests.
    *
    * It deletes the sent account.
@@ -113,11 +117,11 @@ class AccountResource extends ResourceBase {
     return new ResourceResponse($response_data);
   }
 
-  /*
+  /**
   * Responds to the GET request.
   *
   * @return \Drupal\rest\ResourceResponse
-  *   The response containing all the linked accounts
+  *   The response containing all the linked accounts.
   */
   public function get($account_id = NULL) {
     $accounts = array();

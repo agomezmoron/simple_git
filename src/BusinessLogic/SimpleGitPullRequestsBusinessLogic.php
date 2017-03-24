@@ -1,17 +1,29 @@
 <?php
+
 /**
 * @file
-* Contains \Drupal\simple_git\BusinessLogic\SimpleGitPullRequestsBusinessLogic
+* Contains \Drupal\simple_git\BusinessLogic\SimpleGitPullRequestsBusinessLogic.
 */
 namespace Drupal\simple_git\BusinessLogic;
 
 use \Drupal\simple_git\Service;
 
+/**
+ * Class SimpleGitPullRequestsBusinessLogic.
+ *
+ * Generate a Pull Requests.
+ *
+ * @package Drupal\simple_git\BusinessLogic
+ */
 class SimpleGitPullRequestsBusinessLogic {
 
   /**
+   * Get pull requests.
+   *
    * @param $account_id
+   *
    * @param $repo
+   *
    * @return array
    */
   function getPullRequests($account_id, $repo, $user) {
@@ -27,9 +39,14 @@ class SimpleGitPullRequestsBusinessLogic {
   }
 
   /**
+   * Get pull request.
+   *
    * @param $account_id
+   *
    * @param $repo
+   *
    * @param $id
+   *
    * @return array
    */
   function getPullRequest($account_id, $repo, $id, $user) {

@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Provides a Pull Request Resource
+ * Provides a Pull Request Resource.
  *
  * @RestResource(
  *   id = "simple_git_pull_request_resource",
@@ -54,12 +54,16 @@ class PullRequestResource extends ResourceBase {
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
+   *
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
+   *
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
+   *
    * @param array $serializer_formats
    *   The available serialization formats.
+   *
    * @param \Psr\Log\ $logger
    *   A logger instance.
    */
@@ -68,7 +72,7 @@ class PullRequestResource extends ResourceBase {
     $this->current_user = $current_user;
   }
 
-  /*
+  /**
   * Responds to the GET request.
   *
   * @return \Drupal\rest\ResourceResponse

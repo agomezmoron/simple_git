@@ -1,15 +1,26 @@
 <?php
+
 /**
  * @file
- * Contains \Drupal\simple_git\BusinessLogic\SimpleGitRepositoriesBusinessLogic
+ * Contains \Drupal\simple_git\BusinessLogic\SimpleGitRepositoriesBusinessLogic.
  */
+
 namespace Drupal\simple_git\BusinessLogic;
 
 use \Drupal\simple_git\Service;
 
+/**
+ * Class SimpleGitRepositoriesBusinessLogic.
+ *
+ * @package Drupal\simple_git\BusinessLogic
+ */
 class SimpleGitRepositoriesBusinessLogic {
+
   /**
+   * Get multiple repositories.
+   *
    * @param $account_id
+   *
    * @return array|mixed
    */
   function getRepositories($user, $account_id) {
@@ -25,8 +36,12 @@ class SimpleGitRepositoriesBusinessLogic {
 
 
   /**
+   * Get repository.
+   *
    * @param $account_id
+   *
    * @param $repo
+   *
    * @return array|mixed
    */
   function getRepository($account_id, $repo, $user) {
