@@ -57,4 +57,4 @@ Current maintainers:
  * Mª Ángeles Villalba (mavillalba) - https://www.drupal.org/u/mavillalba
 
 This project has been sponsored by:
- * EMERGYA
+ * 3Emergya
