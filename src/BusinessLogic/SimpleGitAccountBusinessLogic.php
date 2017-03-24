@@ -101,7 +101,7 @@ abstract class SimpleGitAccountBusinessLogic {
    * @return mixed
    */
   static function getAccounts($user) {
-    return Drupal::service('user.data')
+    return \Drupal::service('user.data')
       ->get(MODULE_SIMPLEGIT, $user->id(), 'accounts');
   }
 
@@ -121,7 +121,7 @@ abstract class SimpleGitAccountBusinessLogic {
 
     $accounts = self::checkUserData($db_accounts, $new_account);
 
-    return Drupal::service('user.data')
+    return \Drupal::service('user.data')
       ->set(MODULE_SIMPLEGIT, $user->id(), 'accounts', $accounts);
   }
 
