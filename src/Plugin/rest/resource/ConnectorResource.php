@@ -14,7 +14,7 @@ use Drupal\Core\Session\AccountProxyInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Provides a Connector Resource
+ * Provides a Connector Resource.
  *
  * @RestResource(
  *   id = "simple_git_connector_resource",
@@ -53,12 +53,16 @@ class ConnectorResource extends ResourceBase {
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
+   *
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
+   *
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
+   *
    * @param array $serializer_formats
    *   The available serialization formats.
+   *
    * @param \Psr\Log\ $logger
    *   A logger instance.
    */

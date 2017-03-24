@@ -105,7 +105,7 @@ class SimpleGitSettingsForm extends ConfigFormBase {
    * It builds the GitHub configuration subform.
    *
    * @param $form
-   *  An associative array containing the structure of the form
+   *  An associative array containing the structure of the form.
    */
   private function buildGitHubForm(&$form) {
     $git_settings = $this->configFactory->get('simple_git.settings');
@@ -144,7 +144,7 @@ class SimpleGitSettingsForm extends ConfigFormBase {
    * It builds the GitLab configuration subform.
    *
    * @param $form
-   *  An associative array containing the structure of the form
+   *  An associative array containing the structure of the form.
    */
   private function buildGitLabForm(&$form) {
     $git_settings = $this->configFactory->get('simple_git.settings');

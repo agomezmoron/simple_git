@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Contains \Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic.
@@ -11,6 +12,7 @@ abstract class SimpleGitAccountBusinessLogic {
    * Returns an account using the account Id.
    *
    * @param $account_id
+   *
    * @return array
    */
   static function getAccountByAccountId($user, $account_id) {
@@ -39,8 +41,11 @@ abstract class SimpleGitAccountBusinessLogic {
    * Create account.
    *
    * @param $accounts
+   *
    * @param $git_account
+   *
    * @param $connector_type
+   *
    * @return array
    */
   static function createAccount($accounts, $request_account) {
@@ -61,6 +66,7 @@ abstract class SimpleGitAccountBusinessLogic {
    * Modify access info.
    *
    * @param $account
+   *
    * @return array
    */
   static function setAccessInfo($account) {
@@ -91,6 +97,7 @@ abstract class SimpleGitAccountBusinessLogic {
    * Returns accounts.
    *
    * @param $user
+   *
    * @return mixed
    */
   static function getAccounts($user) {
@@ -102,7 +109,9 @@ abstract class SimpleGitAccountBusinessLogic {
    * Modify account.
    *
    * @param $user
+   *
    * @param $accounts
+   *
    * @return mixed
    */
   static function setAccount($user, $account) {
@@ -120,7 +129,9 @@ abstract class SimpleGitAccountBusinessLogic {
    * Modify multiple accounts.
    *
    * @param $user
+   *
    * @param $accounts
+   *
    * @return mixed
    */
   static function setAccounts($user, $accounts) {
@@ -134,7 +145,9 @@ abstract class SimpleGitAccountBusinessLogic {
    * Check for the user data.
    *
    * @param $db_users
+   *
    * @param $new_user
+   *
    * @return array
    */
   static function checkUserData($db_users, $new_user) {
@@ -163,7 +176,9 @@ abstract class SimpleGitAccountBusinessLogic {
    * Check the information of the access data.
    *
    * @param $db_user
+   *
    * @param $new_user
+   *
    * @return null
    */
   static function checkAccessInfo($db_user, $new_user) {

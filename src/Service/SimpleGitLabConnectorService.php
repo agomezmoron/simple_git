@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Contains \Drupal\simple_git\Service\SimpleGitHubConnectorService.
@@ -17,7 +18,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class SimpleGitLabConnectorService
+ * Class SimpleGitLabConnectorService.
+ *
  * @package Drupal\simple_git\Service
  */
 class SimpleGitLabConnectorService extends SimpleGitConnector {
@@ -34,8 +36,11 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
 
   /**
    * {@inheritdoc}
+   *
    * @param \Drupal\simple_git\Service\it $params
-   * In this case the needed params are the sent state to login and the code returned from login
+   *  In this case the needed params are the sent state to login and the code
+   *  returned from login.
+   *
    * @return mixed the access token to perform the requests
    *
    * parameters = 'client_id=APP_ID&client_secret=APP_SECRET&code=RETURNED_CODE&grant_type=authorization_code&redirect_uri=REDIRECT_URI'
@@ -76,8 +81,10 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
 
 
   /**
-   * List repository branches
+   * List repository branches.
+   *
    * @param $params
+   *
    * @return array
    */
   public function getBranchesList($params) {
@@ -98,8 +105,10 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
 
 
   /**
-   * Get single repository branch
+   * Get single repository branch.
+   *
    * @param $params
+   *
    * @return array
    */
   public function getBranches($params) {
@@ -137,8 +146,10 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
 
 
   /**
-   * List projects
+   * List projects.
+   *
    * @param $params
+   *
    * @return array
    */
   public function getProjectsList($params) {
@@ -152,8 +163,10 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   }
 
   /**
-   * Get single project
+   * Get single project.
+   *
    * @param $params
+   *
    * @return array
    */
   public function getProjects($params) {
@@ -168,9 +181,12 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   }
 
   /**
-   * List repository tree
+   * List repository tree.
+   *
    * {@inheritdoc}
+   *
    * @param \Drupal\simple_git\Service\it $params it needs the userInfo
+   *
    * @return array
    */
   public function getRepositoriesList($params) {
@@ -204,10 +220,14 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   }
 
   /**
-   * List merge requests
+   * List merge requests.
+   *
    * {@inheritdoc}
+   *
    * @param \Drupal\simple_git\Service\it $params
-   * It needs the userInfo and the name of the repository to see its associated pull requests
+   *  It needs the userInfo and the name of the repository to see
+   *  its associated pull requests.
+   *
    * @return array
    */
   public function getPullRequestsList($params) {
@@ -223,10 +243,12 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   }
 
   /**
-   *
    * {@inheritdoc}
+   *
    * @param \Drupal\simple_git\Service\it $params
-   * It needs the userInfo, the name of accessed repo and the id of the concrete pull request
+   *  It needs the userInfo, the name of accessed repo and the id of the concrete
+   *  pull request.
+   *
    * @return array
    */
   public function getPullRequest($params) {
@@ -242,10 +264,11 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   }
 
   /**
+   * Obtain the user detail of a non-logged user.
    *
-   * Obtain the user detail of a non-logged user
    * @param $params
-   * It needs the userName
+   *  It needs the userName.
+   *
    * @return mixed
    */
   protected function getUserDetail($params) { //Non-logged user
@@ -259,10 +282,11 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   }
 
   /**
-   * ------
    * {@inheritdoc}
+   *
    * @param \Drupal\simple_git\Service\it $params
-   * It needs the userInfo
+   *  It needs the userInfo.
+   *
    * @return array
    */
   public function getAccount($params) {
@@ -280,18 +304,22 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
 
   /**
    * {@inheritdoc}
+   *
    * @return string
    */
   public function getConnectorType() {
     return GIT_TYPE_GITLAB;
   }
 
-
-
-  /** Obtain the commit list from a concrete pull request.
+  /**
+   * Obtain the commit list from a concrete pull request.
+   *
    * @param $user the userInfo
+   *
    * @param $repo the name of accessed repository
+   *
    * @param $pr_id the pull request id
+   *
    * @return mixed
    */
   protected function getPullRequestCommits($user, $merge_request_iid, $pr_id) {
@@ -301,10 +329,15 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
     return $response;
   }
 
-  /** Obtain the comment list from a concrete pull request
+  /**
+   * Obtain the comment list from a concrete pull request.
+   *
    * @param $user the userInfo
+   *
    * @param $repo the name of accessed repository
+   *
    * @param $pr_id the pull request id
+   *
    * @return mixed
    */
   protected function getPullRequestComments($user, $repo, $pr_id) {
@@ -314,7 +347,9 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
 //    return $response;
   }
 
-  /** Include the headers into the curl request
+  /**
+   * Include the headers into the curl request.
+   *
    * @return array
    */
   protected function getHeaders($token = NULL) {
@@ -328,11 +363,17 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
     return $headers;
   }
 
-  /** Configure a basic curl request
+  /**
+   * Configure a basic curl request.
+   *
    * @param $url the attacked endpoint
+   *
    * @param null $username
+   *
    * @param null $token
-   * These params are 'optional'. (By the moment the only exception is the authorize method).
+   *  These params are 'optional'. (By the moment the only exception is the
+   *  authorize method).
+   *
    * @return resource
    */
   protected function getConfiguredCURL($url, $user = NULL) {
@@ -353,8 +394,11 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
     return $ch;
   }
 
-  /** Perform the curl request, close the stream and return the response
+  /**
+   * Perform the curl request, close the stream and return the response.
+   *
    * @param $ch
+   *
    * @return mixed
    */
   protected function performCURL(&$ch) {
