@@ -8,5 +8,6 @@
             "email": "amoron@emergya.com"
         }
     ],
+    "type": "drupal-module",
     "require": {}
 }
