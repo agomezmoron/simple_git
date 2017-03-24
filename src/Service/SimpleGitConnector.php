@@ -8,7 +8,9 @@
 
 namespace Drupal\simple_git\Service;
 
-/** This abstract class is a management contract for the different connection types
+/**
+ * This abstract class is a management contract for the different connection types.
+ * 
  * Class SimpleGitConnector
  * @package Drupal\simple_git\Service
  */
