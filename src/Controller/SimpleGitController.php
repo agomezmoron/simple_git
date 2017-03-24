@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Contains \Drupal\simple_git\Controller\SimpleGitController.
@@ -24,12 +25,14 @@ class SimpleGitController extends ControllerBase implements ContainerInjectionIn
    * @var \Drupal\Core\Utility\LinkGeneratorInterface
    */
   protected $linkGenerator;
+
   /**
    * The user data service.
    *
    * @var \Drupal\user\UserData
    */
   protected $user_data;
+
   /**
    * Constructs an SimpleGitHubController object.
    *
@@ -43,6 +46,7 @@ class SimpleGitController extends ControllerBase implements ContainerInjectionIn
     $this->user_data = $user_data;
     $this->linkGenerator = $link_generator;
   }
+
   /**
    * {@inheritdoc}
    */
@@ -53,6 +57,7 @@ class SimpleGitController extends ControllerBase implements ContainerInjectionIn
     $link_generator = $container->get('link_generator');
     return new static($user_data, $link_generator);
   }
+
   /**
    * Returns the list of repositories for a user.
    *
@@ -75,7 +80,7 @@ class SimpleGitController extends ControllerBase implements ContainerInjectionIn
                 'simple_github:' => $user->id(),
             );
     */
-    //$list['heading']['#markup'] = $this->linkGenerator->generate($this->t('Add consumer'), Url::fromRoute('oauth.user_consumer_add', array('user' => $user->id())));
+    // $list['heading']['#markup'] = $this->linkGenerator->generate($this->t('Add consumer'), Url::fromRoute('oauth.user_consumer_add', array('user' => $user->id())));
     // Get the list of repositories.
     $result = $this->user_data->get('simple_github', $user->id(), 'repositories');
     // Define table headers.
@@ -98,7 +103,7 @@ class SimpleGitController extends ControllerBase implements ContainerInjectionIn
       '#rows' => array(),
     );
     // Add existing repositories to the table.
-    //foreach ($result as $repository) {
+    // foreach ($result as $repository) {
     $list['table']['#rows'][] = array(
       'data' => array(
         'repo_name' => 'Prueba',//$repository['repo_name'],
