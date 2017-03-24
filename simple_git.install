@@ -20,7 +20,7 @@ function simple_git_requirements($phase) {
  * Implements hook_install().
  */
 function simple_git_install() {
-  ;
+
 }
 
 /**

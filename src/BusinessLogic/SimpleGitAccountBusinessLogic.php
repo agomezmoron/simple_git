@@ -1,13 +1,15 @@
 <?php
 /**
  * @file
- * Contains \Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic
+ * Contains \Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic.
  */
 namespace Drupal\simple_git\BusinessLogic;
 
 abstract class SimpleGitAccountBusinessLogic {
 
   /**
+   * Returns an account using the account Id.
+   *
    * @param $account_id
    * @return array
    */
@@ -34,6 +36,8 @@ abstract class SimpleGitAccountBusinessLogic {
 
 
   /**
+   * Create account.
+   *
    * @param $accounts
    * @param $git_account
    * @param $connector_type
@@ -54,6 +58,8 @@ abstract class SimpleGitAccountBusinessLogic {
   }
 
   /**
+   * Modify access info.
+   *
    * @param $account
    * @return array
    */
@@ -82,6 +88,8 @@ abstract class SimpleGitAccountBusinessLogic {
   }
 
   /**
+   * Returns accounts.
+   *
    * @param $user
    * @return mixed
    */
@@ -91,6 +99,8 @@ abstract class SimpleGitAccountBusinessLogic {
   }
 
   /**
+   * Modify account.
+   *
    * @param $user
    * @param $accounts
    * @return mixed
@@ -107,6 +117,8 @@ abstract class SimpleGitAccountBusinessLogic {
   }
 
   /**
+   * Modify multiple accounts.
+   *
    * @param $user
    * @param $accounts
    * @return mixed
@@ -119,6 +131,8 @@ abstract class SimpleGitAccountBusinessLogic {
   }
 
   /**
+   * Check for the user data.
+   *
    * @param $db_users
    * @param $new_user
    * @return array
@@ -146,6 +160,8 @@ abstract class SimpleGitAccountBusinessLogic {
   }
 
   /**
+   * Check the information of the access data.
+   *
    * @param $db_user
    * @param $new_user
    * @return null
