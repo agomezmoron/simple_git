@@ -144,7 +144,6 @@ abstract class SimpleGitConnector {
    */
   protected final function buildResponse($data, $entity_type) {
     $response = array();
-
     if (isset($this->mappings[$entity_type]) && is_array($this->mappings[$entity_type])) {
       foreach ($this->mappings[$entity_type] as $responseKey => $connectorKey) {
         // we check if it is a multinode element
@@ -163,6 +162,7 @@ abstract class SimpleGitConnector {
       }
       $response['type'] = $this->getConnectorType();
     }
+    //error_log('>>>>>>>>'.$entity_type.'>>>>'.print_r($data, true));
     return $response;
   }
 

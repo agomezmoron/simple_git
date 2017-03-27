@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SimpleGitHubConnectorService extends SimpleGitConnector {
 
-  const BASE_URL = "https://github.com/";
+  const BASE_URL = "https://api.github.com/";
 
   /**
    * SimpleGitHubConnectorService constructor.
@@ -52,14 +52,13 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $state = $params['state'];
       $settings = $this->getConnectorConfig();
       //Url to user
-      $url = self::BASE_URL . "login/oauth/access_token";
-
+//      $url = self::BASE_URL . "login/oauth/access_token";
+      $url = "https://github.com/" . "login" . "/oauth/access_token";
       //Set parameters
       $parameters = array(
         "client_id" => $settings['app_id'],
         "client_secret" => $settings['app_secret'],
         "code" => $code,
-        "redirect_uri" => "",
         "state" => $state
       );
 
@@ -70,13 +69,11 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       curl_setopt($ch, CURLOPT_URL, $url);
       curl_setopt($ch, CURLOPT_POST, count($parameters));
       curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
-      $status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);   //get status code
+      $status_code = curl_getinfo($ch, CURLINFO_HTTP_COD);   //get status code
       $response = $this->performCURL($ch);
-
       //Exposing the access token if it's necessary
-      $access_token = $response['access_token'];
-      $token_type = $response['token_type'];
-
+      $access_token = json_decode($response)->access_token;
+//      $token_type = json_decode($response)['token_type'];
       //Return the obtained access_token
       return $access_token;
     }
@@ -205,7 +202,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
   public function getAccount($params) {
     if ($params['userInfo']) {
       $user = $params['userInfo'];
-      $url = self::BASE_URL . "user/";
+      $url = self::BASE_URL . "user";
       $ch = $this->getConfiguredCURL($url, $user);
       $account = $this->performCURL($ch);
       $account['number_of_repos'] = $account['total_private_repos'] + $account['public_repos'];
@@ -297,12 +294,13 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    *
    * @return array
    */
-  protected function getHeaders($token = NULL) {
+  protected function buildHeaders($token = NULL) {
     $headers = [];
     $headers[] = 'Accept: application/json';
+    $headers[] = 'User-Agent: GitHub Dashboard';
 // if we have the security token
 
-    if (is_null($token)) {
+    if (!is_null($token)) {
       $headers[] = 'Authorization: token ' . $token;
     }
     return $headers;
@@ -327,10 +325,10 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 
     if (!is_null($user) && !is_null($user['access_info']) && isset($user['access_info']['token'])) {
-      $headers = $this->getHeaders($user['access_info']['token']);
+      $headers = $this->buildHeaders($user['access_info']['token']);
     }
     else {
-      $headers = $this->getHeaders();
+      $headers = $this->buildHeaders();
     }
 
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);

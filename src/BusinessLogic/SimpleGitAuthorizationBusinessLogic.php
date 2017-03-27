@@ -38,7 +38,9 @@ abstract class SimpleGitAuthorizationBusinessLogic {
 
     // 'access_token'
     if (!empty($auth_info)) {
+      $auth_info = array('userInfo' => array('access_info' => array('token' => $auth_info)));
       $git_account = $git_service->getAccount($auth_info);
+      //TODO
       if (isset($git_account['user'])) {
         //
         $account_info = SimpleGitAccountBusinessLogic::addOrUpdateAccount($user, $git_account);
