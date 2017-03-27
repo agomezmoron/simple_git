@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\simple_git\Service\SimpleGitHubConnectorService.
+ * Contains \Drupal\simple_git\Service\SimpleGitLabConnectorService.
  */
 namespace Drupal\simple_git\Service;
 
@@ -41,7 +41,8 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
    *  In this case the needed params are the sent state to login and the code
    *  returned from login.
    *
-   * @return mixed the access token to perform the requests
+   * @return mixed
+   *  The access token to perform the requests
    *
    * parameters = 'client_id=APP_ID&client_secret=APP_SECRET&code=RETURNED_CODE&grant_type=authorization_code&redirect_uri=REDIRECT_URI'
    * https://gitlab.example.com/oauth/authorize?client_id=APP_ID&redirect_uri=REDIRECT_URI&response_type=code&state=your_unique_state_hash
@@ -51,10 +52,10 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
       $code = $params['code'];
       $state = $params['state'];
       $settings = $this->getConnectorConfig();
-//Url to attack
+      //Url to attack
       $url = self::BASE_URL . "/oauth/authorize";
 
-//Set parameters
+      //Set parameters
       $parameters = array(
         "client_id" => $settings['app_id'],
         "client_secret" => $settings['app_secret'],
@@ -62,19 +63,20 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
         "response_type" => $code,
         "state" => $state
       );
-//Open curl stream
+
+        //Open curl stream
       $ch = $this->getConfiguredCURL($url);
-//set the url, number of POST vars, POSTdata
+      //set the url, number of POST vars, POSTdata
       curl_setopt($ch, CURLOPT_URL, $url);
       curl_setopt($ch, CURLOPT_POST, count($parameters));
       curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
       $status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);   //get status code
       $response = $this->performCURL($ch);
-//Exposing the access token if it's necessary
+      //Exposing the access token if it's necessary
       $access_token = $response['access_token'];
       $token_type = $response['token_type'];
-//    error_log('>>>'.print_r(json_decode($access_token), true));
-//Return the obtained token3
+
+      //Return the obtained token
       return $access_token;
     }
   }
@@ -84,8 +86,10 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
    * List repository branches.
    *
    * @param $params
+   *  To retrieves the available branches.
    *
    * @return array
+   *  With all the branches.
    */
   public function getBranchesList($params) {
     if($params['userInfo']){
@@ -93,9 +97,9 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
     $id = $params['id_proyect'];// The ID of a project
     $url = self::BASE_URL . '/projects/' . $id . '/repository/branches';
       $ch = $this->getConfiguredCURL($url, $user);
-      $repos = $this->performCURL($ch);
+      $repositories = $this->performCURL($ch);
       $response = array();
-      foreach ($repos as $repo) {
+      foreach ($repositories as $repo) {
         $repo['parent'] = $repo['parent'] ? TRUE : FALSE;
         array_push($response, $this->buildResponse($repo, self::BRANCH));
       }
@@ -105,11 +109,13 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
 
 
   /**
-   * Get single repository branch.
+   * Gets all the branches with detailed information.
    *
    * @param $params
+   *  To retrieve all the branches.
    *
    * @return array
+   *  With all the branches.
    */
   public function getBranches($params) {
     if($params['userInfo']){
@@ -128,6 +134,14 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
     }
   }
 
+  /**
+   * It retrieves a commit information.
+   *
+   * @param $params
+   *  To retrieve the commit.
+   * @return array
+   *  With the commit information.
+   */
   public function getCommit($params) {
     if($params['userInfo']){
       $user = $params['userInfo'];

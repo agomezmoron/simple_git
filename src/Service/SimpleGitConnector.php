@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Interface SimpleGitConnectorInterface.
+ * Abstract class SimpleGitConnector.
  *
  * @file
- * Contains \Drupal\simple_git\Service\SimpleGitConnectorInterface.php.
+ * Contains \Drupal\simple_git\Service\SimpleGitConnector.php.
  */
 
 namespace Drupal\simple_git\Service;
@@ -42,7 +42,7 @@ abstract class SimpleGitConnector {
   /**
    * Obtain the connection config based in the connection type(Github, Gitlab..).
    *
-   * @return mixed
+   * @return string with the connector type associated.
    */
   protected final function getConnectorConfig() {
     $git_settings =  \Drupal::config('simple_git.settings');
@@ -52,83 +52,95 @@ abstract class SimpleGitConnector {
   /**
    * Create the mappings for ensure the response format.
    *
-   * @return mixed
    */
   protected abstract function buildCustomMappings();
 
   /**
    * Get token from login params for the authorization.
    *
-   * @param $params it's an array that content depends on implementation
+   * @param $params
+   *  Tt's an array that content depends on implementation
    *
-   * @return mixed The return is the response of the first 'user detail' request to serve the complete account
+   * @return
+   *  Mixed The return is the response of the first 'user detail' request to serve the complete account
    */
   public abstract function authorize($params);
 
   /**
    * Get the list of repositories associated to the selected account.
    *
-   * @param $params it's an array that content depends on implementation
+   * @param $params
+   *  It's an array that content depends on implementation
    *
-   * @return mixed
+   * @return array
+   *  With all the repositories available.
    */
   public abstract function getRepositoriesList($params);
 
   /**
    * Get a concrete repository.
    *
-   * @param $params it's an array that content depends on implementation
+   * @param $params
+   *  It's an array that content depends on implementation
    *
    * @return mixed
+   *  With the repository information.
    */
   public abstract function getRepository($params);
 
   /**
    * Get the list of pull request associated to the selected repository.
    *
-   * @param $params it's an array that content depends on implementation
+   * @param $params
+   *  It's an array that content depends on implementation
    *
-   * @return mixed
+   * @return array
+   *  With all Pull Requests.
    */
   public abstract function getPullRequestsList($params);
 
   /**
    * Get a concrete pull request.
    *
-   * @param $params it's an array that content depends on implementation
+   * @param $params
+   *  It's an array that content depends on implementation
    *
    * @return mixed
+   *  With the Pull Request information.
    */
   public abstract function getPullRequest($params);
 
   /**
    * Get the logged user account details.
    *
-   * @param $params it's an array that content depends on implementation
+   * @param $params
+   *  It's an array that content depends on implementation
    *
    * @return mixed
+   *  With the account information.
    */
   public abstract function getAccount($params);
 
   /**
    * Return the connection type(Github, Gitlab...) defined as constant.
    *
-   * @return mixed
+   * @return mixed with the conenctor type.
    */
   public abstract function getConnectorType();
-
-  // $this->buildResponse($data, 'PR');
 
   /**
    * Configure the response, based in the corresponding mapping. For multi node
    * elements we're using the -> separator as custom convention
    * inside of the string.
    *
-   * @param $data The original response from repository without filtering
+   * @param $data
+   *  The original response from repository without filtering
    *
-   * @param $entity_type The response mapping type (PullRequest, Repository, Account)
+   * @param $entity_type
+   *  The response mapping type (PullRequest, Repository, Account)
    *
-   * @return array with the correct format to send to client apps
+   * @return array
+   *  With the correct format to send to client apps
    */
   protected final function buildResponse($data, $entity_type) {
     $response = array();

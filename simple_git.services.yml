@@ -1,3 +1,5 @@
 services:
   simple_git.github_connector.service:
     class: 'Drupal\simple_git\Service\SimpleGitHubConnectorService'
+  simple_git.gitlab_connector.service:
+      class: 'Drupal\simple_git\Service\SimpleGitLabConnectorService'

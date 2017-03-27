@@ -40,7 +40,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\simple_git\Service\it $params   *
+   * @param \Drupal\simple_git\Service\it $params *
    *  In this case the needed params are the sent state to login and the code
    *  returned from login.
    *
@@ -51,10 +51,10 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $code = $params['code'];
       $state = $params['state'];
       $settings = $this->getConnectorConfig();
-//Url to attack
+      //Url to user
       $url = self::BASE_URL . "login/oauth/access_token";
 
-//Set parameters
+      //Set parameters
       $parameters = array(
         "client_id" => $settings['app_id'],
         "client_secret" => $settings['app_secret'],
@@ -63,20 +63,21 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
         "state" => $state
       );
 
-//Open curl stream
+      //Open curl stream
       $ch = $this->getConfiguredCURL($url);
 
-//set the url, number of POST vars, POSTdata
+      //set the url, number of POST vars, POSTdata
       curl_setopt($ch, CURLOPT_URL, $url);
       curl_setopt($ch, CURLOPT_POST, count($parameters));
       curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
       $status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);   //get status code
       $response = $this->performCURL($ch);
-//Exposing the access token if it's necessary
+
+      //Exposing the access token if it's necessary
       $access_token = $response['access_token'];
       $token_type = $response['token_type'];
-//    error_log('>>>'.print_r(json_decode($access_token), true));
-//Return the obtained token3
+
+      //Return the obtained access_token
       return $access_token;
     }
   }
@@ -106,7 +107,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\simple_git\Service\it $params   *
+   * @param \Drupal\simple_git\Service\it $params *
    *  It needs the userInfo and the name of the repository requested.
    *
    * @return mixed
@@ -126,7 +127,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\simple_git\Service\it $params   *
+   * @param \Drupal\simple_git\Service\it $params *
    *  It needs the userInfo and the name of the repository to see its associated
    *  pull requests.
    *
@@ -157,7 +158,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\simple_git\Service\it $params   *
+   * @param \Drupal\simple_git\Service\it $params *
    *  It needs the userInfo, the name of accessed repo and the id of the concrete
    *  pull request.
    *
