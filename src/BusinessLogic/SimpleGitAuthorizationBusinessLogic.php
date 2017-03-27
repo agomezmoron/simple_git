@@ -16,7 +16,7 @@ use \Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
  *
  * @package Drupal\simple_git\BusinessLogic
  */
-abstract class SimpleGitAuthorizationBusinessLogic extends SimpleGitDataBaseBusinnesLogic {
+abstract class SimpleGitAuthorizationBusinessLogic {
 
   /**
    * Check user authorization.
@@ -41,7 +41,7 @@ abstract class SimpleGitAuthorizationBusinessLogic extends SimpleGitDataBaseBusi
       $git_account = $git_service->getAccount($auth_info);
       if (isset($git_account['user'])) {
         //
-        $account_info = SimpleGitAccountBusinessLogic::SaddOrUpdateAccount($user, $git_account, $git_service->getConnectorType());
+        $account_info = SimpleGitAccountBusinessLogic::addOrUpdateAccount($user, $git_account);
 
         $result = $git_account;
         $result['account_id'] = $account_info['account_id'];

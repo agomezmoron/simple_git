@@ -73,39 +73,28 @@ class PullRequestResource extends ResourceBase {
   }
 
   /**
-  * Responds to the GET request.
-  *
-  * @return \Drupal\rest\ResourceResponse
-  *   The response containing all the available Pull Requests.
-  */
+   * Responds to the GET request.
+   *
+   * @return \Drupal\rest\ResourceResponse
+   *   The response containing all the available Pull Requests.
+   */
   public function get() {
     $accounts = array();
 
 
-
     $accounts[] = array(
-      'id' => 1,
-      'fullname' => 'Alejandro Gómez Morón',
-      'username' => 'agomezmoron',
-      'email' => 'agommor@gmail.com',
-      'type' => 'GITHUB',
-      'photoUrl' => 'http://lorempixel.com/200/200/',
-      'repoNumber' => 10,
-      'organization' => 'Emergya',
-      'location' => 'Sevilla',
+
+      'description' => 'prueba',
+      'userName' => 'agomezmoron',
+      'date' => '27/02/2014',
+      'commits' => 'yyyyyyy',
+      'comments' => 'dkksksks',
+      'count' => '25',
+      'from' => 'agomezmoron',
+      'to' => 'aaa'
     );
 
-    $accounts[] = array(
-      'id' => 3,
-      'fullname' => 'Alejandro Gómez Morón',
-      'username' => 'agomezmoron',
-      'email' => 'agommor@gmail.com',
-      'type' => 'BITBUCKET',
-      'photoUrl' => 'http://lorempixel.com/200/200/',
-      'repoNumber' => 10,
-      'organization' => 'Emergya',
-      'location' => 'Sevilla',
-    );
+
 
 
     return new ResourceResponse($accounts);

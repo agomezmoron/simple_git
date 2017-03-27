@@ -57,7 +57,7 @@ abstract class SimpleGitAccountBusinessLogic {
       'account_id' => $max_account_id + 1,
       'type' => $request_account['type'],
       'name' => $request_account['name'],
-      'access_info' => setAccessInfo($request_account),
+      'access_info' => self::setAccessInfo($request_account),
     );
 
     return $account;
@@ -125,7 +125,7 @@ abstract class SimpleGitAccountBusinessLogic {
 
     $new_account = self::createAccount($db_accounts, $account);
 
-    $accounts = self::checkUserData($db_accounts, $new_account);
+    $accounts = self::checkAndUpdateUserData($db_accounts, $new_account);
 
     return \Drupal::service('user.data')
       ->set(MODULE_SIMPLEGIT, $user->id(), 'accounts', $accounts);
@@ -143,6 +143,7 @@ abstract class SimpleGitAccountBusinessLogic {
    * @return mixed
    */
   static function setAccounts($user, $accounts) {
+    $last_accounts_list = [];
     foreach ($accounts as $account) {
       $last_accounts_list = self::setAccount($user, $account);
     }
@@ -150,7 +151,7 @@ abstract class SimpleGitAccountBusinessLogic {
   }
 
   /**
-   * Check for the user data.
+   * Check and update all the associated linked users for the user data.
    *
    * @param array $db_users
    *  A user account object of the database.
@@ -161,14 +162,14 @@ abstract class SimpleGitAccountBusinessLogic {
    * @return array $db_users
    *   Contains the new user.
    */
-  static function checkUserData($db_users, $new_user) {
+  static function checkAndUpdateUserData($db_users, $new_user) {
     $exist = FALSE;
 
-    foreach ($db_users as $db_user) {
+    foreach ($db_users as &$db_user) {
       if ($db_user['username'] == $new_user['username']) {
         $exist = TRUE;
         if ($db_user['type'] == $new_user['type']) {
-          $checked_user = checkAccessInfo($db_user, $new_user);
+          $checked_user = self::checkAndUpdateAccessInfo($db_user, $new_user);
           if (isset($checked_user)) {
             $db_user = $checked_user;
           }
@@ -184,7 +185,7 @@ abstract class SimpleGitAccountBusinessLogic {
   }
 
   /**
-   * Check the information of the access data.
+   * Check and update the information of the access data (updating the token if needed).
    *
    * @param array $db_user
    *  A user account object of the database.
@@ -196,14 +197,11 @@ abstract class SimpleGitAccountBusinessLogic {
    *   An associative array with user.
    *
    */
-  static function checkAccessInfo($db_user, $new_user) {
+  static function checkAndUpdateAccessInfo($db_user, $new_user) {
     switch ($new_user['type']) {
       case GIT_TYPE_GITHUB:
         if ($db_user['access_info']['token'] != $new_user['access_info']['token']) {
           $db_user['access_info']['token'] = $new_user['access_info']['token'];
-        }
-        else {
-          $db_user = NULL;
         }
         break;
       case GIT_TYPE_GITLAB:
@@ -213,11 +211,24 @@ abstract class SimpleGitAccountBusinessLogic {
         if ($db_user['access_info']['token'] != $new_user['access_info']['token']) {
           $db_user['access_info']['token'] = $new_user['access_info']['token'];
         }
-        else {
-          $db_user = NULL;
-        }
         break;
     }
     return $db_user;
+  }
+
+  /**
+   * It adds or update an account to the logged user.
+   *
+   * @param mixed $user
+   *  The logged user.
+   * @param array $git_account
+   *  The git account information.
+   * @return array $db_accounts
+   *  All the associated accounts with the passed one (updated or created).
+   */
+  static function addOrUpdateAccount($user, $git_account) {
+    $db_accounts = self::getAccounts($user);
+    $db_accounts = self::checkAndUpdateUserData($db_accounts, $git_account);
+    return self::setAccounts($user, $db_accounts);
   }
 }
