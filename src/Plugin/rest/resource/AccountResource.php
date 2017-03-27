@@ -77,7 +77,7 @@ class AccountResource extends ResourceBase {
   /**
    * Responds to POST requests.
    *
-   * It conneccuado ts with the Git Service given using the given information, returning the account data.
+   * It connects the user to with the Git Service given using the given information, returning the account data.
    *
    * @param array $data
    *  Request data.
