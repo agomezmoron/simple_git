@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\simple_git\BusinessLogic\SimpleGitPullRequestsBusinessLogic;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -80,7 +81,8 @@ class PullRequestResource extends ResourceBase {
    */
   public function get() {
     $accounts = array();
-
+    //TODO
+    //$accounts = SimpleGitPullRequestsBusinessLogic::getPullRequests();
 
     $accounts[] = array(
 

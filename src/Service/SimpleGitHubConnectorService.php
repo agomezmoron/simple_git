@@ -52,8 +52,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $state = $params['state'];
       $settings = $this->getConnectorConfig();
       //Url to user
-//      $url = self::BASE_URL . "login/oauth/access_token";
-      $url = "https://github.com/" . "login" . "/oauth/access_token";
+      $url = "https://github.com/login/oauth/access_token";
       //Set parameters
       $parameters = array(
         "client_id" => $settings['app_id'],
@@ -72,8 +71,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $status_code = curl_getinfo($ch, CURLINFO_HTTP_COD);   //get status code
       $response = $this->performCURL($ch);
       //Exposing the access token if it's necessary
-      $access_token = json_decode($response)->access_token;
-//      $token_type = json_decode($response)['token_type'];
+      $access_token = $response['access_token'];
       //Return the obtained access_token
       return $access_token;
     }
@@ -224,32 +222,33 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    */
   protected function buildCustomMappings() {
     $this->mappings[self::PULL_REQUEST] = array(
-      'pr_number' => 'number',
-      'pr_name' => 'title',
-      'pr_desc' => 'body',
+      'id' => 'milestone->id',
+      'title' => 'title',
+      'description' => 'body',
       'username' => 'milestone->creator->login',
       'date' => 'milestone->updated_at',
       'commits' => 'commits',
       'comments' => 'comments',
-      'from_branch' => 'head->label',
-      'to_branch' => 'base->label',
+      'from' => 'head->label',
+      'to' => 'base->label',
     );
     $this->mappings[self::ACCOUNT] = array(
-      'name' => 'name',
-      'user' => 'login',
-      'photo' => 'avatar_url',
+      'fullname' => array('name', 'login'),
+      'username' => 'login',
+      'photoUrl' => 'avatar_url',
       'id' => 'id',
+      'email' => 'email',
       'location' => 'location',
-      'company' => 'company',
-      'repos' => 'number_of_repos' // it is autocalculated on getAccount method.
+      'organization' => 'company',
+      'repoNumber' => 'number_of_repos' // it is autocalculated on getAccount method.
     );
     $this->mappings[self::REPOSITORY] = array(
-      'repo_name' => 'name',
-      'owner_user' => 'owner->login',
+      'name' => 'name',
+      'username' => 'owner->login',
       'issues' => 'open_issues_count',
       'language' => 'language',
       'updated' => 'pushed_at',
-      'forked_origin' => 'parent'
+      'age' => 'created_at'
     );
   }
 
@@ -347,6 +346,9 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
   protected function performCURL(&$ch) {
     $data = curl_exec($ch);
     curl_close($ch);
+    if (!is_array($data) && is_string($data)) {
+      $data = json_decode($data, TRUE);
+    }
     return $data;
   }
 }

@@ -53,14 +53,10 @@ abstract class SimpleGitAccountBusinessLogic {
     // getting the maximim account_id
     $max_account_id = max(array_column($accounts, 'account_id'));
 
-    $account = array(
-      'account_id' => $max_account_id + 1,
-      'type' => $request_account['type'],
-      'name' => $request_account['name'],
-      'access_info' => self::setAccessInfo($request_account),
-    );
+    $request_account['account_id'] = $max_account_id + 1;
+    $request_account['access_info'] = self::setAccessInfo($request_account);
 
-    return $account;
+    return $request_account;
   }
 
   /**
@@ -77,19 +73,19 @@ abstract class SimpleGitAccountBusinessLogic {
     switch ($account['type']) {
       case GIT_TYPE_GITHUB:
         $access_info = array(
-          'token' => $account['token'],
+          'token' => $account['access_info']['token'],
         );
         break;
       case GIT_TYPE_GITLAB:
         $access_info = array(
-          'token' => $account['token'],
-          'expires_in' => $account['expires_in'],
-          'refresh_token' => $account['refresh_token'],
+          'token' => $account['access_info']['token'],
+          'expires_in' => $account['access_info']['expires_in'],
+          'refresh_token' => $account['access_info']['refresh_token'],
         );
         break;
       default:
         $access_info = array(
-          'token' => $account['token'],
+          'token' => $account['access_info']['token'],
         );
         break;
     }
@@ -105,30 +101,16 @@ abstract class SimpleGitAccountBusinessLogic {
    * @return mixed
    */
   static function getAccounts($user) {
-    return \Drupal::service('user.data')
+    $db_accounts = [];
+
+    $saved_accounts = \Drupal::service('user.data')
       ->get(MODULE_SIMPLEGIT, $user->id(), 'accounts');
-  }
 
-  /**
-   * Modify account.
-   *
-   * @param array $user
-   *   An associative array containing structure user.
-   *
-   * @param array $account
-   *   An associative array containing structure account.
-   *
-   * @return mixed
-   */
-  static function setAccount($user, $account) {
-    $db_accounts = self::getAccounts($user);
+    if (!empty($saved_accounts) && is_array($saved_accounts)) {
+      $db_accounts = $saved_accounts;
+    }
 
-    $new_account = self::createAccount($db_accounts, $account);
-
-    $accounts = self::checkAndUpdateUserData($db_accounts, $new_account);
-
-    return \Drupal::service('user.data')
-      ->set(MODULE_SIMPLEGIT, $user->id(), 'accounts', $accounts);
+    return $db_accounts;
   }
 
   /**
@@ -143,11 +125,11 @@ abstract class SimpleGitAccountBusinessLogic {
    * @return mixed
    */
   static function setAccounts($user, $accounts) {
-    $last_accounts_list = [];
-    foreach ($accounts as $account) {
-      $last_accounts_list = self::setAccount($user, $account);
-    }
-    return $last_accounts_list;
+    \Drupal::service('user.data')
+      ->set(MODULE_SIMPLEGIT, $user->id(), 'accounts', $accounts);
+    // FIXME: we cannot rebuild all the caches, we have to fix it ASAP
+    drupal_flush_all_caches();
+    return $accounts;
   }
 
   /**
@@ -166,18 +148,17 @@ abstract class SimpleGitAccountBusinessLogic {
     $exist = FALSE;
 
     foreach ($db_users as &$db_user) {
-      if ($db_user['username'] == $new_user['username']) {
+      if ($db_user['username'] == $new_user['username'] && $db_user['type'] == $new_user['type']) {
         $exist = TRUE;
-        if ($db_user['type'] == $new_user['type']) {
-          $checked_user = self::checkAndUpdateAccessInfo($db_user, $new_user);
-          if (isset($checked_user)) {
-            $db_user = $checked_user;
-          }
+        $checked_user = self::checkAndUpdateAccessInfo($db_user, $new_user);
+        if (isset($checked_user)) {
+          $db_user = $checked_user;
         }
       }
     }
 
     if (!$exist) {
+      $new_user = self::createAccount($db_users, $new_user);
       $db_users[] = $new_user;
     }
 

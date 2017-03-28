@@ -144,26 +144,48 @@ abstract class SimpleGitConnector {
    */
   protected final function buildResponse($data, $entity_type) {
     $response = array();
+
+
     if (isset($this->mappings[$entity_type]) && is_array($this->mappings[$entity_type])) {
+
       foreach ($this->mappings[$entity_type] as $responseKey => $connectorKey) {
-        // we check if it is a multinode element
-        if (strpos($connectorKey, '->')) {
-          $node_names = explode('->', $connectorKey);
 
-          $finalValue = $data[$node_names[0]]; // $data['milestone']
-          for ($i = 1; $i < sizeof($node_names); $i++) {
-            $finalValue = $finalValue[$node_names[$i]];
+        // multiple options
+        if (is_array($connectorKey)) {
+          foreach($connectorKey as $key) {
+            $value = $this->getMappingBySingleKey($data, $key);
+            $response[$responseKey] = $value;
+            if (!empty($response[$responseKey])) {
+              break;
+            }
           }
-
-          $response[$responseKey] = $finalValue;
         } else {
-          $response[$responseKey] = $data[$connectorKey];
+          // single mapping
+          $response[$responseKey] = $this->getMappingBySingleKey($data, $connectorKey);
         }
+
       }
       $response['type'] = $this->getConnectorType();
     }
-    //error_log('>>>>>>>>'.$entity_type.'>>>>'.print_r($data, true));
+
     return $response;
+  }
+
+  protected final function getMappingBySingleKey($data, $connectorKey) {
+    $value = '';
+    // we check if it is a multi-node element
+    if (strpos($connectorKey, '->')) {
+      $node_names = explode('->', $connectorKey);
+      $finalValue = $data[$node_names[0]]; // $data['milestone']
+      for ($i = 1; $i < sizeof($node_names); $i++) {
+        $finalValue = $finalValue[$node_names[$i]];
+
+      }
+      $value = $finalValue;
+    } else {
+      $value = $data[$connectorKey];
+    }
+    return $value;
   }
 
 }

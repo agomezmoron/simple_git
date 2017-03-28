@@ -32,7 +32,7 @@ class SimpleGitPullRequestsBusinessLogic {
    * @return array $pr
    *  Contains user's pull request.
    */
-  function getPullRequests($account_id, $repo, $user) {
+  static function getPullRequests($account_id, $repo, $user) {
     $pr = array();
     $account = SimpleGitAccountBusinessLogic::getAccountByAccountId($user, $account_id);
     if (!empty($account)) {
@@ -61,7 +61,7 @@ class SimpleGitPullRequestsBusinessLogic {
    * @return array $pr
    *   Contains user's pull request.
    */
-  function getPullRequest($account_id, $repo, $id, $user) {
+  static function getPullRequest($account_id, $repo, $id, $user) {
     $pr = array();
     $account = SimpleGitAccountBusinessLogic::getAccountByAccountId($user,$account_id);
     if (!empty($account)) {
