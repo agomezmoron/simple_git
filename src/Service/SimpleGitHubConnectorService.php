@@ -85,18 +85,22 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    * @return array
    */
   public function getRepositoriesList($params) {
+    $response = array();
     if ($params['userInfo']) {
       $user = $params['userInfo'];
-      $url = self::BASE_URL . "user/repos";
+      $url = self::BASE_URL . "user/repos?per_page=500";
       $ch = $this->getConfiguredCURL($url, $user);
-      $repos = $this->performCURL($ch);
-      $response = array();
-      foreach ($repos as $repo) {
+      $repositories = $this->performCURL($ch);
+      foreach ($repositories as $repo) {
+        error_log($user['username'].':::'.$repo['name']);
         $repo['parent'] = $repo['parent'] ? TRUE : FALSE;
-        array_push($response, $this->buildResponse($repo, self::REPOSITORY));
+        $repo = $this->buildResponse($repo, self::REPOSITORY);
+        $repo['account'] = $user['username'];
+        array_push($response, $repo);
       }
-      return $response;
     }
+
+    return $response;
   }
 
   /**
@@ -115,6 +119,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $ch = $this->getConfiguredCURL($url, $user);
       $repo = $this->performCURL($ch);
       $response = $this->configureRepositoryFields($repo);
+      $response['account'] = $user['username'];
       return $response;
     }
   }
@@ -129,31 +134,28 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    * @return array
    */
   public function getPullRequestsList($params) {
-    if ($params['userInfo'] && $params['repo']) {
+    $pull_requests = [];
+    if ($params['userInfo'] &&  $params['repositories']) {
       $user = $params['userInfo'];
-      $repo = $params['repo'];
-      $url = self::BASE_URL . "repos/" . $user->username . "/" . $repo . "/pulls";
-      $ch = $this->getConfiguredCURL($url, $user);
-      $prs = $this->performCURL($ch);
-      $response = array();
-      foreach ($prs as $pr) {
-        array_push($response, $this->getPullRequest(
-          array(
-            "userInfo" => $user,
-            "repo" => $repo,
-            "id" => $pr['id']
-          )
-        )
-        );
+      $repositories = $params['repositories'];
+
+      foreach($repositories as $repository) {
+        $url = self::BASE_URL . "repos/" . $repository['username'] . "/" . $repository['name'] . "/pulls";
+        $ch = $this->getConfiguredCURL($url, $user);
+        $prs = $this->performCURL($ch);
+        foreach ($prs as $pr) {
+          $pull_requests[] = $this->buildResponse($pr, self::PULL_REQUEST);
+        }
       }
-      return $response;
     }
+
+    return $pull_requests;
   }
 
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\simple_git\Service\it $params *
+   * @param \Drupal\simple_git\Service\it $params
    *  It needs the userInfo, the name of accessed repo and the id of the concrete
    *  pull request.
    *
@@ -164,7 +166,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $user = $params['userInfo'];
       $repo = $params['repo'];
       $id = $params['id'];
-      $url = self::BASE_URL . "repos/" . $user->username . "/" . $repo . "/pulls/" . $id;
+      $url = self::BASE_URL . "repos/" . $user['username'] . "/" . $repo . "/pulls/" . $id;
       $ch = $this->getConfiguredCURL($url, $user);
       $pr = $this->performCURL($ch);
       return $this->buildResponse($pr, self::PULL_REQUEST);
@@ -222,11 +224,12 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    */
   protected function buildCustomMappings() {
     $this->mappings[self::PULL_REQUEST] = array(
-      'id' => 'milestone->id',
+      'id' => 'id',
       'title' => 'title',
       'description' => 'body',
-      'username' => 'milestone->creator->login',
-      'date' => 'milestone->updated_at',
+      'username' => 'user->login',
+      'date' => 'created_at',
+      'updated' => 'updated_at',
       'commits' => 'commits',
       'comments' => 'comments',
       'from' => 'head->label',
@@ -240,9 +243,11 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       'email' => 'email',
       'location' => 'location',
       'organization' => 'company',
-      'repoNumber' => 'number_of_repos' // it is autocalculated on getAccount method.
+      'repoNumber' => 'number_of_repos'
+      // it is autocalculated on getAccount method.
     );
     $this->mappings[self::REPOSITORY] = array(
+      'id' => 'id',
       'name' => 'name',
       'username' => 'owner->login',
       'issues' => 'open_issues_count',
@@ -296,6 +301,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
   protected function buildHeaders($token = NULL) {
     $headers = [];
     $headers[] = 'Accept: application/json';
+    $headers[] = 'Accept: application/vnd.github.v3+json';
     $headers[] = 'User-Agent: GitHub Dashboard';
 // if we have the security token
 

@@ -18,30 +18,37 @@ use \Drupal\simple_git\Service;
 class SimpleGitPullRequestsBusinessLogic {
 
   /**
-   * Get pull requests.
+   * Get List pull requests.
    *
-   * @param int $account_id
-   *   A id account.
+   * @param array $accounts
+   *   Account information.
    *
-   * @param string $repo
-   *   A string with URL of the repositories.
+   * @param string $repositories
+   *   An array with all the repositories associated.
    *
-   * @param array $user
-   *   An associative array containing structure user.
-   *
-   * @return array $pr
-   *  Contains user's pull request.
+   * @return array $prs
+   *  Contains user's pull requests.
    */
-  static function getPullRequests($account_id, $repo, $user) {
-    $pr = array();
-    $account = SimpleGitAccountBusinessLogic::getAccountByAccountId($user, $account_id);
-    if (!empty($account)) {
+  static function getPullRequests($accounts, $repositories) {
+    //drupal_flush_all_caches();
+    $pull_requests = array();
+    // agrupar repos por $account
+
+    foreach($accounts as &$account) {
+      $params = [];
+      $params['repositories'] = SimpleGitRepositoriesBusinessLogic::filterRepositoriesByAccount($account, $repositories);
       $params['userInfo'] = $account;
-      $params['repo'] = $repo;
       $git_service = Service\SimpleGitConnectorFactory::getConnector($account['type']);
-      $pr = $git_service->getPullRequestsList($params);
+      $pull_requests_by_account = $git_service->getPullRequestsList($params);
+      if (!empty($pull_requests_by_account)) {
+        $pull_requests = array_merge($pull_requests, $pull_requests_by_account);
+      }
     }
-    return $pr;
+
+    // removing duplicated PRs
+    $pull_requests = array_unique($pull_requests, SORT_REGULAR);
+
+    return $pull_requests;
   }
 
   /**

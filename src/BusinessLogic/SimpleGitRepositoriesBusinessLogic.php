@@ -19,23 +19,20 @@ class SimpleGitRepositoriesBusinessLogic {
   /**
    * Get multiple repositories.
    *
-   * @param int $account_id
-   *    A id account.
-   *
    * @param array $user
    *   An associative array containing structure user.
    *
    * @return array $repositories
    *   Contains user's repository.
    */
-  function getRepositories($user, $account_id) {
+  static function getRepositories($accounts) {
     $repositories = array();
-    $account = SimpleGitAccountBusinessLogic::getAccountByAccountId($user, $account_id);
-    if (!empty($account)) {
+    foreach ($accounts as $account) {
       $params['userInfo'] = $account;
-      $git_service = Service\SimpleGitConnectorFactory::getConnector($account['type']);
-      $repositories = $git_service->getRepositoriesList($params);
+      $git_service = Service\SimpleGitConnectorFactory::getConnector( $params['userInfo']['type']);
+      $repositories = array_merge($repositories, $git_service->getRepositoriesList($params));
     }
+
     return $repositories;
   }
 
@@ -55,7 +52,7 @@ class SimpleGitRepositoriesBusinessLogic {
    * @return array $repository
    *   Contains user's repository.
    */
-  function getRepository($account_id, $repo, $user) {
+  static function getRepository($account_id, $repo, $user) {
     $repository = array();
     $account = SimpleGitAccountBusinessLogic::getAccountByAccountId($user, $account_id);
     if (!empty($account)) {
@@ -65,6 +62,19 @@ class SimpleGitRepositoriesBusinessLogic {
       $repository = $git_service->getRepositoriesList($params);
     }
     return $repository;
+  }
+
+
+
+
+  static function filterRepositoriesByAccount($account, &$repositories) {
+    return array_filter($repositories, function($repository) use($account){
+      if ($repository['name'] == 'simple_git') {
+        error_log('ALOHA!!'.print_r($repository, true));
+        error_log(print_r($account, true));
+      }
+      return $repository['username'] == $account['username'] || $repository['account'] == $account['username'] ;
+    });
   }
 
 }

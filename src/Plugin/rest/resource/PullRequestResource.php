@@ -11,7 +11,11 @@ use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
 use Drupal\simple_git\BusinessLogic\SimpleGitPullRequestsBusinessLogic;
+use Drupal\simple_git\BusinessLogic\SimpleGitRepositoriesBusinessLogic;
+use Drupal\simple_git\Service\SimpleGitHubConnectorService;
+use Drupal\simple_git\Service\SimpleGitLabConnectorService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -81,25 +85,12 @@ class PullRequestResource extends ResourceBase {
    */
   public function get() {
     $accounts = array();
-    //TODO
-    //$accounts = SimpleGitPullRequestsBusinessLogic::getPullRequests();
+    $accounts = SimpleGitAccountBusinessLogic::getAccounts($this->current_user);
+    $repositories = SimpleGitRepositoriesBusinessLogic::getRepositories($accounts);
 
-    $accounts[] = array(
+    $pr = SimpleGitPullRequestsBusinessLogic::getPullRequests($accounts, $repositories);
 
-      'description' => 'prueba',
-      'userName' => 'agomezmoron',
-      'date' => '27/02/2014',
-      'commits' => 'yyyyyyy',
-      'comments' => 'dkksksks',
-      'count' => '25',
-      'from' => 'agomezmoron',
-      'to' => 'aaa'
-    );
-
-
-
-
-    return new ResourceResponse($accounts);
+    return new ResourceResponse($pr);
   }
 
 }

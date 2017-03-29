@@ -194,6 +194,8 @@ abstract class SimpleGitAccountBusinessLogic {
         }
         break;
     }
+    // updating the rest of the information (fullname, photo, etc).
+    $db_user['userInfo'] = $new_user['userInfo'];
     return $db_user;
   }
 
