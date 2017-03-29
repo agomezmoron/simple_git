@@ -26,14 +26,13 @@ class SimpleGitPullRequestsBusinessLogic {
    * @param string $repositories
    *   An array with all the repositories associated.
    *
-   * @return array $prs
+   * @return array $pull_requests
    *  Contains user's pull requests.
    */
   static function getPullRequests($accounts, $repositories) {
-    //drupal_flush_all_caches();
-    $pull_requests = array();
-    // agrupar repos por $account
+    $pull_requests = [];
 
+    // group repositories by $account
     foreach($accounts as &$account) {
       $params = [];
       $params['repositories'] = SimpleGitRepositoriesBusinessLogic::filterRepositoriesByAccount($account, $repositories);
@@ -45,10 +44,18 @@ class SimpleGitPullRequestsBusinessLogic {
       }
     }
 
-    // removing duplicated PRs
-    $pull_requests = array_unique($pull_requests, SORT_REGULAR);
+    // removing duplicated pull requests
+    $filtered_pull_requests = [];
+    $added_prs = [];
 
-    return $pull_requests;
+    foreach ($pull_requests as $pull_request) {
+      if (!in_array($pull_request['id'], $added_prs)) {
+        $filtered_pull_requests[] = $pull_request;
+        $added_prs[] = $pull_request['id'];
+      }
+    }
+
+    return $filtered_pull_requests;
   }
 
   /**

@@ -40,7 +40,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\simple_git\Service\it $params *
+   * @param array $params
    *  In this case the needed params are the sent state to login and the code
    *  returned from login.
    *
@@ -80,7 +80,8 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\simple_git\Service\it $params it needs the userInfo
+   * @param array $params
+   *  It needs the userInfo
    *
    * @return array
    */
@@ -92,7 +93,6 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $ch = $this->getConfiguredCURL($url, $user);
       $repositories = $this->performCURL($ch);
       foreach ($repositories as $repo) {
-        error_log($user['username'].':::'.$repo['name']);
         $repo['parent'] = $repo['parent'] ? TRUE : FALSE;
         $repo = $this->buildResponse($repo, self::REPOSITORY);
         $repo['account'] = $user['username'];
@@ -106,16 +106,16 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\simple_git\Service\it $params *
+   * @param array $params
    *  It needs the userInfo and the name of the repository requested.
    *
    * @return mixed
    */
   public function getRepository($params) {
-    if ($params['userInfo'] && $params['repo']) {
+    if ($params['userInfo'] && $params['repository']) {
       $user = $params['userInfo'];
-      $name = $params['repo'];
-      $url = self::BASE_URL . $user->username . "/" . $name;
+      $repository = $params['repository'];
+      $url = self::BASE_URL . $repository['username'] . "/" . $repository['name'];
       $ch = $this->getConfiguredCURL($url, $user);
       $repo = $this->performCURL($ch);
       $response = $this->configureRepositoryFields($repo);
@@ -127,11 +127,12 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\simple_git\Service\it $params *
+   * @param array $params
    *  It needs the userInfo and the name of the repository to see its associated
    *  pull requests.
    *
-   * @return array
+   * @return array $pull_requests
+   *  With the Pull Requests of the provided repository.
    */
   public function getPullRequestsList($params) {
     $pull_requests = [];
@@ -155,18 +156,18 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\simple_git\Service\it $params
+   * @param array $params
    *  It needs the userInfo, the name of accessed repo and the id of the concrete
    *  pull request.
    *
    * @return array
    */
   public function getPullRequest($params) {
-    if ($params['userInfo'] && $params['repo'] && $params['id']) {
+    if ($params['userInfo'] && $params['repository'] && $params['id']) {
       $user = $params['userInfo'];
-      $repo = $params['repo'];
-      $id = $params['id'];
-      $url = self::BASE_URL . "repos/" . $user['username'] . "/" . $repo . "/pulls/" . $id;
+      $repository = $params['repository'];
+      $pr_id = $params['id'];
+      $url = self::BASE_URL . "repos/" . $repository['username'] . "/" . $repository['name'] . "/pulls/" . $pr_id;
       $ch = $this->getConfiguredCURL($url, $user);
       $pr = $this->performCURL($ch);
       return $this->buildResponse($pr, self::PULL_REQUEST);
@@ -224,7 +225,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    */
   protected function buildCustomMappings() {
     $this->mappings[self::PULL_REQUEST] = array(
-      'id' => 'id',
+      'id' => 'number',
       'title' => 'title',
       'description' => 'body',
       'username' => 'user->login',
@@ -233,7 +234,11 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       'commits' => 'commits',
       'comments' => 'comments',
       'from' => 'head->label',
+      'from_repo_id' => 'head->repo->id',
+      'from_repo_name' => 'head->repo->name',
       'to' => 'base->label',
+      'to_repo_id' => 'base->repo->id',
+      'to_repo_name' => 'base->repo->name'
     );
     $this->mappings[self::ACCOUNT] = array(
       'fullname' => array('name', 'login'),

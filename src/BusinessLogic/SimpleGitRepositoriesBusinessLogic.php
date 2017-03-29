@@ -19,7 +19,7 @@ class SimpleGitRepositoriesBusinessLogic {
   /**
    * Get multiple repositories.
    *
-   * @param array $user
+   * @param array $accounts
    *   An associative array containing structure user.
    *
    * @return array $repositories
@@ -33,7 +33,18 @@ class SimpleGitRepositoriesBusinessLogic {
       $repositories = array_merge($repositories, $git_service->getRepositoriesList($params));
     }
 
-    return $repositories;
+    // removing duplicated repositories
+    $filtered_repositories = [];
+    $added_repos = [];
+
+    foreach ($repositories as $repository) {
+      if (!in_array($repository['id'], $added_repos)) {
+        $filtered_repositories[] = $repository;
+        $added_repos[] = $repository['id'];
+      }
+    }
+
+    return $filtered_repositories;
   }
 
 
@@ -65,14 +76,18 @@ class SimpleGitRepositoriesBusinessLogic {
   }
 
 
-
-
+  /**
+   * It filters and return an array with the repositories where the $account is
+   * owner or collaborator.
+   * @param array $account
+   *  To get his/her repositories.
+   * @param array $repositories
+   *  To be filtered.
+   * @return array $repositories
+   *  With the repositories associated to the given $account.
+   */
   static function filterRepositoriesByAccount($account, &$repositories) {
     return array_filter($repositories, function($repository) use($account){
-      if ($repository['name'] == 'simple_git') {
-        error_log('ALOHA!!'.print_r($repository, true));
-        error_log(print_r($account, true));
-      }
       return $repository['username'] == $account['username'] || $repository['account'] == $account['username'] ;
     });
   }
