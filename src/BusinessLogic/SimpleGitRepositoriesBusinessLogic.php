@@ -19,24 +19,32 @@ class SimpleGitRepositoriesBusinessLogic {
   /**
    * Get multiple repositories.
    *
-   * @param int $account_id
-   *    A id account.
-   *
-   * @param array $user
+   * @param array $accounts
    *   An associative array containing structure user.
    *
    * @return array $repositories
    *   Contains user's repository.
    */
-  function getRepositories($user, $account_id) {
+  static function getRepositories($accounts) {
     $repositories = array();
-    $account = SimpleGitAccountBusinessLogic::getAccountByAccountId($user, $account_id);
-    if (!empty($account)) {
+    foreach ($accounts as $account) {
       $params['userInfo'] = $account;
-      $git_service = Service\SimpleGitConnectorFactory::getConnector($account['type']);
-      $repositories = $git_service->getRepositoriesList($params);
+      $git_service = Service\SimpleGitConnectorFactory::getConnector( $params['userInfo']['type']);
+      $repositories = array_merge($repositories, $git_service->getRepositoriesList($params));
     }
-    return $repositories;
+
+    // removing duplicated repositories
+    $filtered_repositories = [];
+    $added_repos = [];
+
+    foreach ($repositories as $repository) {
+      if (!in_array($repository['id'], $added_repos)) {
+        $filtered_repositories[] = $repository;
+        $added_repos[] = $repository['id'];
+      }
+    }
+
+    return $filtered_repositories;
   }
 
 
@@ -55,7 +63,7 @@ class SimpleGitRepositoriesBusinessLogic {
    * @return array $repository
    *   Contains user's repository.
    */
-  function getRepository($account_id, $repo, $user) {
+  static function getRepository($account_id, $repo, $user) {
     $repository = array();
     $account = SimpleGitAccountBusinessLogic::getAccountByAccountId($user, $account_id);
     if (!empty($account)) {
@@ -65,6 +73,23 @@ class SimpleGitRepositoriesBusinessLogic {
       $repository = $git_service->getRepositoriesList($params);
     }
     return $repository;
+  }
+
+
+  /**
+   * It filters and return an array with the repositories where the $account is
+   * owner or collaborator.
+   * @param array $account
+   *  To get his/her repositories.
+   * @param array $repositories
+   *  To be filtered.
+   * @return array $repositories
+   *  With the repositories associated to the given $account.
+   */
+  static function filterRepositoriesByAccount($account, &$repositories) {
+    return array_filter($repositories, function($repository) use($account){
+      return $repository['username'] == $account['username'] || $repository['account'] == $account['username'] ;
+    });
   }
 
 }

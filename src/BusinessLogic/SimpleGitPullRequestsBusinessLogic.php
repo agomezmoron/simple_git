@@ -18,30 +18,44 @@ use \Drupal\simple_git\Service;
 class SimpleGitPullRequestsBusinessLogic {
 
   /**
-   * Get pull requests.
+   * Get List pull requests.
    *
-   * @param int $account_id
-   *   A id account.
+   * @param array $accounts
+   *   Account information.
    *
-   * @param string $repo
-   *   A string with URL of the repositories.
+   * @param string $repositories
+   *   An array with all the repositories associated.
    *
-   * @param array $user
-   *   An associative array containing structure user.
-   *
-   * @return array $pr
-   *  Contains user's pull request.
+   * @return array $pull_requests
+   *  Contains user's pull requests.
    */
-  function getPullRequests($account_id, $repo, $user) {
-    $pr = array();
-    $account = SimpleGitAccountBusinessLogic::getAccountByAccountId($user, $account_id);
-    if (!empty($account)) {
+  static function getPullRequests($accounts, $repositories) {
+    $pull_requests = [];
+
+    // group repositories by $account
+    foreach($accounts as &$account) {
+      $params = [];
+      $params['repositories'] = SimpleGitRepositoriesBusinessLogic::filterRepositoriesByAccount($account, $repositories);
       $params['userInfo'] = $account;
-      $params['repo'] = $repo;
       $git_service = Service\SimpleGitConnectorFactory::getConnector($account['type']);
-      $pr = $git_service->getPullRequestsList($params);
+      $pull_requests_by_account = $git_service->getPullRequestsList($params);
+      if (!empty($pull_requests_by_account)) {
+        $pull_requests = array_merge($pull_requests, $pull_requests_by_account);
+      }
     }
-    return $pr;
+
+    // removing duplicated pull requests
+    $filtered_pull_requests = [];
+    $added_prs = [];
+
+    foreach ($pull_requests as $pull_request) {
+      if (!in_array($pull_request['id'], $added_prs)) {
+        $filtered_pull_requests[] = $pull_request;
+        $added_prs[] = $pull_request['id'];
+      }
+    }
+
+    return $filtered_pull_requests;
   }
 
   /**
@@ -61,7 +75,7 @@ class SimpleGitPullRequestsBusinessLogic {
    * @return array $pr
    *   Contains user's pull request.
    */
-  function getPullRequest($account_id, $repo, $id, $user) {
+  static function getPullRequest($account_id, $repo, $id, $user) {
     $pr = array();
     $account = SimpleGitAccountBusinessLogic::getAccountByAccountId($user,$account_id);
     if (!empty($account)) {
