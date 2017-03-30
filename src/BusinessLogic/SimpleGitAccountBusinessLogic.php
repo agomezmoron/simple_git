@@ -114,6 +114,29 @@ abstract class SimpleGitAccountBusinessLogic {
   }
 
   /**
+   * Delete a account.
+   *
+   * @param $accounts
+   *    An associative array containing structure account.
+   *
+   * @param $account_id
+   *    A id of account.
+   *
+   * @return array $filetered_accounts
+   */
+  static function deleteAccount($accounts, $account_id) {
+
+    $filtered_accounts = [];
+// we have to check if there is an account with the given $account['account_id'] for this $account_id
+    foreach ($accounts as $account) {
+      if ($account['account_id'] != $account_id) {
+        $filtered_accounts[] = $account;
+      }
+    }
+    return $filtered_accounts;
+  }
+
+  /**
    * Modify multiple accounts.
    *
    * @param array $user
