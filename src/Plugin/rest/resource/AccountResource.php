@@ -102,7 +102,7 @@ class AccountResource extends ResourceBase {
    *
    * It deletes the sent account.
    *
-   * @param array $account_id
+   * @param $account_id
    *  A id of account
    *
    * @return \Drupal\rest\ResourceResponse
@@ -126,7 +126,7 @@ class AccountResource extends ResourceBase {
   *   The response containing all the linked accounts.
   */
   public function get($account_id = NULL) {
-    $accounts = array();
+    $accounts = [];
 
     if ($account_id == REST_ALL_OPTION) {
       // should be reviewed once it is pushed!
