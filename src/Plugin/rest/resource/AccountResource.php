@@ -102,19 +102,21 @@ class AccountResource extends ResourceBase {
    *
    * It deletes the sent account.
    *
-   * @param array $data
-   *  Request data.
+   * @param $account_id
+   *  A id of account
    *
    * @return \Drupal\rest\ResourceResponse
    *   The response with the result status.
    */
-  public function delete($data) {
-    // TODO: Link to github and validate $data information
-    $response_data = array(
-      'message' => _('Account removed successfully')
-    );
+  public function delete($account_id) {
+    $accounts = [];
+    $current_accounts = [];
 
-    return new ResourceResponse($response_data);
+    $accounts = SimpleGitAccountBusinessLogic::getAccounts($this->current_user);
+    $current_accounts = SimpleGitAccountBusinessLogic::deleteAccount($accounts, $account_id);
+    SimpleGitAccountBusinessLogic::setAccounts($this->current_user, $current_accounts);
+
+    return new ResourceResponse();
   }
 
   /**
@@ -124,7 +126,7 @@ class AccountResource extends ResourceBase {
   *   The response containing all the linked accounts.
   */
   public function get($account_id = NULL) {
-    $accounts = array();
+    $accounts = [];
 
     if ($account_id == REST_ALL_OPTION) {
       // should be reviewed once it is pushed!
