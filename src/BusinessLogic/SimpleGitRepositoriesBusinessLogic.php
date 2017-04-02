@@ -110,7 +110,7 @@ class SimpleGitRepositoriesBusinessLogic {
     if (!empty($account) && !empty($repository_info) && isset($repository_info['name'])) {
       $params = [];
       $params['userInfo'] = $account;
-      $params['repo'] = $repository_info;
+      $params['repository'] = $repository_info;
       $git_service = Service\SimpleGitConnectorFactory::getConnector($account['type']);
       // TODO: add this to the git service interface $repository = $git_service->createRepository($params);
     }
@@ -132,9 +132,9 @@ class SimpleGitRepositoriesBusinessLogic {
     if (!empty($account)&& !empty($repository_info) && isset($repository_info['name'])) {
       $params = [];
       $params['userInfo'] = $account;
-      $params['repo'] = $repository_info;
+      $params['repository'] = $repository_info;
       $git_service = Service\SimpleGitConnectorFactory::getConnector($account['type']);
-      // TODO: add this to the git service interface $exists = $git_service->exists($params);
+      $exists = $git_service->existsRepository($params);
     }
     return $exists;
   }

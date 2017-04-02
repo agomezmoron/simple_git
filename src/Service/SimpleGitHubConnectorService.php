@@ -117,6 +117,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    * @return mixed
    */
   public function getRepository($params) {
+    $response = [];
     if ($params['userInfo'] && $params['repository']) {
       $user = $params['userInfo'];
       $repository = $params['repository'];
@@ -125,8 +126,8 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $repo = $this->performCURL($ch);
       $response = $this->configureRepositoryFields($repo);
       $response['account'] = $user['username'];
-      return $response;
     }
+    return $response;
   }
 
   /**
