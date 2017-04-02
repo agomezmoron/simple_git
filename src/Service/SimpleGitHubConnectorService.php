@@ -307,9 +307,16 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
     $headers = [];
     $headers[] = 'Accept: application/json';
     $headers[] = 'Accept: application/vnd.github.v3+json';
-    $headers[] = 'User-Agent: GitHub Dashboard';
-// if we have the security token
 
+    // by default name
+    $app_name = 'GitHub Dashboard';
+    $connector_config = $this->getConnectorConfig();
+    if (!empty($connector_config) && isset($connector_config['app_name'])) {
+      $app_name = $connector_config['app_name'];
+    }
+    $headers[] = 'User-Agent: '.$app_name;
+
+    // if we have the security token
     if (!is_null($token)) {
       $headers[] = 'Authorization: token ' . $token;
     }
