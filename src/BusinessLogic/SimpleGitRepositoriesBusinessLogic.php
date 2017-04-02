@@ -92,4 +92,51 @@ class SimpleGitRepositoriesBusinessLogic {
     });
   }
 
+  /**
+   * It creates a repository in the provided account.
+   *
+   * @param array $account
+   *  Account information.
+   * @param array $repository_info
+   *  The repository info to create the repository. At least,the keys should be:
+   *    'name' => string
+   *    'collaborators' => array with the keys:
+   *      'username' => 'username 1'
+   * @return array $repository
+   *  With the created repository
+   */
+  static function create($account, $repository_info) {
+    $repository = [];
+    if (!empty($account) && !empty($repository_info) && isset($repository_info['name'])) {
+      $params = [];
+      $params['userInfo'] = $account;
+      $params['repo'] = $repository_info;
+      $git_service = Service\SimpleGitConnectorFactory::getConnector($account['type']);
+      // TODO: add this to the git service interface $repository = $git_service->createRepository($params);
+    }
+    return $repository;
+  }
+
+  /**
+   * It checks if exists a repository with the provided info.
+   *
+   * @param array $account
+   *  Account information.
+   * @param array $repository_info
+   *  The repository info to be checked. The key "name" is needed.
+   * @return boolean exists
+   *  true if the repository exists.
+   */
+  static function exists($account, $repository_info) {
+    $exists = false;
+    if (!empty($account)&& !empty($repository_info) && isset($repository_info['name'])) {
+      $params = [];
+      $params['userInfo'] = $account;
+      $params['repo'] = $repository_info;
+      $git_service = Service\SimpleGitConnectorFactory::getConnector($account['type']);
+      // TODO: add this to the git service interface $exists = $git_service->exists($params);
+    }
+    return $exists;
+  }
+
 }
