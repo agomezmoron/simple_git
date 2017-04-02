@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SimpleGitLabConnectorService extends SimpleGitConnector {
 
-  const BASE_URL = "https://gitlab.com/";
+  const BASE_URL = 'https://gitlab.com/';
 
   /**
    * SimpleGitLabConnectorService constructor.
@@ -53,15 +53,15 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
       $state = $params['state'];
       $settings = $this->getConnectorConfig();
       //Url to attack
-      $url = self::BASE_URL . "/oauth/authorize";
+      $url = self::BASE_URL . '/oauth/authorize';
 
       //Set parameters
       $parameters = array(
-        "client_id" => $settings['app_id'],
-        "client_secret" => $settings['app_secret'],
-        "redirect_uri" => $settings['redirect_uri'],
-        "response_type" => $code,
-        "state" => $state
+        'client_id' => $settings['app_id'],
+        'client_secret' => $settings['app_secret'],
+        'redirect_uri' => $settings['redirect_uri'],
+        'response_type' => $code,
+        'state' => $state
       );
 
         //Open curl stream
@@ -169,7 +169,7 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   public function getProjectsList($params) {
     if ($params['userInfo']) {
       $user = $params['userInfo'];
-      $url = self::BASE_URL . "/projects";
+      $url = self::BASE_URL . '/projects';
       $ch = $this->getConfiguredCURL($url, $user);
       $account = $this->performCURL($ch);
       return $this->buildResponse($account, self::PROJECTS);
@@ -187,7 +187,7 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
     if ($params['userInfo']) {
       $user = $params['userInfo'];
       $id=$params['id'];//The ID or NAMESPACE/PROJECT_NAME of the project
-      $url = self::BASE_URL . "/projects/".$id;
+      $url = self::BASE_URL . '/projects/'.$id;
       $ch = $this->getConfiguredCURL($url, $user);
       $account = $this->performCURL($ch);
       return $this->buildResponse($account, self::PROJECTS);
@@ -224,7 +224,7 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
     /*if ($params['userInfo'] && $params['repo']) {
       $user = $params['userInfo'];
       $name = $params['repo'];
-      $url = self::BASE_URL . $user->username . "/" . $name;
+      $url = self::BASE_URL . $user->username . '/' . $name;
       $ch = $this->getConfiguredCURL($url, $user);
       $repo = $this->performCURL($ch);
       $response = $this->configureRepositoryFields($repo);
@@ -288,7 +288,7 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   protected function getUserDetail($params) { //Non-logged user
     if ($params['userInfo']) {
       $user = $params['userInfo'];
-      $url = self::BASE_URL . "users/" . $user->id;
+      $url = self::BASE_URL . 'users/' . $user->id;
       $ch = $this->getConfiguredCURL($url, $user);
       $response = $this->performCURL($ch);
       return $response;
@@ -306,7 +306,7 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   public function getAccount($params) {
     if ($params['userInfo']) {
       $user = $params['userInfo'];
-      $url = self::BASE_URL . "users/";
+      $url = self::BASE_URL . 'users/';
       $ch = $this->getConfiguredCURL($url, $user);
       $account = $this->performCURL($ch);
       // $account['number_of_repos'] = $account['total_private_repos'] + $account['public_repos'];
@@ -355,7 +355,7 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
    * @return mixed
    */
   protected function getPullRequestComments($user, $repo, $pr_id) {
-//    $url = self::BASE_URL . "repos/" . $user->usermname . "/" . $repo . "/pulls/" . $pr_id . "/comments";
+//    $url = self::BASE_URL . 'repos/' . $user->usermname . '/' . $repo . '/pulls/' . $pr_id . '/comments';
 //    $ch = $this->getConfiguredCURL($url, $user);
 //    $response = $this->performCURL($ch);
 //    return $response;
