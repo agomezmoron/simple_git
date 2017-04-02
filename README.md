@@ -42,6 +42,8 @@ CONFIGURATION
   
 When enabled, the module will register some permissions & some resources, so remember refreshing the cache.
 
+You can get more information about the REST interfaces in the following [link](REST_INTERFACES.md).
+
 TROUBLESHOOTING
 ---------------
 
