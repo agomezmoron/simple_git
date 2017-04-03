@@ -3,26 +3,25 @@
 /**
  * @file
  * Contains \Drupal\simple_git\Plugin\rest\resource\PullRequestResource.php
+ * @author  Alejandro Gómez Morón <amoron@emergya.com>
+ * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
+ * @version PHP: 7
  */
 
 namespace Drupal\simple_git\Plugin\rest\resource;
 
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
-use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
 use Drupal\simple_git\BusinessLogic\SimpleGitPullRequestsBusinessLogic;
 use Drupal\simple_git\BusinessLogic\SimpleGitRepositoriesBusinessLogic;
-use Drupal\simple_git\Service\SimpleGitHubConnectorService;
-use Drupal\simple_git\Service\SimpleGitLabConnectorService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Provides a Pull Request Resource.
  *
+ * @package Drupal\simple_git\Plugin\rest\resource
  * @RestResource(
  *   id = "simple_git_pull_request_resource",
  *   label = @Translation("Git Pull Request Resource"),
@@ -41,9 +40,41 @@ class PullRequestResource extends ResourceBase {
   protected $current_user;
 
   /**
+   * Constructs a Drupal\rest\Plugin\ResourceBase object.
+   *
+   * @param array     $configuration
+   *   A configuration array containing information about the plugin instance.
+   *
+   * @param string    $plugin_id
+   *   The plugin_id for the plugin instance.
+   *
+   * @param mixed     $plugin_definition
+   *   The plugin implementation definition.
+   *
+   * @param array     $serializer_formats
+   *   The available serialization formats.
+   *
+   * @param \Psr\Log\ $logger
+   *   A logger instance.
+   */
+  public function __construct(
+    array $configuration, $plugin_id, $plugin_definition,
+    array $serializer_formats, $logger, AccountProxyInterface $current_user
+  ) {
+    parent::__construct(
+      $configuration, $plugin_id, $plugin_definition, $serializer_formats,
+      $logger
+    );
+    $this->current_user = $current_user;
+  }
+
+  /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(
+    ContainerInterface $container, array $configuration, $plugin_id,
+    $plugin_definition
+  ) {
     return new static(
       $configuration,
       $plugin_id,
@@ -55,29 +86,6 @@ class PullRequestResource extends ResourceBase {
   }
 
   /**
-   * Constructs a Drupal\rest\Plugin\ResourceBase object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   *
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   *
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   *
-   * @param array $serializer_formats
-   *   The available serialization formats.
-   *
-   * @param \Psr\Log\ $logger
-   *   A logger instance.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, array $serializer_formats, $logger, AccountProxyInterface $current_user) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
-    $this->current_user = $current_user;
-  }
-
-  /**
    * Responds to the GET request.
    *
    * @return \Drupal\rest\ResourceResponse
@@ -85,10 +93,16 @@ class PullRequestResource extends ResourceBase {
    */
   public function get() {
     $accounts = array();
-    $accounts = SimpleGitAccountBusinessLogic::getAccounts($this->current_user);
-    $repositories = SimpleGitRepositoriesBusinessLogic::getRepositories($accounts);
+    $accounts = SimpleGitAccountBusinessLogic::getAccounts(
+      $this->current_user
+    );
+    $repositories = SimpleGitRepositoriesBusinessLogic::getRepositories(
+      $accounts
+    );
 
-    $pr = SimpleGitPullRequestsBusinessLogic::getPullRequests($accounts, $repositories);
+    $pr = SimpleGitPullRequestsBusinessLogic::getPullRequests(
+      $accounts, $repositories
+    );
 
     return new ResourceResponse($pr);
   }

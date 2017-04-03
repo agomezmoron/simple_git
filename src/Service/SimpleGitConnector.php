@@ -5,6 +5,9 @@
  *
  * @file
  * Contains \Drupal\simple_git\Service\SimpleGitConnector.php.
+ * @author  Alejandro Gómez Morón <amoron@emergya.com>
+ * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
+ * @version PHP: 7
  */
 
 namespace Drupal\simple_git\Service;
@@ -18,8 +21,6 @@ namespace Drupal\simple_git\Service;
  */
 abstract class SimpleGitConnector {
 
-  protected $mappings = array();
-
   /**
    * Constants to determine to output mapping.
    */
@@ -29,6 +30,7 @@ abstract class SimpleGitConnector {
   const BRANCH = 'BRANCH';
   const PROJECTS = 'PROJECTS';
   const COMMIT = 'COMMIT';
+  protected $mappings = array();
 
   /**
    * SimpleGitConnector constructor.
@@ -37,16 +39,6 @@ abstract class SimpleGitConnector {
    */
   public function __construct() {
     $this->buildCustomMappings();
-  }
-
-  /**
-   * Obtain the connection config based in the connection type(Github, Gitlab..).
-   *
-   * @return string with the connector type associated.
-   */
-  protected final function getConnectorConfig() {
-    $git_settings =  \Drupal::config('simple_git.settings');
-    return $git_settings->get($this->getConnectorType());
   }
 
   /**
@@ -76,17 +68,6 @@ abstract class SimpleGitConnector {
    *  With all the repositories available.
    */
   public abstract function getRepositoriesList($params);
-
-  /**
-   * Get a concrete repository.
-   *
-   * @param $params
-   *  It's an array that content depends on implementation
-   *
-   * @return mixed
-   *  With the repository information.
-   */
-  public abstract function getRepository($params);
 
   /**
    * Get the list of pull request associated to the selected repository.
@@ -122,13 +103,6 @@ abstract class SimpleGitConnector {
   public abstract function getAccount($params);
 
   /**
-   * Return the connection type(Github, Gitlab...) defined as constant.
-   *
-   * @return mixed with the conenctor type.
-   */
-  public abstract function getConnectorType();
-
-  /**
    * It checks if the repository exists.
    *
    * @param $params
@@ -141,6 +115,33 @@ abstract class SimpleGitConnector {
     return !empty($this->getRepository($params));
   }
 
+  /**
+   * Get a concrete repository.
+   *
+   * @param $params
+   *  It's an array that content depends on implementation
+   *
+   * @return mixed
+   *  With the repository information.
+   */
+  public abstract function getRepository($params);
+
+  /**
+   * Obtain the connection config based in the connection type(Github, Gitlab..).
+   *
+   * @return string with the connector type associated.
+   */
+  protected final function getConnectorConfig() {
+    $git_settings = \Drupal::config('simple_git.settings');
+    return $git_settings->get($this->getConnectorType());
+  }
+
+  /**
+   * Return the connection type(Github, Gitlab...) defined as constant.
+   *
+   * @return mixed with the conenctor type.
+   */
+  public abstract function getConnectorType();
 
   /**
    * Configure the response, based in the corresponding mapping. For multi node
@@ -160,22 +161,31 @@ abstract class SimpleGitConnector {
     $response = array();
 
 
-    if (isset($this->mappings[$entity_type]) && is_array($this->mappings[$entity_type])) {
+    if (isset($this->mappings[$entity_type])
+      && is_array(
+        $this->mappings[$entity_type]
+      )
+    ) {
 
-      foreach ($this->mappings[$entity_type] as $responseKey => $connectorKey) {
+      foreach (
+        $this->mappings[$entity_type] as $responseKey => $connectorKey
+      ) {
 
         // multiple options
         if (is_array($connectorKey)) {
-          foreach($connectorKey as $key) {
+          foreach ($connectorKey as $key) {
             $value = $this->getMappingBySingleKey($data, $key);
             $response[$responseKey] = $value;
             if (!empty($response[$responseKey])) {
               break;
             }
           }
-        } else {
+        }
+        else {
           // single mapping
-          $response[$responseKey] = $this->getMappingBySingleKey($data, $connectorKey);
+          $response[$responseKey] = $this->getMappingBySingleKey(
+            $data, $connectorKey
+          );
         }
 
       }
@@ -196,7 +206,8 @@ abstract class SimpleGitConnector {
 
       }
       $value = $finalValue;
-    } else {
+    }
+    else {
       $value = $data[$connectorKey];
     }
     return $value;

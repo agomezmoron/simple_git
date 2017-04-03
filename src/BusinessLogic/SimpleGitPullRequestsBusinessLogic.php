@@ -1,9 +1,10 @@
 <?php
 
 /**
-* @file
-* Contains \Drupal\simple_git\BusinessLogic\SimpleGitPullRequestsBusinessLogic.
-*/
+ * @file
+ * Contains \Drupal\simple_git\BusinessLogic\SimpleGitPullRequestsBusinessLogic.
+ */
+
 namespace Drupal\simple_git\BusinessLogic;
 
 use \Drupal\simple_git\Service;
@@ -20,7 +21,7 @@ class SimpleGitPullRequestsBusinessLogic {
   /**
    * Get List pull requests.
    *
-   * @param array $accounts
+   * @param array  $accounts
    *   Account information.
    *
    * @param string $repositories
@@ -33,11 +34,16 @@ class SimpleGitPullRequestsBusinessLogic {
     $pull_requests = [];
 
     // group repositories by $account
-    foreach($accounts as &$account) {
+    foreach ($accounts as &$account) {
       $params = [];
-      $params['repositories'] = SimpleGitRepositoriesBusinessLogic::filterRepositoriesByAccount($account, $repositories);
+      $params['repositories']
+        = SimpleGitRepositoriesBusinessLogic::filterRepositoriesByAccount(
+        $account, $repositories
+      );
       $params['userInfo'] = $account;
-      $git_service = Service\SimpleGitConnectorFactory::getConnector($account['type']);
+      $git_service = Service\SimpleGitConnectorFactory::getConnector(
+        $account['type']
+      );
       $pull_requests_by_account = $git_service->getPullRequestsList($params);
       if (!empty($pull_requests_by_account)) {
         $pull_requests = array_merge($pull_requests, $pull_requests_by_account);
@@ -61,15 +67,15 @@ class SimpleGitPullRequestsBusinessLogic {
   /**
    * Get pull request.
    *
-   * @param int $account_id
+   * @param int    $account_id
    *   A id account.
    *
    * @param string $repo
    *   A string with URL of the repositories.
    *
-   * @param int $id
+   * @param int    $id
    *
-   * @param array $user
+   * @param array  $user
    *   An associative array containing structure user.
    *
    * @return array $pr
@@ -77,12 +83,16 @@ class SimpleGitPullRequestsBusinessLogic {
    */
   static function getPullRequest($account_id, $repo, $id, $user) {
     $pr = array();
-    $account = SimpleGitAccountBusinessLogic::getAccountByAccountId($user,$account_id);
+    $account = SimpleGitAccountBusinessLogic::getAccountByAccountId(
+      $user, $account_id
+    );
     if (!empty($account)) {
       $params['userInfo'] = $account;
       $params['repo'] = $repo;
       $params['id'] = $id;
-      $git_service = Service\SimpleGitConnectorFactory::getConnector($account['type']);
+      $git_service = Service\SimpleGitConnectorFactory::getConnector(
+        $account['type']
+      );
       $pr = $git_service->getPullRequest($params);
     }
     return $pr;
