@@ -63,7 +63,7 @@ abstract class SimpleGitAccountBusinessLogic {
     $db_accounts = [];
 
     $saved_accounts = \Drupal::service('user.data')
-      ->get(MODULE_SIMPLEGIT, $user->id(), 'accounts');
+      ->get(ModuleConstantInterface::MODULE_SIMPLEGIT, $user->id(), 'accounts');
 
     if (!empty($saved_accounts) && is_array($saved_accounts)) {
       $db_accounts = $saved_accounts;

@@ -251,8 +251,8 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
     if ($params['userInfo']) {
       $user = $params['userInfo'];
 
-      $id=$params['id'];//The ID or NAMESPACE/PROJECT_NAME of the project
-      $url = self::BASE_URL . '/projects/'.$id;
+      $id = $params['id'];//The ID or NAMESPACE/PROJECT_NAME of the project
+      $url = self::BASE_URL . '/projects/' . $id;
       $ch = $this->getConfiguredCURL($url, $user);
       $account = $this->performCURL($ch);
       return $this->buildResponse($account, self::PROJECTS);
@@ -347,7 +347,6 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   }
 
   /**
-
    * {@inheritdoc}
    *
    * @param \Drupal\simple_git\Service\it $params
