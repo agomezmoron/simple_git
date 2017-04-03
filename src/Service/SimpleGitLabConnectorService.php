@@ -250,14 +250,9 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   public function getProjects($params) {
     if ($params['userInfo']) {
       $user = $params['userInfo'];
-<<<<<<< HEAD
-      $id
-        = $params['id'];//The ID or NAMESPACE/PROJECT_NAME of the project
-      $url = self::BASE_URL . "/projects/" . $id;
-=======
+
       $id=$params['id'];//The ID or NAMESPACE/PROJECT_NAME of the project
       $url = self::BASE_URL . '/projects/'.$id;
->>>>>>> 3b72161475a1c6d214f82388a7f1c7981ae01af2
       $ch = $this->getConfiguredCURL($url, $user);
       $account = $this->performCURL($ch);
       return $this->buildResponse($account, self::PROJECTS);
@@ -352,27 +347,7 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   }
 
   /**
-<<<<<<< HEAD
-=======
-   * Obtain the user detail of a non-logged user.
-   *
-   * @param $params
-   *  It needs the userName.
-   *
-   * @return mixed
-   */
-  protected function getUserDetail($params) { //Non-logged user
-    if ($params['userInfo']) {
-      $user = $params['userInfo'];
-      $url = self::BASE_URL . 'users/' . $user->id;
-      $ch = $this->getConfiguredCURL($url, $user);
-      $response = $this->performCURL($ch);
-      return $response;
-    }
-  }
 
-  /**
->>>>>>> 3b72161475a1c6d214f82388a7f1c7981ae01af2
    * {@inheritdoc}
    *
    * @param \Drupal\simple_git\Service\it $params
