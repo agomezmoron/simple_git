@@ -3,13 +3,26 @@
 /**
  * @file
  * Contains \Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic.
+ * @author  Alejandro Gómez Morón <amoron@emergya.com>
+ * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
+ * @version PHP: 7
  */
+
 namespace Drupal\simple_git\BusinessLogic;
 
+use Drupal\simple_git\Interfaces\ModuleConstantInterface;
+
+/**
+ * The base class for all account business logic.
+ *
+ * @package Drupal\simple_git\BusinessLogic
+ */
 abstract class SimpleGitAccountBusinessLogic {
 
   /**
    * Returns an account using the account Id.
+   *
+   * @package BusinessLogic
    *
    * @param int $account_id
    *   A id of account.
@@ -36,60 +49,6 @@ abstract class SimpleGitAccountBusinessLogic {
     }
 
     return $result;
-  }
-
-
-  /**
-   * Create account.
-   *
-   * @param array $accounts
-   *   An associative array containing structure account.
-   *
-   * @return array $account
-   *   An associative array with element 'account_id', 'type', 'name',
-   *   'access_info' for create account.
-   */
-  static function createAccount($accounts, $request_account) {
-    // getting the maximim account_id
-    $max_account_id = max(array_column($accounts, 'account_id'));
-
-    $request_account['account_id'] = $max_account_id + 1;
-    $request_account['access_info'] = self::setAccessInfo($request_account);
-
-    return $request_account;
-  }
-
-  /**
-   * Modify access info.
-   *
-   * @param array $account
-   *   An associative array containing structure account.
-   *
-   * @return array $access_info
-   *   An associative array with element 'token', 'expires_in', 'refresh_token'.
-   */
-  static function setAccessInfo($account) {
-    $access_info = array();
-    switch ($account['type']) {
-      case GIT_TYPE_GITHUB:
-        $access_info = array(
-          'token' => $account['access_info']['token'],
-        );
-        break;
-      case GIT_TYPE_GITLAB:
-        $access_info = array(
-          'token' => $account['access_info']['token'],
-          'expires_in' => $account['access_info']['expires_in'],
-          'refresh_token' => $account['access_info']['refresh_token'],
-        );
-        break;
-      default:
-        $access_info = array(
-          'token' => $account['access_info']['token'],
-        );
-        break;
-    }
-    return $access_info;
   }
 
   /**
@@ -137,29 +96,27 @@ abstract class SimpleGitAccountBusinessLogic {
   }
 
   /**
-   * Modify multiple accounts.
+   * It adds or update an account to the logged user.
    *
-   * @param array $user
-   *   An associative array containing structure user.
+   * @param mixed $user
+   *  The logged user.
+   * @param array $git_account
+   *  The git account information.
    *
-   * @param array $accounts
-   *   An associative array containing structure account.
-   *
-   * @return mixed
+   * @return array $db_accounts
+   *  All the associated accounts with the passed one (updated or created).
    */
-  static function setAccounts($user, $accounts) {
-    \Drupal::service('user.data')
-      ->set(MODULE_SIMPLEGIT, $user->id(), 'accounts', $accounts);
-    // FIXME: we cannot rebuild all the caches, we have to fix it ASAP
-    drupal_flush_all_caches();
-    return $accounts;
+  static function addOrUpdateAccount($user, $git_account) {
+    $db_accounts = self::getAccounts($user);
+    $db_accounts = self::checkAndUpdateUserData($db_accounts, $git_account);
+    return self::setAccounts($user, $db_accounts);
   }
 
   /**
    * Check and update all the associated linked users for the user data.
    *
    * @param array $db_users
-   *  A user account object of the database.
+   *    A user account object of the database.
    *
    * @param array $new_user
    *    A new user account object.
@@ -171,9 +128,13 @@ abstract class SimpleGitAccountBusinessLogic {
     $exist = FALSE;
 
     foreach ($db_users as &$db_user) {
-      if ($db_user['username'] == $new_user['username'] && $db_user['type'] == $new_user['type']) {
+      if ($db_user['username'] == $new_user['username']
+        && $db_user['type'] == $new_user['type']
+      ) {
         $exist = TRUE;
-        $checked_user = self::checkAndUpdateAccessInfo($db_user, $new_user);
+        $checked_user = self::checkAndUpdateAccessInfo(
+          $db_user, $new_user
+        );
         if (isset($checked_user)) {
           $db_user = $checked_user;
         }
@@ -192,7 +153,7 @@ abstract class SimpleGitAccountBusinessLogic {
    * Check and update the information of the access data (updating the token if needed).
    *
    * @param array $db_user
-   *  A user account object of the database.
+   *   A user account object of the database.
    *
    * @param array $new_user
    *   A new user account object.
@@ -203,17 +164,23 @@ abstract class SimpleGitAccountBusinessLogic {
    */
   static function checkAndUpdateAccessInfo($db_user, $new_user) {
     switch ($new_user['type']) {
-      case GIT_TYPE_GITHUB:
-        if ($db_user['access_info']['token'] != $new_user['access_info']['token']) {
-          $db_user['access_info']['token'] = $new_user['access_info']['token'];
+      case ModuleConstantInterface::GIT_TYPE_GITHUB:
+        if ($db_user['access_info']['token']
+          != $new_user['access_info']['token']
+        ) {
+          $db_user['access_info']['token']
+            = $new_user['access_info']['token'];
         }
         break;
-      case GIT_TYPE_GITLAB:
+      case ModuleConstantInterface::GIT_TYPE_GITLAB:
         // TODO: Pending to implement Gitlab connector
         break;
       default:
-        if ($db_user['access_info']['token'] != $new_user['access_info']['token']) {
-          $db_user['access_info']['token'] = $new_user['access_info']['token'];
+        if ($db_user['access_info']['token']
+          != $new_user['access_info']['token']
+        ) {
+          $db_user['access_info']['token']
+            = $new_user['access_info']['token'];
         }
         break;
     }
@@ -223,18 +190,77 @@ abstract class SimpleGitAccountBusinessLogic {
   }
 
   /**
-   * It adds or update an account to the logged user.
+   * Create account.
    *
-   * @param mixed $user
-   *  The logged user.
-   * @param array $git_account
-   *  The git account information.
-   * @return array $db_accounts
-   *  All the associated accounts with the passed one (updated or created).
+   * @param array $accounts
+   *   An associative array containing structure account.
+   *
+   * @return array $account
+   *   An associative array with element 'account_id', 'type', 'name',
+   *   'access_info' for create account.
    */
-  static function addOrUpdateAccount($user, $git_account) {
-    $db_accounts = self::getAccounts($user);
-    $db_accounts = self::checkAndUpdateUserData($db_accounts, $git_account);
-    return self::setAccounts($user, $db_accounts);
+  static function createAccount($accounts, $request_account) {
+    // getting the maximim account_id
+    $max_account_id = max(array_column($accounts, 'account_id'));
+
+    $request_account['account_id'] = $max_account_id + 1;
+    $request_account['access_info'] = self::setAccessInfo($request_account);
+
+    return $request_account;
+  }
+
+  /**
+   * Modify access info.
+   *
+   * @param array $account
+   *   An associative array containing structure account.
+   *
+   * @return array $access_info
+   *   An associative array with element 'token', 'expires_in', 'refresh_token'.
+   */
+  static function setAccessInfo($account) {
+    $access_info = array();
+    switch ($account['type']) {
+      case ModuleConstantInterface::GIT_TYPE_GITHUB:
+        $access_info = array(
+          'token' => $account['access_info']['token'],
+        );
+        break;
+      case ModuleConstantInterface::GIT_TYPE_GITLAB:
+        $access_info = array(
+          'token' => $account['access_info']['token'],
+          'expires_in' => $account['access_info']['expires_in'],
+          'refresh_token' => $account['access_info']['refresh_token'],
+        );
+        break;
+      default:
+        $access_info = array(
+          'token' => $account['access_info']['token'],
+        );
+        break;
+    }
+    return $access_info;
+  }
+
+  /**
+   * Modify multiple accounts.
+   *
+   * @param array $user
+   *   An associative array containing structure user.
+   *
+   * @param array $accounts
+   *   An associative array containing structure account.
+   *
+   * @return mixed
+   */
+  static function setAccounts($user, $accounts) {
+    \Drupal::service('user.data')
+      ->set(
+        ModuleConstantInterface::MODULE_SIMPLEGIT, $user->id(), 'accounts',
+        $accounts
+      );
+    // FIXME: we cannot rebuild all the caches, we have to fix it ASAP
+    drupal_flush_all_caches();
+    return $accounts;
   }
 }

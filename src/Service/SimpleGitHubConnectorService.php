@@ -3,7 +3,11 @@
 /**
  * @file
  * Contains \Drupal\simple_git\Service\SimpleGitHubConnectorService.
+ * @author  Alejandro Gómez Morón <amoron@emergya.com>
+ * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
+ * @version PHP: 7
  */
+
 namespace Drupal\simple_git\Service;
 
 use Drupal\Core\Controller\ControllerBase;
