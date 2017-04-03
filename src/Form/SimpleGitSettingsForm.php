@@ -87,6 +87,7 @@ class SimpleGitSettingsForm extends ConfigFormBase {
       'app_id' => $form_state->getValue('git_hub_app_id'),
       'app_secret' => $form_state->getValue('git_hub_app_secret'),
       'app_url_redirect' => $form_state->getValue('git_hub_app_url_redirect'),
+      'app_name' => $form_state->getValue('git_hub_app_name')
     );
 
     $values['git_lab'] = array(
@@ -136,6 +137,13 @@ class SimpleGitSettingsForm extends ConfigFormBase {
       '#title' => $this->t('GitHub URL Redirect'),
       '#description' => $this->t('GitHub URL Redirect value'),
       '#default_value' => $git_settings->get(GIT_TYPE_GITHUB)['app_url_redirect'],
+    );
+
+    $form['git_hub']['git_hub_app_name'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('GitHub App Name'),
+      '#description' => $this->t('GitHub App Name'),
+      '#default_value' => $git_settings->get(GIT_TYPE_GITHUB)['app_name'],
     );
 
   }

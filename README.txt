@@ -1,40 +1,62 @@
-# Simple Git Module
+# simple_git
 
-Module to work with the GitHub, GitLab, etc REST API from Drupal exposing a REST service to be used from another clients (Angular, Ionic, etc).
+CONTENTS OF THIS FILE
+---------------------
+   
+ * Introduction
+ * Requirements
+ * Recommended modules
+ * Installation
+ * Configuration
+ * Troubleshooting
+ * FAQ
+ * Maintainers
 
-It also supports OAuth integrations.
+INTRODUCTION
+------------
+Drupal module to have a simple interface to connect your Git services accounts.
 
-## REST Services exposed
+REQUIREMENTS
+------------
 
-The REST API base PATH will be: **/api/simple_git**
+* This module requires REST capabilities enabled. 
+* CORS should be enabled if you will use from an external domain.
 
-### Connector
+RECOMMENDED MODULES
+-------------------
 
-REST service to retrieve the configured connectors to work with GitHub, GitLab, etc.
+* [REST UI](https://www.drupal.org/project/restui) module to handle it easily.
 
-**Path:** /connector
+INSTALLATION
+------------
+ 
+ * Install as you would normally install a contributed Drupal module.
 
-| Method  | Parameters | Response | Description |
-| ------------- | ------------- | ------------- | ------------- |
-| GET  | None  | [{"client_id": "XXXX", "type": "GITHUB"}] | Returns the Git App Client ID and the Git Service type.  |
+CONFIGURATION
+-------------
+ 
+ * Configure the GitHub & GitLab apps on  user permissions in Administration » Configuration » Web services » Simple Git.
+ * Enable the REST resources of the module:
+  * Git Account Resource
+  * Git Connector Resource
+  
+When enabled, the module will register some permissions & some resources, so remember refreshing the cache.
 
-### Account
+You can get more information about the REST interfaces in the following [link](REST_INTERFACES.md).
 
-REST service to link and retrieve accounts information.
+TROUBLESHOOTING
+---------------
 
-**Path:** /account
+If you have issues connecting to the Git services, ensure all the needed information is properly configured.
 
-| Method  | Parameters | Response | Description |
-| ------------- | ------------- | ------------- | ------------- |
-| GET  |  **/all** the accounts will be returned.| [{ "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" }] | It returns all the associated accounts  |
-| GET  | **/{account_id}** that account will be returned. | { "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" } | It returns the associated account  |
-| POST  | { "code": "ABCD", "nonce": "EDFG" } | { "id": 3, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" } | It connects to GitHub and returns the linked account information.  **If the authentication fails, an error with a 401 status code will be raised.** | 
-| DELETE  | None  | {"client_id": "XXXX"} | Returns the GitHub App Client ID.  |
+MAINTAINERS
+-----------
 
-### Pull Requests
+Current maintainers:
+ * Aleandro Gómez (agomezmoron) - https://drupal.org/u/agomezmoron
+ * Carlos Raigada (craigada) - https://drupal.org/u/craigada
+ * Estefanía Barrera (ebarrera) - https://www.drupal.org/u/ebarrera
+ * Mª Ángeles Villalba (mavillalba) - https://www.drupal.org/u/mavillalba
 
-**Path:** /pull_request
-
-| Method  | Parameters | Response | Description |
-| ------------- | ------------- | ------------- | ------------- |
-| GET  | None  | [{"title": "Pull Request 1 Title", "description": "Pull Request description gfjdngfkjdnbjdkjnfvjdn", "userName": "UserName1", "date": "10 months", "commits": 312, "comments": 129, "count": 582, "from": "MB-1685-DEV_Fix", "to": "Master_branch_of_project" }] | Returns all the available Pull Requests.  |
+This project has been sponsored by:
+ * 3Emergya

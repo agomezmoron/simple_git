@@ -26,7 +26,12 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SimpleGitHubConnectorService extends SimpleGitConnector {
 
-  const BASE_URL = "https://api.github.com/";
+  const BASE_URL = 'https://api.github.com/';
+
+  /**
+   * Items per page. By default the GitHub API has 30 elements.
+   */
+  const PER_PAGE = 500;
 
   /**
    * SimpleGitHubConnectorService constructor.
@@ -52,13 +57,13 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $state = $params['state'];
       $settings = $this->getConnectorConfig();
       //Url to user
-      $url = "https://github.com/login/oauth/access_token";
+      $url = 'https://github.com/login/oauth/access_token';
       //Set parameters
       $parameters = array(
-        "client_id" => $settings['app_id'],
-        "client_secret" => $settings['app_secret'],
-        "code" => $code,
-        "state" => $state
+        'client_id' => $settings['app_id'],
+        'client_secret' => $settings['app_secret'],
+        'code' => $code,
+        'state' => $state
       );
 
       //Open curl stream
@@ -89,7 +94,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
     $response = array();
     if ($params['userInfo']) {
       $user = $params['userInfo'];
-      $url = self::BASE_URL . "user/repos?per_page=500";
+      $url = self::BASE_URL . 'user/repos?per_page='.PER_PAGE;
       $ch = $this->getConfiguredCURL($url, $user);
       $repositories = $this->performCURL($ch);
       foreach ($repositories as $repo) {
@@ -112,16 +117,17 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    * @return mixed
    */
   public function getRepository($params) {
+    $response = [];
     if ($params['userInfo'] && $params['repository']) {
       $user = $params['userInfo'];
       $repository = $params['repository'];
-      $url = self::BASE_URL . $repository['username'] . "/" . $repository['name'];
+      $url = self::BASE_URL . $repository['username'] . '/' . $repository['name'];
       $ch = $this->getConfiguredCURL($url, $user);
       $repo = $this->performCURL($ch);
       $response = $this->configureRepositoryFields($repo);
       $response['account'] = $user['username'];
-      return $response;
     }
+    return $response;
   }
 
   /**
@@ -141,7 +147,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $repositories = $params['repositories'];
 
       foreach($repositories as $repository) {
-        $url = self::BASE_URL . "repos/" . $repository['username'] . "/" . $repository['name'] . "/pulls";
+        $url = self::BASE_URL . 'repos/' . $repository['username'] . '/' . $repository['name'] . '/pulls?per_page='.PER_PAGE;
         $ch = $this->getConfiguredCURL($url, $user);
         $prs = $this->performCURL($ch);
         foreach ($prs as $pr) {
@@ -167,7 +173,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $user = $params['userInfo'];
       $repository = $params['repository'];
       $pr_id = $params['id'];
-      $url = self::BASE_URL . "repos/" . $repository['username'] . "/" . $repository['name'] . "/pulls/" . $pr_id;
+      $url = self::BASE_URL . 'repos/' . $repository['username'] . '/' . $repository['name'] . '/pulls/' . $pr_id;
       $ch = $this->getConfiguredCURL($url, $user);
       $pr = $this->performCURL($ch);
       return $this->buildResponse($pr, self::PULL_REQUEST);
@@ -185,7 +191,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
   protected function getUserDetail($params) { //Non-logged user
     if ($params['userInfo']) {
       $user = $params['userInfo'];
-      $url = self::BASE_URL . "users/" . $user->username;
+      $url = self::BASE_URL . 'users/' . $user->username;
       $ch = $this->getConfiguredCURL($url, $user);
       $response = $this->performCURL($ch);
       return $response;
@@ -203,7 +209,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
   public function getAccount($params) {
     if ($params['userInfo']) {
       $user = $params['userInfo'];
-      $url = self::BASE_URL . "user";
+      $url = self::BASE_URL . 'user';
       $ch = $this->getConfiguredCURL($url, $user);
       $account = $this->performCURL($ch);
       $account['number_of_repos'] = $account['total_private_repos'] + $account['public_repos'];
@@ -274,7 +280,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    * @return mixed
    */
   protected function getPullRequestCommits($user, $repo, $pr_id) {
-    $url = self::BASE_URL . "repos/" . $user->usermname . "/" . $repo . "/pulls/" . $pr_id . "/commits";
+    $url = self::BASE_URL . 'repos/' . $user->usermname . '/' . $repo . '/pulls/' . $pr_id . '/commits';
     $ch = $this->getConfiguredCURL($url, $user);
     $response = $this->performCURL($ch);
     return $response;
@@ -292,7 +298,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    * @return mixed
    */
   protected function getPullRequestComments($user, $repo, $pr_id) {
-    $url = self::BASE_URL . "repos/" . $user->usermname . "/" . $repo . "/pulls/" . $pr_id . "/comments";
+    $url = self::BASE_URL . 'repos/' . $user->usermname . '/' . $repo . '/pulls/' . $pr_id . '/comments?per_page='.PER_PAGE;
     $ch = $this->getConfiguredCURL($url, $user);
     $response = $this->performCURL($ch);
     return $response;
@@ -307,9 +313,16 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
     $headers = [];
     $headers[] = 'Accept: application/json';
     $headers[] = 'Accept: application/vnd.github.v3+json';
-    $headers[] = 'User-Agent: GitHub Dashboard';
-// if we have the security token
 
+    // by default name
+    $app_name = 'GitHub Dashboard';
+    $connector_config = $this->getConnectorConfig();
+    if (!empty($connector_config) && isset($connector_config['app_name'])) {
+      $app_name = $connector_config['app_name'];
+    }
+    $headers[] = 'User-Agent: '.$app_name;
+
+    // if we have the security token
     if (!is_null($token)) {
       $headers[] = 'Authorization: token ' . $token;
     }

@@ -6,6 +6,10 @@
         {
             "name": "Alejandro Gómez Morón",
             "email": "amoron@emergya.com"
+        },
+        {
+            "name": "Estefanía Barrera Berengeno",
+            "email": "ebarrera@emergya.com"
         }
     ],
     "type": "drupal-module",
