@@ -3,6 +3,9 @@
 /**
  * @file
  * Contains \Drupal\simple_git\Service\SimpleGitConnectorFactory.php
+ * @author  Alejandro Gómez Morón <amoron@emergya.com>
+ * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
+ * @version PHP: 7
  */
 
 namespace Drupal\simple_git\Service;
@@ -12,6 +15,8 @@ use Drupal\simple_git\Service\SimpleGitConnectorInterface;
 
 /**
  * Connector Simple Factory.
+ *
+ * @package Drupal\simple_git\Service
  */
 abstract class SimpleGitConnectorFactory {
 

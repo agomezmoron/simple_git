@@ -3,12 +3,16 @@
  *
  * @file
  * Hook implementations for Simple Git module.
+ * @author  Alejandro Gómez Morón <amoron@emergya.com>
+ * @version PHP 7
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
  * Implements hook_help().
+ *
+ * @package Drupal/simple_git
  */
 function simple_github_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {

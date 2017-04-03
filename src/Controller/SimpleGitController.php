@@ -3,6 +3,9 @@
 /**
  * @file
  * Contains \Drupal\simple_git\Controller\SimpleGitController.
+ * @author  Alejandro Gómez Morón <amoron@emergya.com>
+ * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
+ * @version PHP: 7
  */
 
 namespace Drupal\simple_git\Controller;
@@ -17,6 +20,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Controller routines for oauth routes.
+ *
+ * @package Drupal/simpple_git/Controller
  */
 class SimpleGitController extends ControllerBase implements
   ContainerInjectionInterface {

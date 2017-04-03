@@ -3,17 +3,26 @@
 /**
  * @file
  * Contains \Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic.
+ * @author  Alejandro Gómez Morón <amoron@emergya.com>
+ * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
+ * @version PHP: 7
  */
 
 namespace Drupal\simple_git\BusinessLogic;
 
 use Drupal\simple_git\Interfaces\ModuleConstantInterface;
 
-
+/**
+ * The base class for all account business logic.
+ *
+ * @package Drupal\simple_git\BusinessLogic
+ */
 abstract class SimpleGitAccountBusinessLogic {
 
   /**
    * Returns an account using the account Id.
+   *
+   * @package BusinessLogic
    *
    * @param int $account_id
    *   A id of account.

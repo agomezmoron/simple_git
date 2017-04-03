@@ -1,8 +1,12 @@
 <?php
 
 /**
+ * @version PHP: 7
  * @file
  * Contains \Drupal\simple_git\BusinessLogic\SimpleGitPullRequestsBusinessLogic.
+ * @author  Alejandro Gómez Morón <amoron@emergya.com>
+ * @author  Estefania arrrera Berengeno <ebarrera@emergya.com>
+ * @version PHP: 7
  */
 
 namespace Drupal\simple_git\BusinessLogic;

@@ -1,11 +1,11 @@
 <?php
 
 /**
- * File for account resource
- *
  * @file
  * Contains \Drupal\simple_git\Plugin\rest\resource\AccountResource.php
- *
+ * @author  Alejandro Gómez Morón <amoron@emergya.com>
+ * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
+ * @version PHP: 7
  */
 
 namespace Drupal\simple_git\Plugin\rest\resource;
@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 /**
  * Provides a Connector Resource.
  *
+ * @package Drupal\simple_git\Plugin\rest\resource
  * @RestResource(
  *   id = "simple_git_account_resource",
  *   label = @Translation("Git Account Resource"),
@@ -38,6 +39,7 @@ class AccountResource extends ResourceBase {
    *
    * @var \Drupal\Core\Session\AccountProxyInterface
    */
+
   protected $current_user;
 
   /**
@@ -45,19 +47,16 @@ class AccountResource extends ResourceBase {
    *
    * @param array     $configuration
    *   A configuration array containing information about the plugin instance.
-   *
    * @param string    $plugin_id
    *   The plugin_id for the plugin instance.
-   *
    * @param mixed     $plugin_definition
    *   The plugin implementation definition.
-   *
    * @param array     $serializer_formats
    *   The available serialization formats.
-   *
    * @param \Psr\Log\ $logger
    *   A logger instance.
    */
+
   public function __construct(
     array $configuration, $plugin_id, $plugin_definition,
     array $serializer_formats, $logger, AccountProxyInterface $current_user
@@ -72,6 +71,7 @@ class AccountResource extends ResourceBase {
   /**
    * {@inheritdoc}
    */
+
   public static function create(
     ContainerInterface $container, array $configuration, $plugin_id,
     $plugin_definition
@@ -97,6 +97,7 @@ class AccountResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    *   The response containing the Git account data.
    */
+
   public function post(array $data = []) {
     $user_data = SimpleGitAuthorizationBusinessLogic::authorize(
       $this->current_user, $data
@@ -124,6 +125,7 @@ class AccountResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    *   The response with the result status.
    */
+
   public function delete($account_id) {
     $accounts = [];
     $current_accounts = [];
@@ -147,6 +149,7 @@ class AccountResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    *   The response containing all the linked accounts.
    */
+
   public function get($account_id = NULL) {
     $accounts = [];
 

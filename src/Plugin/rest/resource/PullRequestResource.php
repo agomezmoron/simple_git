@@ -3,6 +3,9 @@
 /**
  * @file
  * Contains \Drupal\simple_git\Plugin\rest\resource\PullRequestResource.php
+ * @author  Alejandro Gómez Morón <amoron@emergya.com>
+ * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
+ * @version PHP: 7
  */
 
 namespace Drupal\simple_git\Plugin\rest\resource;
@@ -18,6 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides a Pull Request Resource.
  *
+ * @package Drupal\simple_git\Plugin\rest\resource
  * @RestResource(
  *   id = "simple_git_pull_request_resource",
  *   label = @Translation("Git Pull Request Resource"),

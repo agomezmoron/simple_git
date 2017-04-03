@@ -1,11 +1,21 @@
 <?php
 
+/**
+ * Interface for a router class for Drupal with access check.
+ *
+ * @author  Alejandro Gómez Morón <amoron@emergya.com>
+ * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
+ * @version PHP 7
+ */
+
 namespace Drupal\simple_git\Interfaces;
 
 interface ModuleConstantInterface {
 
   /**
    * Defining the module name.
+   *
+   * @package Drupal/simple_git/Interfaces
    */
   const MODULE_SIMPLEGIT = 'simple_git';
 

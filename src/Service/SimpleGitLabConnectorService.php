@@ -1,8 +1,11 @@
 <?php
-
 /**
  * @file
- * Contains \Drupal\simple_git\Service\SimpleGitLabConnectorService.
+ * Contains \Drupal\simple_git\Service\SimpleGitLabConnectorService
+ * @author  Alejandro Gómez Morón <amoron@emergya.com>
+ * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
+ * @version PHP 7
+ *
  */
 
 namespace Drupal\simple_git\Service;

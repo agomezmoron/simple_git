@@ -3,6 +3,9 @@
 /**
  * @file
  * Contains \Drupal\simple_git\Form\SimpleGitSettingsForm.
+ * @author  Alejandro Gómez Morón <agomezmoron@emergya.com>
+ * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
+ * @version PHP: 7
  */
 
 namespace Drupal\simple_git\Form;
@@ -15,6 +18,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a deletion confirmation form for the block instance deletion form.
+ *
+ * @package Drupal/simple_git/Form
  */
 class SimpleGitSettingsForm extends ConfigFormBase {
 

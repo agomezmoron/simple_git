@@ -5,6 +5,9 @@
  *
  * @file
  * Contains \Drupal\simple_git\Plugin\rest\resource\ConnectorResource.php
+ * @author  Alejandro Gómez Morón <amoron@emergya.com>
+ * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
+ * @version PHP: 7
  */
 
 namespace Drupal\simple_git\Plugin\rest\resource;
@@ -18,6 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides a Connector Resource.
  *
+ * @package Drupal\simple_git\Plugin\rest\resource
  * @RestResource(
  *   id = "simple_git_connector_resource",
  *   label = @Translation("Git Connector Resource"),
@@ -94,18 +98,32 @@ class ConnectorResource extends ResourceBase {
     $git_settings = \Drupal::config('simple_git.settings');
 
     // GitHub connector
-    if (!empty($git_settings->get(GIT_TYPE_GITHUB)['app_id'])) {
+    if (!empty(
+    $git_settings->get(
+      ModuleConstantInterface::GIT_TYPE_GITHUB
+    )['app_id']
+    )
+    ) {
       $connectors[] = array(
-        'client_id' => $git_settings->get(GIT_TYPE_GITHUB)['app_id'],
-        'type' => GIT_TYPE_GITHUB
+        'client_id' => $git_settings->get(
+          ModuleConstantInterface::GIT_TYPE_GITHUB
+        )['app_id'],
+        'type' => ModuleConstantInterface::GIT_TYPE_GITHUB
       );
     }
 
     // GitLab connector
-    if (!empty($git_settings->get(GIT_TYPE_GITLAB)['app_id'])) {
+    if (!empty(
+    $git_settings->get(
+      ModuleConstantInterface::GIT_TYPE_GITLAB
+    )['app_id']
+    )
+    ) {
       $connectors[] = array(
-        'client_id' => $git_settings->get(GIT_TYPE_GITLAB)['app_id'],
-        'type' => GIT_TYPE_GITLAB
+        'client_id' => $git_settings->get(
+          ModuleConstantInterface::GIT_TYPE_GITLAB
+        )['app_id'],
+        'type' => ModuleConstantInterface::GIT_TYPE_GITLAB
       );
     }
 
