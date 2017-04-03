@@ -7,6 +7,7 @@
 
 namespace Drupal\simple_git\Service;
 
+use Drupal\simple_git\Interfaces\ModuleConstantInterface;
 use Drupal\simple_git\Service\SimpleGitConnectorInterface;
 
 /**
@@ -19,23 +20,29 @@ abstract class SimpleGitConnectorFactory {
    *
    * @param $type
    *  Depending on the type, the factory will return a different instance of
-   * \Drupal\simple_git\Service\SimpleGitConnectorService.
+   *  \Drupal\simple_git\Service\SimpleGitConnectorService.
    *
    * @return \Drupal\simple_git\Service\SimpleGitConnector
    *  Instance that matches with the given $type.
    */
   static function getConnector($type) {
-    $connector = null;
-
+    $connector = NULL;
+    error_log('type' . print_r($type), TRUE);
     switch ($type) {
-      case GIT_TYPE_GITHUB:
-        $connector = \Drupal::service('simple_git.github_connector.service');
+      case ModuleConstantInterface::GIT_TYPE_GITHUB:
+        $connector = \Drupal::service(
+          'simple_git.github_connector.service'
+        );
         break;
-      case GIT_TYPE_GITLAB:
-        $connector = \Drupal::service('simple_git.gitlab_connector.service');
+      case ModuleConstantInterface::GIT_TYPE_GITLAB:
+        $connector = \Drupal::service(
+          'simple_git.gitlab_connector.service'
+        );
         break;
       default:
-        $connector = \Drupal::service('simple_git.github_connector.service');
+        $connector = \Drupal::service(
+          'simple_git.github_connector.service'
+        );
     }
     return $connector;
   }

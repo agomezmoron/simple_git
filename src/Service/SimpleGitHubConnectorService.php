@@ -4,18 +4,11 @@
  * @file
  * Contains \Drupal\simple_git\Service\SimpleGitHubConnectorService.
  */
+
 namespace Drupal\simple_git\Service;
 
-use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Url;
-use Drupal\Core\Utility\LinkGeneratorInterface;
-use Drupal\simple_git\Plugin\rest\resource\PullRequestResource;
+use Drupal\simple_git\Interfaces\ModuleConstantInterface;
 use Drupal\simple_git\Service\SimpleGitConnectorInterface;
-use Drupal\user\UserDataInterface;
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\user\UserInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * This service manage the requests to the github's API.
@@ -73,8 +66,76 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       //Exposing the access token if it's necessary
       $access_token = $response['access_token'];
       //Return the obtained access_token
+      error_log('token' . print_r($access_token), TRUE);
       return $access_token;
     }
+  }
+
+  /**
+   * Configure a basic curl request.
+   *
+   * @param      $url the attacked endpoint
+   *
+   * @param null $username
+   *
+   * @param null $token
+   *                  These params are 'optional'. (By the moment the only exception is the
+   *                  authorize method).
+   *
+   * @return resource
+   */
+  protected function getConfiguredCURL($url, $user = NULL) {
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+
+    if (!is_null($user) && !is_null($user['access_info'])
+      && isset($user['access_info']['token'])
+    ) {
+      $headers = $this->buildHeaders($user['access_info']['token']);
+    }
+    else {
+      $headers = $this->buildHeaders();
+    }
+
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    return $ch;
+  }
+
+  /**
+   * Include the headers into the curl request.
+   *
+   * @return array
+   */
+  protected function buildHeaders($token = NULL) {
+    $headers = [];
+    $headers[] = 'Accept: application/json';
+    $headers[] = 'Accept: application/vnd.github.v3+json';
+    $headers[] = 'User-Agent: GitHub Dashboard';
+// if we have the security token
+
+    if (!is_null($token)) {
+      $headers[] = 'Authorization: token ' . $token;
+    }
+    return $headers;
+  }
+
+  /**
+   * Perform the curl request, close the stream and return the response.
+   *
+   * @param $ch
+   *
+   * @return mixed
+   */
+  protected function performCURL(&$ch) {
+    $data = curl_exec($ch);
+    curl_close($ch);
+    if (!is_array($data) && is_string($data)) {
+      $data = json_decode($data, TRUE);
+    }
+    return $data;
   }
 
   /**
@@ -115,7 +176,8 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
     if ($params['userInfo'] && $params['repository']) {
       $user = $params['userInfo'];
       $repository = $params['repository'];
-      $url = self::BASE_URL . $repository['username'] . "/" . $repository['name'];
+      $url = self::BASE_URL . $repository['username'] . "/"
+        . $repository['name'];
       $ch = $this->getConfiguredCURL($url, $user);
       $repo = $this->performCURL($ch);
       $response = $this->configureRepositoryFields($repo);
@@ -136,16 +198,19 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    */
   public function getPullRequestsList($params) {
     $pull_requests = [];
-    if ($params['userInfo'] &&  $params['repositories']) {
+    if ($params['userInfo'] && $params['repositories']) {
       $user = $params['userInfo'];
       $repositories = $params['repositories'];
 
-      foreach($repositories as $repository) {
-        $url = self::BASE_URL . "repos/" . $repository['username'] . "/" . $repository['name'] . "/pulls";
+      foreach ($repositories as $repository) {
+        $url = self::BASE_URL . "repos/" . $repository['username'] . "/"
+          . $repository['name'] . "/pulls";
         $ch = $this->getConfiguredCURL($url, $user);
         $prs = $this->performCURL($ch);
         foreach ($prs as $pr) {
-          $pull_requests[] = $this->buildResponse($pr, self::PULL_REQUEST);
+          $pull_requests[] = $this->buildResponse(
+            $pr, self::PULL_REQUEST
+          );
         }
       }
     }
@@ -167,11 +232,41 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $user = $params['userInfo'];
       $repository = $params['repository'];
       $pr_id = $params['id'];
-      $url = self::BASE_URL . "repos/" . $repository['username'] . "/" . $repository['name'] . "/pulls/" . $pr_id;
+      $url = self::BASE_URL . "repos/" . $repository['username'] . "/"
+        . $repository['name'] . "/pulls/" . $pr_id;
       $ch = $this->getConfiguredCURL($url, $user);
       $pr = $this->performCURL($ch);
       return $this->buildResponse($pr, self::PULL_REQUEST);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @param \Drupal\simple_git\Service\it $params
+   *  It needs the userInfo.
+   *
+   * @return array
+   */
+  public function getAccount($params) {
+    if ($params['userInfo']) {
+      $user = $params['userInfo'];
+      $url = self::BASE_URL . "user";
+      $ch = $this->getConfiguredCURL($url, $user);
+      $account = $this->performCURL($ch);
+      $account['number_of_repos'] = $account['total_private_repos']
+        + $account['public_repos'];
+      return $this->buildResponse($account, self::ACCOUNT);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @return string
+   */
+  public function getConnectorType() {
+    return ModuleConstantInterface::GIT_TYPE_GITHUB;
   }
 
   /**
@@ -190,34 +285,6 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $response = $this->performCURL($ch);
       return $response;
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * @param \Drupal\simple_git\Service\it $params
-   *  It needs the userInfo.
-   *
-   * @return array
-   */
-  public function getAccount($params) {
-    if ($params['userInfo']) {
-      $user = $params['userInfo'];
-      $url = self::BASE_URL . "user";
-      $ch = $this->getConfiguredCURL($url, $user);
-      $account = $this->performCURL($ch);
-      $account['number_of_repos'] = $account['total_private_repos'] + $account['public_repos'];
-      return $this->buildResponse($account, self::ACCOUNT);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * @return string
-   */
-  public function getConnectorType() {
-    return GIT_TYPE_GITHUB;
   }
 
   /**
@@ -265,16 +332,17 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
   /**
    * Obtain the commit list from a concrete pull request.
    *
-   * @param $user the userInfo
+   * @param $user  the userInfo
    *
-   * @param $repo the name of accessed repository
+   * @param $repo  the name of accessed repository
    *
    * @param $pr_id the pull request id
    *
    * @return mixed
    */
   protected function getPullRequestCommits($user, $repo, $pr_id) {
-    $url = self::BASE_URL . "repos/" . $user->usermname . "/" . $repo . "/pulls/" . $pr_id . "/commits";
+    $url = self::BASE_URL . "repos/" . $user->usermname . "/" . $repo
+      . "/pulls/" . $pr_id . "/commits";
     $ch = $this->getConfiguredCURL($url, $user);
     $response = $this->performCURL($ch);
     return $response;
@@ -283,83 +351,19 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
   /**
    * Obtain the comment list from a concrete pull request.
    *
-   * @param $user the userInfo
+   * @param $user  the userInfo
    *
-   * @param $repo the name of accessed repository
+   * @param $repo  the name of accessed repository
    *
    * @param $pr_id the pull request id
    *
    * @return mixed
    */
   protected function getPullRequestComments($user, $repo, $pr_id) {
-    $url = self::BASE_URL . "repos/" . $user->usermname . "/" . $repo . "/pulls/" . $pr_id . "/comments";
+    $url = self::BASE_URL . "repos/" . $user->usermname . "/" . $repo
+      . "/pulls/" . $pr_id . "/comments";
     $ch = $this->getConfiguredCURL($url, $user);
     $response = $this->performCURL($ch);
     return $response;
-  }
-
-  /**
-   * Include the headers into the curl request.
-   *
-   * @return array
-   */
-  protected function buildHeaders($token = NULL) {
-    $headers = [];
-    $headers[] = 'Accept: application/json';
-    $headers[] = 'Accept: application/vnd.github.v3+json';
-    $headers[] = 'User-Agent: GitHub Dashboard';
-// if we have the security token
-
-    if (!is_null($token)) {
-      $headers[] = 'Authorization: token ' . $token;
-    }
-    return $headers;
-  }
-
-  /**
-   * Configure a basic curl request.
-   *
-   * @param $url the attacked endpoint
-   *
-   * @param null $username
-   *
-   * @param null $token
-   *  These params are 'optional'. (By the moment the only exception is the
-   *  authorize method).
-   *
-   * @return resource
-   */
-  protected function getConfiguredCURL($url, $user = NULL) {
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-
-    if (!is_null($user) && !is_null($user['access_info']) && isset($user['access_info']['token'])) {
-      $headers = $this->buildHeaders($user['access_info']['token']);
-    }
-    else {
-      $headers = $this->buildHeaders();
-    }
-
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-    return $ch;
-  }
-
-  /**
-   * Perform the curl request, close the stream and return the response.
-   *
-   * @param $ch
-   *
-   * @return mixed
-   */
-  protected function performCURL(&$ch) {
-    $data = curl_exec($ch);
-    curl_close($ch);
-    if (!is_array($data) && is_string($data)) {
-      $data = json_decode($data, TRUE);
-    }
-    return $data;
   }
 }

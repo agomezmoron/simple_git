@@ -7,8 +7,7 @@
 
 namespace Drupal\simple_git\BusinessLogic;
 
-use \Drupal\simple_git\Service;
-use \Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
+use Drupal\simple_git\Service;
 
 
 /**
@@ -30,7 +29,9 @@ abstract class SimpleGitAuthorizationBusinessLogic {
    * @return array|mixed
    */
   static function authorize($user, $params) {
-    $git_service = Service\SimpleGitConnectorFactory::getConnector($params['type']);
+    $git_service = Service\SimpleGitConnectorFactory::getConnector(
+      $params['type']
+    );
 
     $auth_info = $git_service->authorize($params);
     $result = array();
@@ -38,14 +39,19 @@ abstract class SimpleGitAuthorizationBusinessLogic {
     // 'access_token'
     if (!empty($auth_info)) {
 
-      $auth_info = array('userInfo' => array('access_info' => array('token' => $auth_info)));
+      $auth_info
+        = array('userInfo' => array('access_info' => array('token' => $auth_info)));
       $git_account = $git_service->getAccount($auth_info);
 
       if (isset($git_account['username'])) {
         $result = $git_account;
 
-        $git_account['access_info'] = $auth_info['userInfo']['access_info'];
-        $account_info = SimpleGitAccountBusinessLogic::addOrUpdateAccount($user, $git_account);
+        $git_account['access_info']
+          = $auth_info['userInfo']['access_info'];
+        $account_info
+          = SimpleGitAccountBusinessLogic::addOrUpdateAccount(
+          $user, $git_account
+        );
 
         $result['account_id'] = $account_info['account_id'];
       }

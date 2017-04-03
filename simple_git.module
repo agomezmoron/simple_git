@@ -1,5 +1,6 @@
 <?php
 /**
+ *
  * @file
  * Hook implementations for Simple Git module.
  */
@@ -7,36 +8,17 @@
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
-  * Defining the module.
-  */
-const MODULE_SIMPLEGIT = 'simple_git';
-
-/**
- * Defining the GitHub type.
- */
-const GIT_TYPE_GITHUB = 'GITHUB';
-
-/**
- * Defining the GitLab type.
- */
-const GIT_TYPE_GITLAB = 'GITLAB';
-
-/**
- * Defining the "all" option in the rest definition.
- */
-const REST_ALL_OPTION = 'all';
-
-/**
  * Implements hook_help().
  */
-function  simple_github_help($route_name, RouteMatchInterface $route_match) {
-    switch ($route_name) {
-        case 'help.page':
-            $output = '';
-            $output .= '<h3>' . t('About') . '</h3>';
-            $output .= '<p>' . t('A Simple GIT manager: accounts manager.') . '</p>';
-            return $output;
-        default:
-            return '';
-    }
+function simple_github_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('A Simple GIT manager: accounts manager.')
+        . '</p>';
+      return $output;
+    default:
+      return '';
+  }
 }

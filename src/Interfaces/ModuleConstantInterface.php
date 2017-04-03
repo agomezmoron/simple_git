@@ -1,0 +1,29 @@
+<?php
+
+namespace Drupal\simple_git\Interfaces;
+
+interface ModuleConstantInterface {
+
+  /**
+   * Defining the module name.
+   */
+  const MODULE_SIMPLEGIT = 'simple_git';
+
+  /**
+   * Defining the GitHub type.
+   */
+  const GIT_TYPE_GITHUB = 'GITHUB';
+
+  /**
+   * Defining the GitLab type.
+   */
+  const GIT_TYPE_GITLAB = 'GITLAB';
+
+  /**
+   * Defining the "all" option in the rest definition.
+   */
+  const REST_ALL_OPTION = 'all';
+
+}
+
+?>

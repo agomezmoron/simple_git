@@ -4,10 +4,11 @@
  * @file
  * Contains \Drupal\simple_git\Controller\SimpleGitController.
  */
+
 namespace Drupal\simple_git\Controller;
+
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\Url;
 use Drupal\Core\Utility\LinkGeneratorInterface;
 use Drupal\simple_git\Service\SimpleGitHubConnectorService;
 use Drupal\user\UserDataInterface;
@@ -17,7 +18,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Controller routines for oauth routes.
  */
-class SimpleGitController extends ControllerBase implements ContainerInjectionInterface {
+class SimpleGitController extends ControllerBase implements
+  ContainerInjectionInterface {
 
   /**
    * The URL generator service.
@@ -36,13 +38,15 @@ class SimpleGitController extends ControllerBase implements ContainerInjectionIn
   /**
    * Constructs an SimpleGitHubController object.
    *
-   * @param \Drupal\user\UserDataInterface $user_data
+   * @param \Drupal\user\UserDataInterface              $user_data
    *   The user data service.
    *
    * @param \Drupal\Core\Utility\LinkGeneratorInterface $link_generator
    *   The link generator service.
    */
-  public function __construct(UserDataInterface $user_data, LinkGeneratorInterface $link_generator) {
+  public function __construct(
+    UserDataInterface $user_data, LinkGeneratorInterface $link_generator
+  ) {
     $this->user_data = $user_data;
     $this->linkGenerator = $link_generator;
   }
@@ -82,7 +86,9 @@ class SimpleGitController extends ControllerBase implements ContainerInjectionIn
     */
     // $list['heading']['#markup'] = $this->linkGenerator->generate($this->t('Add consumer'), Url::fromRoute('oauth.user_consumer_add', array('user' => $user->id())));
     // Get the list of repositories.
-    $result = $this->user_data->get('simple_github', $user->id(), 'repositories');
+    $result = $this->user_data->get(
+      'simple_github', $user->id(), 'repositories'
+    );
     // Define table headers.
     $list['table'] = array(
       '#theme' => 'table',
