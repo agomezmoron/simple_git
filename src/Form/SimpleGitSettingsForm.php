@@ -67,6 +67,39 @@ class SimpleGitSettingsForm extends ConfigFormBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    parent::validateForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
+
+    $values = array();
+    $values['git_hub'] = array(
+      'app_id' => $form_state->getValue('git_hub_app_id'),
+      'app_secret' => $form_state->getValue('git_hub_app_secret'),
+      'app_url_redirect' => $form_state->getValue('git_hub_app_url_redirect'),
+      'app_name' => $form_state->getValue('git_hub_app_name')
+    );
+
+    $values['git_lab'] = array(
+      'app_id' => $form_state->getValue('git_lab_app_id'),
+      'app_secret' => $form_state->getValue('git_lab_app_secret'),
+      'app_url_redirect' => $form_state->getValue('git_lab_app_url_redirect'),
+    );
+
+    \Drupal::configFactory()->getEditable('simple_git.settings')
+      ->set(GIT_TYPE_GITHUB, $values['git_hub'])
+      ->set(GIT_TYPE_GITLAB, $values['git_lab'])
+      ->save();
+  }
+
+  /**
    * It builds the GitHub configuration subform.
    *
    * @param $form
@@ -107,6 +140,13 @@ class SimpleGitSettingsForm extends ConfigFormBase {
       '#default_value' => $git_settings->get(
         ModuleConstantInterface::GIT_TYPE_GITHUB
       )['app_url_redirect'],
+    );
+
+    $form['git_hub']['git_hub_app_name'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('GitHub App Name'),
+      '#description' => $this->t('GitHub App Name'),
+      '#default_value' => $git_settings->get(ModuleConstantInterface::GIT_TYPE_GITHUB)['app_name'],
     );
 
   }

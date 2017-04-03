@@ -131,6 +131,20 @@ abstract class SimpleGitConnector {
   public abstract function getConnectorType();
 
   /**
+   * It checks if the repository exists.
+   *
+   * @param $params
+   *  It's an array that content depends on implementation
+   *
+   * @return boolean
+   *  True if the repository exists
+   */
+  public function existsRepository($params) {
+    return !empty($this->getRepository($params));
+  }
+
+
+  /**
    * Configure the response, based in the corresponding mapping. For multi node
    * elements we're using the -> separator as custom convention
    * inside of the string.

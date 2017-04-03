@@ -26,10 +26,10 @@ REST service to link and retrieve accounts information.
 
 | Method  | Parameters | Response | Description |
 | ------------- | ------------- | ------------- | ------------- |
-| GET  |  **/all** the accounts will be returned.| [{ "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" }] | It returns all the associated accounts  |
-| GET  | **/{account_id}** that account will be returned. | { "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" } | It returns the associated account  |
-| POST  | { "code": "ABCD", "nonce": "EDFG" } | { "id": 3, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" } | It connects to GitHub and returns the linked account information.  **If the authentication fails, an error with a 401 status code will be raised.** | 
-| DELETE  | None  | {"client_id": "XXXX"} | Returns the GitHub App Client ID.  |
+| GET  |  **/all** | All the associated accounts:  [{ "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" }] | It returns all the associated accounts  |
+| GET  | **/{account_id}** | { "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" } | It returns the associated account  |
+| POST  | { "code": "ABCD", "nonce": "EDFG", "type": "GITHUB"} | { "id": 3, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" } | It connects to GitHub and returns the linked account information.  **If the authentication fails, an error with a 401 status code will be raised.** | 
+| DELETE  | **/{account_id}** | NONE | It deletes the provided {account_id}. |
 
 ### Pull Requests
 

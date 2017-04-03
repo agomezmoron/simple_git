@@ -22,7 +22,12 @@ use Drupal\simple_git\Service\SimpleGitConnectorInterface;
  */
 class SimpleGitHubConnectorService extends SimpleGitConnector {
 
-  const BASE_URL = "https://api.github.com/";
+  const BASE_URL = 'https://api.github.com/';
+
+  /**
+   * Items per page. By default the GitHub API has 30 elements.
+   */
+  const PER_PAGE = 500;
 
   /**
    * SimpleGitHubConnectorService constructor.
@@ -48,13 +53,13 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $state = $params['state'];
       $settings = $this->getConnectorConfig();
       //Url to user
-      $url = "https://github.com/login/oauth/access_token";
+      $url = 'https://github.com/login/oauth/access_token';
       //Set parameters
       $parameters = array(
-        "client_id" => $settings['app_id'],
-        "client_secret" => $settings['app_secret'],
-        "code" => $code,
-        "state" => $state
+        'client_id' => $settings['app_id'],
+        'client_secret' => $settings['app_secret'],
+        'code' => $code,
+        'state' => $state
       );
 
       //Open curl stream
@@ -153,7 +158,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
     $response = array();
     if ($params['userInfo']) {
       $user = $params['userInfo'];
-      $url = self::BASE_URL . "user/repos?per_page=500";
+      $url = self::BASE_URL . 'user/repos?per_page=' . PER_PAGE;
       $ch = $this->getConfiguredCURL($url, $user);
       $repositories = $this->performCURL($ch);
       foreach ($repositories as $repo) {
@@ -176,17 +181,19 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    * @return mixed
    */
   public function getRepository($params) {
+    $response = [];
     if ($params['userInfo'] && $params['repository']) {
       $user = $params['userInfo'];
       $repository = $params['repository'];
+
       $url = self::BASE_URL . $repository['username'] . "/"
         . $repository['name'];
       $ch = $this->getConfiguredCURL($url, $user);
       $repo = $this->performCURL($ch);
       $response = $this->configureRepositoryFields($repo);
       $response['account'] = $user['username'];
-      return $response;
     }
+    return $response;
   }
 
   /**
@@ -254,7 +261,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
   public function getAccount($params) {
     if ($params['userInfo']) {
       $user = $params['userInfo'];
-      $url = self::BASE_URL . "user";
+      $url = self::BASE_URL . 'user';
       $ch = $this->getConfiguredCURL($url, $user);
       $account = $this->performCURL($ch);
       $account['number_of_repos'] = $account['total_private_repos']
@@ -270,6 +277,24 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    */
   public function getConnectorType() {
     return ModuleConstantInterface::GIT_TYPE_GITHUB;
+  }
+
+  /**
+   * Obtain the user detail of a non-logged user.
+   *
+   * @param $params
+   *  It needs the userName
+   *
+   * @return mixed
+   */
+  protected function getUserDetail($params) { //Non-logged user
+    if ($params['userInfo']) {
+      $user = $params['userInfo'];
+      $url = self::BASE_URL . 'users/' . $user->username;
+      $ch = $this->getConfiguredCURL($url, $user);
+      $response = $this->performCURL($ch);
+      return $response;
+    }
   }
 
   /**
@@ -344,6 +369,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    * @return mixed
    */
   protected function getPullRequestCommits($user, $repo, $pr_id) {
+
     $url = self::BASE_URL . "repos/" . $user->usermname . "/" . $repo
       . "/pulls/" . $pr_id . "/commits";
     $ch = $this->getConfiguredCURL($url, $user);
@@ -363,10 +389,84 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    * @return mixed
    */
   protected function getPullRequestComments($user, $repo, $pr_id) {
-    $url = self::BASE_URL . "repos/" . $user->usermname . "/" . $repo
-      . "/pulls/" . $pr_id . "/comments";
+    $url = self::BASE_URL . 'repos/' . $user->usermname . '/' . $repo
+      . '/pulls/' . $pr_id . '/comments?per_page=' . PER_PAGE;
     $ch = $this->getConfiguredCURL($url, $user);
     $response = $this->performCURL($ch);
     return $response;
+  }
+
+  /**
+   * Include the headers into the curl request.
+   *
+   * @return array
+   */
+  protected function buildHeaders($token = NULL) {
+    $headers = [];
+    $headers[] = 'Accept: application/json';
+    $headers[] = 'Accept: application/vnd.github.v3+json';
+
+    // by default name
+    $app_name = 'GitHub Dashboard';
+    $connector_config = $this->getConnectorConfig();
+    if (!empty($connector_config) && isset($connector_config['app_name'])) {
+      $app_name = $connector_config['app_name'];
+    }
+    $headers[] = 'User-Agent: ' . $app_name;
+
+    // if we have the security token
+    if (!is_null($token)) {
+      $headers[] = 'Authorization: token ' . $token;
+    }
+    return $headers;
+  }
+
+  /**
+   * Configure a basic curl request.
+   *
+   * @param      $url the attacked endpoint
+   *
+   * @param null $username
+   *
+   * @param null $token
+   *                  These params are 'optional'. (By the moment the only exception is the
+   *                  authorize method).
+   *
+   * @return resource
+   */
+  protected function getConfiguredCURL($url, $user = NULL) {
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+
+    if (!is_null($user) && !is_null($user['access_info'])
+      && isset($user['access_info']['token'])
+    ) {
+      $headers = $this->buildHeaders($user['access_info']['token']);
+    }
+    else {
+      $headers = $this->buildHeaders();
+    }
+
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    return $ch;
+  }
+
+  /**
+   * Perform the curl request, close the stream and return the response.
+   *
+   * @param $ch
+   *
+   * @return mixed
+   */
+  protected function performCURL(&$ch) {
+    $data = curl_exec($ch);
+    curl_close($ch);
+    if (!is_array($data) && is_string($data)) {
+      $data = json_decode($data, TRUE);
+    }
+    return $data;
   }
 }
