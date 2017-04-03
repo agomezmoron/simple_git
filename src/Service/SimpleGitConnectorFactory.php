@@ -32,7 +32,6 @@ abstract class SimpleGitConnectorFactory {
    */
   static function getConnector($type) {
     $connector = NULL;
-    error_log('type' . print_r($type), TRUE);
     switch ($type) {
       case ModuleConstantInterface::GIT_TYPE_GITHUB:
         $connector = \Drupal::service(

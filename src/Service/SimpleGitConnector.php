@@ -70,17 +70,6 @@ abstract class SimpleGitConnector {
   public abstract function getRepositoriesList($params);
 
   /**
-   * Get a concrete repository.
-   *
-   * @param $params
-   *  It's an array that content depends on implementation
-   *
-   * @return mixed
-   *  With the repository information.
-   */
-  public abstract function getRepository($params);
-
-  /**
    * Get the list of pull request associated to the selected repository.
    *
    * @param $params
@@ -114,6 +103,30 @@ abstract class SimpleGitConnector {
   public abstract function getAccount($params);
 
   /**
+   * It checks if the repository exists.
+   *
+   * @param $params
+   *  It's an array that content depends on implementation
+   *
+   * @return boolean
+   *  True if the repository exists
+   */
+  public function existsRepository($params) {
+    return !empty($this->getRepository($params));
+  }
+
+  /**
+   * Get a concrete repository.
+   *
+   * @param $params
+   *  It's an array that content depends on implementation
+   *
+   * @return mixed
+   *  With the repository information.
+   */
+  public abstract function getRepository($params);
+
+  /**
    * Obtain the connection config based in the connection type(Github, Gitlab..).
    *
    * @return string with the connector type associated.
@@ -129,20 +142,6 @@ abstract class SimpleGitConnector {
    * @return mixed with the conenctor type.
    */
   public abstract function getConnectorType();
-
-  /**
-   * It checks if the repository exists.
-   *
-   * @param $params
-   *  It's an array that content depends on implementation
-   *
-   * @return boolean
-   *  True if the repository exists
-   */
-  public function existsRepository($params) {
-    return !empty($this->getRepository($params));
-  }
-
 
   /**
    * Configure the response, based in the corresponding mapping. For multi node

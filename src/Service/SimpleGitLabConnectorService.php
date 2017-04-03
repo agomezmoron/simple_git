@@ -371,7 +371,7 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
    * @return string
    */
   public function getConnectorType() {
-    return GIT_TYPE_GITLAB;
+    return ModuleConstantInterface::GIT_TYPE_GITLAB;
   }
 
   /**

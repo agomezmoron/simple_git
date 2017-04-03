@@ -100,7 +100,7 @@ class ConnectorResource extends ResourceBase {
     // GitHub connector
     if (!empty(
     $git_settings->get(
-      ModuleConstantInterface::GIT_TYPE_GITHUB
+      GIT_TYPE_GITHUB
     )['app_id']
     )
     ) {

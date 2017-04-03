@@ -10,6 +10,7 @@
 
 namespace Drupal\simple_git\Plugin\rest\resource;
 
+use Drupal\Core\Database\TransactionNameNonUniqueException;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;

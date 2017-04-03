@@ -1,17 +1,13 @@
 <?php
 
 /**
- * @version PHP: 7
  * @file
  * Contains \Drupal\simple_git\BusinessLogic\SimpleGitPullRequestsBusinessLogic.
- * @author  Alejandro Gómez Morón <amoron@emergya.com>
- * @author  Estefania arrrera Berengeno <ebarrera@emergya.com>
- * @version PHP: 7
  */
 
 namespace Drupal\simple_git\BusinessLogic;
 
-use Drupal\simple_git\Service;
+use \Drupal\simple_git\Service;
 
 /**
  * Class SimpleGitPullRequestsBusinessLogic.
@@ -48,13 +44,9 @@ class SimpleGitPullRequestsBusinessLogic {
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']
       );
-      $pull_requests_by_account = $git_service->getPullRequestsList(
-        $params
-      );
+      $pull_requests_by_account = $git_service->getPullRequestsList($params);
       if (!empty($pull_requests_by_account)) {
-        $pull_requests = array_merge(
-          $pull_requests, $pull_requests_by_account
-        );
+        $pull_requests = array_merge($pull_requests, $pull_requests_by_account);
       }
     }
 
