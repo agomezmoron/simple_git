@@ -1,13 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\simple_git\BusinessLogic\SimpleGitRepositoriesBusinessLogic.
- * @author  Alejandro Gómez Morón <amoron@emergya.com>
- * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
- * @version PHP: 7
- */
-
 namespace Drupal\simple_git\BusinessLogic;
 
 use Drupal\simple_git\Service;
@@ -25,11 +17,11 @@ class SimpleGitRepositoriesBusinessLogic {
    * @param array $accounts
    *   An associative array containing structure user.
    *
-   * @return array $repositories
+   * @return array
    *   Contains user's repository.
    */
-  static function getRepositories($accounts) {
-    $repositories = array();
+  public static function getRepositories(array $accounts) {
+    $repositories = [];
     foreach ($accounts as $account) {
       $params['userInfo'] = $account;
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
@@ -40,7 +32,7 @@ class SimpleGitRepositoriesBusinessLogic {
       );
     }
 
-    // removing duplicated repositories
+    // Removing duplicated repositories.
     $filtered_repositories = [];
     $added_repos = [];
 
@@ -54,24 +46,21 @@ class SimpleGitRepositoriesBusinessLogic {
     return $filtered_repositories;
   }
 
-
   /**
    * Get repository.
    *
-   * @param int    $account_id
-   *    A id account.
-   *
+   * @param int $account_id
+   *   A id account.
    * @param string $repo
-   *    A string with URL of the repositories.
+   *   A string with URL of the repositories.
+   * @param array $user
+   *   An associative array containing structure user.
    *
-   * @param array  $user
-   *    An associative array containing structure user.
-   *
-   * @return array $repository
+   * @return array
    *   Contains user's repository.
    */
-  static function getRepository($account_id, $repo, $user) {
-    $repository = array();
+  public static function getRepository($account_id, $repo, array $user) {
+    $repository = [];
     $account = SimpleGitAccountBusinessLogic::getAccountByAccountId(
       $user, $account_id
     );
@@ -86,25 +75,26 @@ class SimpleGitRepositoriesBusinessLogic {
     return $repository;
   }
 
-
   /**
-   * It filters and return an array with the repositories where the $account is
-   * owner or collaborator.
+   * It filters and return an array with the repositories.
    *
    * @param array $account
-   *  To get his/her repositories.
+   *   To get his/her repositories.
    * @param array $repositories
-   *  To be filtered.
+   *   To be filtered.
    *
-   * @return array $repositories
-   *  With the repositories associated to the given $account.
+   * @return array
+   *   With the repositories associated to the given $account.
    */
-  static function filterRepositoriesByAccount($account, &$repositories) {
+  public static function filterRepositoriesByAccount(
+    array $account,
+    array &$repositories
+  ) {
     return array_filter(
       $repositories, function ($repository) use ($account) {
-      return $repository['username'] == $account['username']
+        return $repository['username'] == $account['username']
         || $repository['account'] == $account['username'];
-    }
+      }
     );
   }
 
@@ -112,15 +102,17 @@ class SimpleGitRepositoriesBusinessLogic {
    * It creates a repository in the provided account.
    *
    * @param array $account
-   *      Account information.
+   *   Account information.
    * @param array $repository_info
-   *      The repository info to create the repository. At least,the keys should be:
-   *      'name' => string
-   *      'collaborators' => array with the keys:
-   *      'username' => 'username 1'
+   *   The repository info to create the repository.
+   *   At least,the keys should be.
    *
-   * @return array $repository
-   *  With the created repository
+   * @var 'name' => string
+   * @var 'collaborators' => array with the keys:
+   * @var 'username' => 'username 1'
+   *
+   * @return array
+   *   With the created repository
    */
   static function create($account, $repository_info) {
     $repository = [];
@@ -133,7 +125,7 @@ class SimpleGitRepositoriesBusinessLogic {
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']
       );
-      // TODO: add this to the git service interface $repository = $git_service->createRepository($params);
+      // @TODO: add this to the git service interface $repository = $git_service->createRepository($params);
     }
     return $repository;
   }
@@ -142,14 +134,14 @@ class SimpleGitRepositoriesBusinessLogic {
    * It checks if exists a repository with the provided info.
    *
    * @param array $account
-   *  Account information.
+   *   Account information.
    * @param array $repository_info
-   *  The repository info to be checked. The key "name" is needed.
+   *   The repository info to be checked. The key "name" is needed.
    *
-   * @return boolean exists
-   *  true if the repository exists.
+   * @return bool
+   *   true if the repository exists.
    */
-  static function exists($account, $repository_info) {
+  public static function exists($account, $repository_info) {
     $exists = FALSE;
     if (!empty($account) && !empty($repository_info)
       && isset($repository_info['name'])

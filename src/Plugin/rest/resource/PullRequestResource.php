@@ -1,13 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\simple_git\Plugin\rest\resource\PullRequestResource.php
- * @author  Alejandro Gómez Morón <amoron@emergya.com>
- * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
- * @version PHP: 7
- */
-
 namespace Drupal\simple_git\Plugin\rest\resource;
 
 use Drupal\Core\Session\AccountProxyInterface;
@@ -33,46 +25,51 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class PullRequestResource extends ResourceBase {
 
   /**
-   *  A current user instance.
+   * A current user instance.
    *
    * @var \Drupal\Core\Session\AccountProxyInterface
    */
-  protected $current_user;
+
+  protected $currentUser;
 
   /**
    * Constructs a Drupal\rest\Plugin\ResourceBase object.
    *
-   * @param array     $configuration
+   * @param array $configuration
    *   A configuration array containing information about the plugin instance.
-   *
-   * @param string    $plugin_id
+   * @param string $plugin_id
    *   The plugin_id for the plugin instance.
-   *
-   * @param mixed     $plugin_definition
+   * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   *
-   * @param array     $serializer_formats
+   * @param array $serializer_formats
    *   The available serialization formats.
-   *
-   * @param \Psr\Log\ $logger
+   * @param \Psr\Log $logger
    *   A logger instance.
+   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
+   *   The current account.
    */
   public function __construct(
-    array $configuration, $plugin_id, $plugin_definition,
-    array $serializer_formats, $logger, AccountProxyInterface $current_user
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    array $serializer_formats,
+    $logger,
+    AccountProxyInterface $current_user
   ) {
     parent::__construct(
       $configuration, $plugin_id, $plugin_definition, $serializer_formats,
       $logger
     );
-    $this->current_user = $current_user;
+    $this->currentUser = $current_user;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(
-    ContainerInterface $container, array $configuration, $plugin_id,
+    ContainerInterface $container,
+    array $configuration,
+    $plugin_id,
     $plugin_definition
   ) {
     return new static(
@@ -94,7 +91,7 @@ class PullRequestResource extends ResourceBase {
   public function get() {
     $accounts = array();
     $accounts = SimpleGitAccountBusinessLogic::getAccounts(
-      $this->current_user
+      $this->currentUser
     );
     $repositories = SimpleGitRepositoriesBusinessLogic::getRepositories(
       $accounts

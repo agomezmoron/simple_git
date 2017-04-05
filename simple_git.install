@@ -12,7 +12,7 @@ use Drupal\Core\Database\Database;
  */
 function simple_git_requirements($phase) {
   $requirements = array();
-  // Non extra requirements detected by now
+  // Non extra requirements detected by now.
   return $requirements;
 }
 

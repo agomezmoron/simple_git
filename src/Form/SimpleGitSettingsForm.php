@@ -1,13 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\simple_git\Form\SimpleGitSettingsForm.
- * @author  Alejandro Gómez Morón <agomezmoron@emergya.com>
- * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
- * @version PHP: 7
- */
-
 namespace Drupal\simple_git\Form;
 
 use Drupal\Core\Config\ConfigFactory;
@@ -37,7 +29,7 @@ class SimpleGitSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    /** @var \Drupal\Core\Config\ConfigFactory $config */
+    /*@var \Drupal\Core\Config\ConfigFactory $config*/
     $config = $container->get('config.factory');
     return new static($config);
   }
@@ -55,10 +47,10 @@ class SimpleGitSettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
 
     $form = array();
-    // add the GitHub configuration
+    // Add the GitHub configuration.
     $this->buildGitHubForm($form);
 
-    // add the GitHub configuration
+    // Add the GitHub configuration.
     $this->buildGitLabForm($form);
 
     $form['#submit'][] = array($this, 'submitForm');
@@ -69,8 +61,8 @@ class SimpleGitSettingsForm extends ConfigFormBase {
   /**
    * It builds the GitHub configuration subform.
    *
-   * @param $form
-   *  An associative array containing the structure of the form.
+   * @param array $form
+   *   An associative array containing the structure of the form.
    */
   private function buildGitHubForm(&$form) {
     $git_settings = $this->configFactory->get('simple_git.settings');
@@ -123,8 +115,8 @@ class SimpleGitSettingsForm extends ConfigFormBase {
   /**
    * It builds the GitLab configuration subform.
    *
-   * @param $form
-   *  An associative array containing the structure of the form.
+   * @param array $form
+   *   An associative array containing the structure of the form.
    */
   private function buildGitLabForm(&$form) {
     $git_settings = $this->configFactory->get('simple_git.settings');
@@ -208,4 +200,3 @@ class SimpleGitSettingsForm extends ConfigFormBase {
   }
 
 }
-

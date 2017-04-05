@@ -1,12 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\simple_git\Service\SimpleGitLabConnectorService
- * @author  Alejandro Gómez Morón <amoron@emergya.com>
- * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
- * @version PHP 7
- *
- */
 
 namespace Drupal\simple_git\Service;
 
@@ -19,11 +11,15 @@ use Drupal\simple_git\Service\SimpleGitConnectorInterface;
  */
 class SimpleGitLabConnectorService extends SimpleGitConnector {
 
+  /**
+   * URL of GitLab API.
+   */
   const BASE_URL = 'https://gitlab.com/';
 
   /**
    * SimpleGitLabConnectorService constructor.
-   * It calls to the parent to configure the mappings
+   *
+   * It calls to the parent to configure the mappings.
    */
   public function __construct() {
     parent::__construct();
@@ -32,48 +28,47 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\simple_git\Service\it $params
-   *  In this case the needed params are the sent state to login and the code
-   *  returned from login.
+   * @param array $params
+   *   In this case the needed params are the sent state to login and the code
+   *   returned from login.
    *
    * @return mixed
-   *  The access token to perform the requests
+   *   The access token to perform the requests.
    *
-   * parameters = 'client_id=APP_ID&client_secret=APP_SECRET&code=RETURNED_CODE&grant_type=authorization_code&redirect_uri=REDIRECT_URI'
-   * https://gitlab.example.com/oauth/authorize?client_id=APP_ID&redirect_uri=REDIRECT_URI&response_type=code&state=your_unique_state_hash
+   *   parameters =
+   *   'client_id=APP_ID&client_secret=APP_SECRET&code=RETURNED_CODE&
+   *   grant_type=authorization_code&redirect_uri=REDIRECT_URI'
+   *   https://gitlab.example.com/oauth/authorize?client_id=APP_ID&
+   *   redirect_uri=REDIRECT_URI&response_type=code&state=your_unique_state_hash
    */
   public function authorize($params) {
     if ($params['code'] && $params['state']) {
       $code = $params['code'];
       $state = $params['state'];
       $settings = $this->getConnectorConfig();
-      //Url to attack
+      // Url to attack.
       $url = self::BASE_URL . '/oauth/authorize';
-
-      //Set parameters
+      // Set parameters.
       $parameters = array(
         'client_id' => $settings['app_id'],
         'client_secret' => $settings['app_secret'],
         'redirect_uri' => $settings['redirect_uri'],
         'response_type' => $code,
-        'state' => $state
+        'state' => $state,
       );
-
-      //Open curl stream
+      // Open curl stream.
       $ch = $this->getConfiguredCURL($url);
-      //set the url, number of POST vars, POSTdata
+      // Set the url, number of POST vars, POSTdata.
       curl_setopt($ch, CURLOPT_URL, $url);
       curl_setopt($ch, CURLOPT_POST, count($parameters));
       curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
-      $status_code = curl_getinfo(
-        $ch, CURLINFO_HTTP_CODE
-      );   //get status code
+      curl_getinfo($ch, CURLINFO_HTTP_CODE);
       $response = $this->performCURL($ch);
-      //Exposing the access token if it's necessary
+      // Exposing the access token if it's necessary.
       $access_token = $response['access_token'];
       $token_type = $response['token_type'];
 
-      //Return the obtained token
+      // Return the obtained token.
       return $access_token;
     }
   }
@@ -81,15 +76,13 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   /**
    * Configure a basic curl request.
    *
-   * @param      $url the attacked endpoint
+   * @param mixed $url
+   *   The attacked endpoint.
+   * @param mixed $user
+   *   In this case the needed $user are the sent access_info.
    *
-   * @param null $username
-   *
-   * @param null $token
-   *                  These params are 'optional'. (By the moment the only exception is the
-   *                  authorize method).
-   *
-   * @return resource
+   * @return mixed
+   *   Configured CURL
    */
   protected function getConfiguredCURL($url, $user = NULL) {
     $ch = curl_init($url);
@@ -107,20 +100,23 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
 
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
     return $ch;
   }
 
   /**
    * Include the headers into the curl request.
    *
+   * @param mixed $token
+   *   The token from the user.
+   *
    * @return array
+   *   The response headers.
    */
   protected function getHeaders($token = NULL) {
     $headers = [];
     $headers[] = 'Accept: application/json';
-// if we have the security token
-
+    // If we have the security token.
     if (is_null($token)) {
       $headers[] = 'Authorization: token ' . $token;
     }
@@ -130,9 +126,11 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   /**
    * Perform the curl request, close the stream and return the response.
    *
-   * @param $ch
+   * @param mixed $ch
+   *   Request curl.
    *
    * @return mixed
+   *   The response.
    */
   protected function performCURL(&$ch) {
     $data = curl_exec($ch);
@@ -143,16 +141,17 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   /**
    * List repository branches.
    *
-   * @param $params
-   *  To retrieves the available branches.
+   * @param array $params
+   *   To retrieves the available branches.
    *
    * @return array
-   *  With all the branches.
+   *   Array with all the branches.
    */
-  public function getBranchesList($params) {
+  public function getBranchesList(array $params) {
     if ($params['userInfo']) {
       $user = $params['userInfo'];
-      $id = $params['id_proyect'];// The ID of a project
+      // The ID of a project.
+      $id = $params['id_proyect'];
       $url = self::BASE_URL . '/projects/' . $id . '/repository/branches';
       $ch = $this->getConfiguredCURL($url, $user);
       $repositories = $this->performCURL($ch);
@@ -170,17 +169,19 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   /**
    * Gets all the branches with detailed information.
    *
-   * @param $params
-   *  To retrieve all the branches.
+   * @param array $params
+   *   To retrieve all the branches.
    *
    * @return array
-   *  With all the branches.
+   *   With all the branches.
    */
-  public function getBranches($params) {
+  public function getBranches(array $params) {
     if ($params['userInfo']) {
       $user = $params['userInfo'];
-      $id = $params['id_proyect'];// The ID of a project
-      $branch = $params['branch']; //The name of the branch
+      // The ID of a project.
+      $id = $params['id_proyect'];
+      // The name of the branch.
+      $branch = $params['branch'];
       $url = self::BASE_URL . '/projects/' . $id . '/repository/branches/'
         . $branch;
       $ch = $this->getConfiguredCURL($url, $user);
@@ -199,16 +200,17 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   /**
    * It retrieves a commit information.
    *
-   * @param $params
-   *  To retrieve the commit.
+   * @param array $params
+   *   To retrieve the commit.
    *
    * @return array
-   *  With the commit information.
+   *   With the commit information.
    */
-  public function getCommit($params) {
+  public function getCommit(array $params) {
     if ($params['userInfo']) {
       $user = $params['userInfo'];
-      $id = $params['id_proyect'];// The ID of a project
+      // The ID of a project.
+      $id = $params['id_proyect'];
       $url = self::BASE_URL . '/projects/' . $id . '/repository/commits';
       $ch = $this->getConfiguredCURL($url, $user);
       $repos = $this->performCURL($ch);
@@ -226,11 +228,13 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   /**
    * List projects.
    *
-   * @param $params
+   * @param array $params
+   *   To retrieve the list project.
    *
    * @return array
+   *   Array With the projects information.
    */
-  public function getProjectsList($params) {
+  public function getProjectsList(array $params) {
     if ($params['userInfo']) {
       $user = $params['userInfo'];
       $url = self::BASE_URL . '/projects';
@@ -243,15 +247,17 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   /**
    * Get single project.
    *
-   * @param $params
+   * @param array $params
+   *   To retrieve the project.
    *
    * @return array
+   *   Array With the projects information.
    */
-  public function getProjects($params) {
+  public function getProjects(array $params) {
     if ($params['userInfo']) {
       $user = $params['userInfo'];
-
-      $id = $params['id'];//The ID or NAMESPACE/PROJECT_NAME of the project
+      // The ID or NAMESPACE/PROJECT_NAME of the project.
+      $id = $params['id'];
       $url = self::BASE_URL . '/projects/' . $id;
       $ch = $this->getConfiguredCURL($url, $user);
       $account = $this->performCURL($ch);
@@ -264,14 +270,17 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
    *
    * {@inheritdoc}
    *
-   * @param \Drupal\simple_git\Service\it $params it needs the userInfo
+   * @param mixed[] $params
+   *   It needs the userInfo.
    *
-   * @return array
+   * @return mixed[]
+   *   Array With the repositories information.
    */
   public function getRepositoriesList($params) {
     if ($params['userInfo']) {
       $user = $params['userInfo'];
-      $id = $params['id']; //The ID of a project
+      // The ID of a project.
+      $id = $params['id'];
       $url = self::BASE_URL . '/projects/' . $id . '/repository/tree';
       $ch = $this->getConfiguredCURL($url, $user);
       $repos = $this->performCURL($ch);
@@ -287,15 +296,24 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
 
   }
 
+  /**
+   * {@inheritdoc}
+   *
+   * @param mixed[] $params
+   *   It needs the userInfo and the name of the repository requested.
+   *
+   * @return mixed[]
+   *   Information about the repository.
+   */
   public function getRepository($params) {
     /*if ($params['userInfo'] && $params['repo']) {
-      $user = $params['userInfo'];
-      $name = $params['repo'];
-      $url = self::BASE_URL . $user->username . '/' . $name;
-      $ch = $this->getConfiguredCURL($url, $user);
-      $repo = $this->performCURL($ch);
-      $response = $this->configureRepositoryFields($repo);
-      return $response;
+    $user = $params['userInfo'];
+    $name = $params['repo'];
+    $url = self::BASE_URL . $user->username . '/' . $name;
+    $ch = $this->getConfiguredCURL($url, $user);
+    $repo = $this->performCURL($ch);
+    $response = $this->configureRepositoryFields($repo);
+    return $response;
     }*/
     return NULL;
   }
@@ -305,9 +323,9 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
    *
    * {@inheritdoc}
    *
-   * @param \Drupal\simple_git\Service\it $params
-   *  It needs the userInfo and the name of the repository to see
-   *  its associated pull requests.
+   * @param array $params
+   *   It needs the userInfo and the name of the repository to see
+   *   its associated pull requests.
    *
    * @return array
    */
@@ -326,18 +344,20 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\simple_git\Service\it $params
-   *  It needs the userInfo, the name of accessed repo and the id of the concrete
-   *  pull request.
+   * @param array $params
+   *   It needs the userInfo, the name of accessed repo and the id
+   *   of the concrete pull request.
    *
    * @return array
+   *   Information about the pull request.
    */
   public function getPullRequest($params) {
     if ($params['userInfo'] && $params['repo'] && $params['id']) {
       $user = $params['userInfo'];
-      $id = $params['id'];//The ID of a project
-      $merge_request_iid
-        = $params['merge_request_iid'];//The internal ID of the merge request
+      // The ID of a project.
+      $id = $params['id'];
+      // The internal ID of the merge request.
+      $merge_request_iid = $params['merge_request_iid'];
       $url = self::BASE_URL . 'projects/' . $id . '/merge_requests/'
         . $merge_request_iid;
       $ch = $this->getConfiguredCURL($url, $user);
@@ -349,10 +369,11 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\simple_git\Service\it $params
-   *  It needs the userInfo.
+   * @param array $params
+   *   It needs the userInfo.
    *
    * @return array
+   *   Information about the account.
    */
   public function getAccount($params) {
     if ($params['userInfo']) {
@@ -360,7 +381,6 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
       $url = self::BASE_URL . 'users/';
       $ch = $this->getConfiguredCURL($url, $user);
       $account = $this->performCURL($ch);
-      // $account['number_of_repos'] = $account['total_private_repos'] + $account['public_repos'];
       return $this->buildResponse($account, self::ACCOUNT);
     }
   }
@@ -369,6 +389,7 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
    * {@inheritdoc}
    *
    * @return string
+   *   Information about the type connector
    */
   public function getConnectorType() {
     return ModuleConstantInterface::GIT_TYPE_GITLAB;
@@ -377,12 +398,13 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   /**
    * Obtain the user detail of a non-logged user.
    *
-   * @param $params
-   *  It needs the userName.
+   * @param mixed[] $params
+   *   It needs the userName.
    *
    * @return mixed
+   *   Information about the user.(Non-logged user).
    */
-  protected function getUserDetail($params) { //Non-logged user
+  protected function getUserDetail($params) {
     if ($params['userInfo']) {
       $user = $params['userInfo'];
       $url = self::BASE_URL . "users/" . $user->id;
@@ -395,13 +417,15 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   /**
    * Obtain the commit list from a concrete pull request.
    *
-   * @param $user  the userInfo
-   *
-   * @param $repo  the name of accessed repository
-   *
-   * @param $pr_id the pull request id
+   * @param mixed $user
+   *   The userInfo.
+   * @param mixed $merge_request_iid
+   *   The name of merge request.
+   * @param mixed $pr_id
+   *   The pull request id.
    *
    * @return mixed
+   *   Information about the commits of the pull requests
    */
   protected function getPullRequestCommits($user, $merge_request_iid, $pr_id) {
     $url = self::BASE_URL . '/projects/' . $pr_id . './merge_requests/'
@@ -414,19 +438,17 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
   /**
    * Obtain the comment list from a concrete pull request.
    *
-   * @param $user  the userInfo
-   *
-   * @param $repo  the name of accessed repository
-   *
-   * @param $pr_id the pull request id
+   * @param mixed $user
+   *   The userInfo.
+   * @param mixed $repo
+   *   The name of accessed repository.
+   * @param mixed $pr_id
+   *   The pull request id.
    *
    * @return mixed
+   *   Information about the comments of the pull requests
    */
   protected function getPullRequestComments($user, $repo, $pr_id) {
-//    $url = self::BASE_URL . 'repos/' . $user->usermname . '/' . $repo . '/pulls/' . $pr_id . '/comments';
-//    $ch = $this->getConfiguredCURL($url, $user);
-//    $response = $this->performCURL($ch);
-//    return $response;
   }
 
   /**
@@ -454,19 +476,18 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
       'photo' => 'avatar_url',
       'id' => 'id',
       'location' => 'location',
-      //'repos' => 'number_of_repos' // it is autocalculated on getAccount method.
     );
     $this->mappings[self::REPOSITORY] = array(
       'id' => 'id',
       'name' => 'name',
       'type' => 'type',
-      'path' => 'path'
+      'path' => 'path',
     );
     $this->mappings[self::BRANCH] = array(
       'name_branch' => 'name',
       'commit_author' => 'commit->author_name',
       'commit_title' => 'commit->author_title',
-      'commit_parentsIds' => 'commit->parent_ids'
+      'commit_parentsIds' => 'commit->parent_ids',
     );
     $this->mappings[self::COMMIT] = array(
       'id' => 'id',
@@ -474,7 +495,7 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
       'author' => 'author',
       'committed_date' => 'committed_date',
       'created_at' => 'created_at',
-      'parent_ids' => 'parent_ids'
+      'parent_ids' => 'parent_ids',
     );
     $this->mappings[self::PROJECTS] = array(
       'id_project' => 'id',
@@ -485,7 +506,7 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
       'web_url' => 'web_url',
       'tag_list' => 'tag_list',
       'owner_id' => 'owner->id',
-      'owner_name' => 'owner->name'
+      'owner_name' => 'owner->name',
     );
   }
 

@@ -1,13 +1,8 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\simple_git\BusinessLogic\SimpleGitPullRequestsBusinessLogic.
- */
-
 namespace Drupal\simple_git\BusinessLogic;
 
-use \Drupal\simple_git\Service;
+use Drupal\simple_git\Service;
 
 /**
  * Class SimpleGitPullRequestsBusinessLogic.
@@ -21,19 +16,18 @@ class SimpleGitPullRequestsBusinessLogic {
   /**
    * Get List pull requests.
    *
-   * @param array  $accounts
+   * @param array $accounts
    *   Account information.
-   *
    * @param string $repositories
    *   An array with all the repositories associated.
    *
-   * @return array $pull_requests
-   *  Contains user's pull requests.
+   * @return array
+   *   Contains user's pull requests.
    */
   static function getPullRequests($accounts, $repositories) {
     $pull_requests = [];
 
-    // group repositories by $account
+    // Group repositories by $account.
     foreach ($accounts as &$account) {
       $params = [];
       $params['repositories']
@@ -44,13 +38,15 @@ class SimpleGitPullRequestsBusinessLogic {
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']
       );
-      $pull_requests_by_account = $git_service->getPullRequestsList($params);
+      $pull_requests_by_account
+        = $git_service->getPullRequestsList($params);
       if (!empty($pull_requests_by_account)) {
-        $pull_requests = array_merge($pull_requests, $pull_requests_by_account);
+        $pull_requests = array_merge($pull_requests,
+          $pull_requests_by_account);
       }
     }
 
-    // removing duplicated pull requests
+    // Removing duplicated pull requests.
     $filtered_pull_requests = [];
     $added_prs = [];
 
@@ -67,22 +63,20 @@ class SimpleGitPullRequestsBusinessLogic {
   /**
    * Get pull request.
    *
-   * @param int    $account_id
+   * @param int $account_id
    *   A id account.
-   *
    * @param string $repo
    *   A string with URL of the repositories.
-   *
-   * @param int    $id
-   *
-   * @param array  $user
+   * @param int $id
+   *   A int with id the pull.
+   * @param array $user
    *   An associative array containing structure user.
    *
-   * @return array $pr
+   * @return array
    *   Contains user's pull request.
    */
   static function getPullRequest($account_id, $repo, $id, $user) {
-    $pr = array();
+    $pr = [];
     $account = SimpleGitAccountBusinessLogic::getAccountByAccountId(
       $user, $account_id
     );
@@ -97,6 +91,5 @@ class SimpleGitPullRequestsBusinessLogic {
     }
     return $pr;
   }
-
 
 }
