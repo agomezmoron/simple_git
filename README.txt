@@ -1,62 +1,49 @@
 # simple_git
 
-CONTENTS OF THIS FILE
----------------------
-   
- * Introduction
- * Requirements
- * Recommended modules
- * Installation
- * Configuration
- * Troubleshooting
- * FAQ
- * Maintainers
+CONTENTS OF THIS FILE ---------------------
 
-INTRODUCTION
-------------
-Drupal module to have a simple interface to connect your Git services accounts.
+ * Introduction Requirements Recommended modules Installation Configuration
+ * Troubleshooting FAQ Maintainers
 
-REQUIREMENTS
-------------
+INTRODUCTION ------------ Drupal module to have a simple interface to connect
+your Git services accounts.
 
-* This module requires REST capabilities enabled. 
-* CORS should be enabled if you will use from an external domain.
+REQUIREMENTS ------------
 
-RECOMMENDED MODULES
--------------------
+* This module requires REST capabilities enabled. CORS should be enabled if you
+* will use from an external domain.
+
+RECOMMENDED MODULES -------------------
 
 * [REST UI](https://www.drupal.org/project/restui) module to handle it easily.
 
-INSTALLATION
-------------
- 
+INSTALLATION ------------
+
  * Install as you would normally install a contributed Drupal module.
 
-CONFIGURATION
--------------
- 
- * Configure the GitHub & GitLab apps on  user permissions in Administration » Configuration » Web services » Simple Git.
- * Enable the REST resources of the module:
-  * Git Account Resource
-  * Git Connector Resource
-  
-When enabled, the module will register some permissions & some resources, so remember refreshing the cache.
+CONFIGURATION -------------
 
-You can get more information about the REST interfaces in the following [link](REST_INTERFACES.md).
+ * Configure the GitHub & GitLab apps on  user permissions in Administration »
+ * Configuration » Web services » Simple Git. Enable the REST resources of the
+ * module: Git Account Resource Git Connector Resource
 
-TROUBLESHOOTING
----------------
+When enabled, the module will register some permissions & some resources, so
+remember refreshing the cache.
 
-If you have issues connecting to the Git services, ensure all the needed information is properly configured.
+You can get more information about the REST interfaces in the following
+[link](REST_INTERFACES.md).
 
-MAINTAINERS
------------
+TROUBLESHOOTING ---------------
 
-Current maintainers:
- * Aleandro Gómez (agomezmoron) - https://drupal.org/u/agomezmoron
- * Carlos Raigada (craigada) - https://drupal.org/u/craigada
- * Estefanía Barrera (ebarrera) - https://www.drupal.org/u/ebarrera
- * Mª Ángeles Villalba (mavillalba) - https://www.drupal.org/u/mavillalba
+If you have issues connecting to the Git services, ensure all the needed
+information is properly configured.
 
-This project has been sponsored by:
- * 3Emergya
+MAINTAINERS -----------
+
+Current maintainers: Aleandro Gómez (agomezmoron) -
+https://drupal.org/u/agomezmoron Carlos Raigada (craigada) -
+https://drupal.org/u/craigada Estefanía Barrera (ebarrera) -
+https://www.drupal.org/u/ebarrera Mª Ángeles Villalba (mavillalba) -
+https://www.drupal.org/u/mavillalba
+
+This project has been sponsored by: 3Emergya

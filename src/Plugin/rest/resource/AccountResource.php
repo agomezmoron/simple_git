@@ -1,16 +1,7 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\simple_git\Plugin\rest\resource\AccountResource.php
- * @author  Alejandro Gómez Morón <amoron@emergya.com>
- * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
- * @version PHP: 7
- */
-
 namespace Drupal\simple_git\Plugin\rest\resource;
 
-use Drupal\Core\Database\TransactionNameNonUniqueException;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
@@ -36,45 +27,51 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class AccountResource extends ResourceBase {
 
   /**
-   *  A current user instance.
+   * A current user instance.
    *
    * @var \Drupal\Core\Session\AccountProxyInterface
    */
 
-  protected $current_user;
+  protected $currentUser;
 
   /**
    * Constructs a Drupal\rest\Plugin\ResourceBase object.
    *
-   * @param array     $configuration
+   * @param array $configuration
    *   A configuration array containing information about the plugin instance.
-   * @param string    $plugin_id
+   * @param string $plugin_id
    *   The plugin_id for the plugin instance.
-   * @param mixed     $plugin_definition
+   * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param array     $serializer_formats
+   * @param array $serializer_formats
    *   The available serialization formats.
-   * @param \Psr\Log\ $logger
+   * @param \Psr\Log $logger
    *   A logger instance.
+   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
+   *   The current account.
    */
-
   public function __construct(
-    array $configuration, $plugin_id, $plugin_definition,
-    array $serializer_formats, $logger, AccountProxyInterface $current_user
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    array $serializer_formats,
+    $logger,
+    AccountProxyInterface $current_user
   ) {
     parent::__construct(
       $configuration, $plugin_id, $plugin_definition, $serializer_formats,
       $logger
     );
-    $this->current_user = $current_user;
+    $this->currentUser = $current_user;
   }
 
   /**
    * {@inheritdoc}
    */
-
   public static function create(
-    ContainerInterface $container, array $configuration, $plugin_id,
+    ContainerInterface $container,
+    array $configuration,
+    $plugin_id,
     $plugin_definition
   ) {
     return new static(
@@ -90,21 +87,21 @@ class AccountResource extends ResourceBase {
   /**
    * Responds to POST requests.
    *
-   * It connects the user to with the Git Service given using the given information, returning the account data.
+   * It connects the user to with the Git Service given using the given
+   * information, returning the account data.
    *
    * @param array $data
-   *  Request data.
+   *   Request data.
    *
    * @return \Drupal\rest\ResourceResponse
    *   The response containing the Git account data.
    */
-
   public function post(array $data = []) {
     $user_data = SimpleGitAuthorizationBusinessLogic::authorize(
-      $this->current_user, $data
+      $this->currentUser, $data
     );
 
-    // an error occurred authenticating
+    // An error occurred authenticating.
     if (empty($user_data)) {
       throw new HttpException(
         401, t('An error occurred authorizing the user.')
@@ -121,24 +118,23 @@ class AccountResource extends ResourceBase {
    * It deletes the sent account.
    *
    * @param $account_id
-   *  A id of account
+   *   A id of account.
    *
    * @return \Drupal\rest\ResourceResponse
    *   The response with the result status.
    */
-
   public function delete($account_id) {
     $accounts = [];
     $current_accounts = [];
 
     $accounts = SimpleGitAccountBusinessLogic::getAccounts(
-      $this->current_user
+      $this->currentUser
     );
     $current_accounts = SimpleGitAccountBusinessLogic::deleteAccount(
       $accounts, $account_id
     );
     SimpleGitAccountBusinessLogic::setAccounts(
-      $this->current_user, $current_accounts
+      $this->currentUser, $current_accounts
     );
 
     return new ResourceResponse();
@@ -150,19 +146,18 @@ class AccountResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    *   The response containing all the linked accounts.
    */
-
   public function get($account_id = NULL) {
     $accounts = [];
 
     if ($account_id == ModuleConstantInterface::REST_ALL_OPTION) {
-      // should be reviewed once it is pushed!
+      // Should be reviewed once it is pushed.
       $accounts = SimpleGitAccountBusinessLogic::getAccounts(
-        $this->current_user
+        $this->currentUser
       );
     }
     else {
       $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
-        $this->current_user, $account_id
+        $this->currentUser, $account_id
       );
     }
 

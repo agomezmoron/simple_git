@@ -1,15 +1,12 @@
 <?php
 
-/**
- * Interface for a router class for Drupal with access check.
- *
- * @author  Alejandro Gómez Morón <amoron@emergya.com>
- * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
- * @version PHP 7
- */
-
 namespace Drupal\simple_git\Interfaces;
 
+/**
+ * Interface ModuleConstantInterface.
+ *
+ * @package Drupal\simple_git\Interfaces
+ */
 interface ModuleConstantInterface {
 
   /**
@@ -35,5 +32,3 @@ interface ModuleConstantInterface {
   const REST_ALL_OPTION = 'all';
 
 }
-
-?>

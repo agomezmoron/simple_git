@@ -1,10 +1,8 @@
 <?php
+
 /**
- *
  * @file
  * Hook implementations for Simple Git module.
- * @author  Alejandro Gómez Morón <amoron@emergya.com>
- * @version PHP 7
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
