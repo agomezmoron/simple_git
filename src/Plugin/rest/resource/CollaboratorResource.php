@@ -6,25 +6,26 @@ use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
 use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
-use Drupal\simple_git\BusinessLogic\SimpleGitAuthorizationBusinessLogic;
+use Drupal\simple_git\BusinessLogic\SimpleGitRepositoriesBusinessLogic;
+use Drupal\simple_git\BusinessLogic\SimpleGitCollaboratorsBusinessLogic;
 use Drupal\simple_git\Interfaces\ModuleConstantInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
- * Provides a Connector Resource.
+ * Provides a Collaborator Resource.
  *
  * @package Drupal\simple_git\Plugin\rest\resource
  * @RestResource(
- *   id = "simple_git_account_resource",
- *   label = @Translation("Git Account Resource"),
+ *   id = "simple_git_collaborator_resource",
+ *   label = @Translation("Git Collaborator Resource"),
  *   uri_paths = {
- *     "canonical" = "/api/simple_git/account/{account_id}",
- *     "https://www.drupal.org/link-relations/create" = "/api/simple_git/account",
+ *     "canonical" = "/api/simple_git/collaborator/{account_id}/{repository}/{repository_owner}/{collaborator}",
+ *     "https://www.drupal.org/link-relations/create" = "/api/simple_git/collaborator",
  *   }
  * )
  */
-class AccountResource extends ResourceBase {
+class CollaboratorResource extends ResourceBase {
 
   /**
    * A current user instance.
@@ -84,83 +85,78 @@ class AccountResource extends ResourceBase {
     );
   }
 
-  /**
-   * Responds to POST requests.
-   *
-   * It connects the user to with the Git Service given using the given
-   * information, returning the account data.
-   *
-   * @param array $data
-   *   Request data.
-   *
-   * @return \Drupal\rest\ResourceResponse
-   *   The response containing the Git account data.
-   */
-  public function post(array $data = []) {
-    $user_data = SimpleGitAuthorizationBusinessLogic::authorize(
-      $this->currentUser, $data
-    );
-
-    // An error occurred authenticating.
-    if (empty($user_data)) {
-      throw new HttpException(
-        401, t('An error occurred authorizing the user.')
-      );
-    }
-    return new ResourceResponse($user_data);
-
-  }
 
   /**
    * Responds to DELETE requests.
    *
-   * It deletes the sent account.
+   * It deletes the sent collaborator.
    *
-   * @param $account_id
-   *   A id of account.
+   * @param int $account_id
+   *   An id of account.*
+   * @param array $repositories
+   *   An associative array containing structure account.
+   * @param string $collaborator
+   *   A collaborator name.
    *
    * @return \Drupal\rest\ResourceResponse
    *   The response with the result status.
    */
-  public function delete($account_id) {
-    $accounts = [];
-    $current_accounts = [];
-
-    $accounts = SimpleGitAccountBusinessLogic::getAccounts(
-      $this->currentUser
-    );
-    $current_accounts = SimpleGitAccountBusinessLogic::deleteAccount(
-      $accounts, $account_id
-    );
-    SimpleGitAccountBusinessLogic::setAccounts(
-      $this->currentUser, $current_accounts
-    );
-
+  public function delete($account_id,$repository, $collaborator) {
+    SimpleGitCollaboratorsBusinessLogic::deleteCollaborators(SimpleGitAccountBusinessLogic::getAccountByAccountId($this->currentUser,
+      $account_id), $repository, $collaborator);
     return new ResourceResponse();
   }
 
   /**
    * Responds to the GET request.
    *
+   * @param int $account_id
+   *   An id of account.
+   * @param array $repositories
+   *   An associative array containing structure user.
+   * @param string $collaborator
+   *   A collaborator name.
+   *
    * @return \Drupal\rest\ResourceResponse
-   *   The response containing all the linked accounts.
+   *   The response containing all the collaborators or a requested one.
    */
-  public function get($account_id = NULL) {
-    $accounts = [];
+  public function get($account_id, $repository, $collaborator) {
+    //$found = NULL;
 
     if ($account_id == ModuleConstantInterface::REST_ALL_OPTION) {
-      // Should be reviewed once it is pushed.
       $accounts = SimpleGitAccountBusinessLogic::getAccounts(
         $this->currentUser
       );
-    }
-    else {
+      $found = SimpleGitCollaboratorsBusinessLogic::exists($accounts, $repository, $collaborator);
+    }else{
       $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
         $this->currentUser, $account_id
       );
-    }
+      $found = SimpleGitCollaboratorsBusinessLogic::exists($accounts, $repository, $collaborator);
 
-    return new ResourceResponse($accounts);
+    }
+     return new ResourceResponse($found);
+  }
+
+  /**
+   * Responds to the PUT request.
+   *
+   * It add the sent collaborator.
+   *
+   * @param int $account_id
+   *   An id of account.
+   * @param array $repositories
+   *   An associative array containing structure user.
+   * @param string $collaborator
+   *   A collaborator name.
+   *
+   * @return \Drupal\rest\ResourceResponse
+   *   The response containing all the linked accounts.
+   */
+  public function put($account_id, $repository, $collaborator) {
+      SimpleGitCollaboratorsBusinessLogic::addCollaborators(SimpleGitAccountBusinessLogic::getAccountByAccountId($this->currentUser,
+        $account_id), $repository, $collaborator);
+    return new ResourceResponse();
   }
 
 }

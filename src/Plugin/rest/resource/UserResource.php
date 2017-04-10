@@ -6,23 +6,26 @@ use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
 use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
-use Drupal\simple_git\BusinessLogic\SimpleGitPullRequestsBusinessLogic;
-use Drupal\simple_git\BusinessLogic\SimpleGitRepositoriesBusinessLogic;
+use Drupal\simple_git\BusinessLogic\SimpleGitAuthorizationBusinessLogic;
+use Drupal\simple_git\BusinessLogic\SimpleGitUserBusinessLogic;
+use Drupal\simple_git\Interfaces\ModuleConstantInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
- * Provides a Pull Request Resource.
+ * Provides a Connector Resource.
  *
  * @package Drupal\simple_git\Plugin\rest\resource
  * @RestResource(
- *   id = "simple_git_pull_request_resource",
- *   label = @Translation("Git Pull Request Resource"),
+ *   id = "simple_git_user_resource",
+ *   label = @Translation("Git User Resource"),
  *   uri_paths = {
- *     "canonical" = "/api/simple_git/pull_request"
+ *     "canonical" = "/api/simple_git/user/{account_id}/{user}",
+ *     "https://www.drupal.org/link-relations/create" = "/api/simple_git/user",
  *   }
  * )
  */
-class PullRequestResource extends ResourceBase {
+class UserResource extends ResourceBase {
 
   /**
    * A current user instance.
@@ -86,20 +89,26 @@ class PullRequestResource extends ResourceBase {
    * Responds to the GET request.
    *
    * @return \Drupal\rest\ResourceResponse
-   *   The response containing all the available Pull Requests.
+   *   The response containing all the linked accounts.
    */
-  public function get() {
+  public function get($account_id = NULL , $user) {
     $accounts = [];
-    $accounts = SimpleGitAccountBusinessLogic::getAccounts(
-      $this->currentUser
-    );
-    $repositories = SimpleGitRepositoriesBusinessLogic::getRepositories(
-      $accounts
-    );
-    $pr = SimpleGitPullRequestsBusinessLogic::getPullRequests(
-      $accounts, $repositories
-    );
-    return new ResourceResponse($pr);
+    $userInfo = [];
+
+    if ($account_id == ModuleConstantInterface::REST_ALL_OPTION) {
+      // Should be reviewed once it is pushed.
+      $accounts = SimpleGitAccountBusinessLogic::getAccounts(
+        $this->currentUser
+      );
+      $userInfo = SimpleGitUserBusinessLogic::getUser($accounts,$user);
+    }
+    else {
+      $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
+        $this->currentUser, $account_id
+      );
+      $userInfo = SimpleGitUserBusinessLogic::getUser($accounts,$user);
+    }
+    return new ResourceResponse($userInfo);
   }
 
 }

@@ -56,7 +56,6 @@ class SimpleGitPullRequestsBusinessLogic {
         $added_prs[] = $pull_request['id'];
       }
     }
-
     return $filtered_pull_requests;
   }
 

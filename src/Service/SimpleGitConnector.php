@@ -18,18 +18,28 @@ abstract class SimpleGitConnector {
    * @var PULL_REQUEST
    */
   const PULL_REQUEST = 'PULL_REQUEST';
+
   /**
    * Constants to determine to output mapping.
    *
    * @var ACCOUNT
    */
   const ACCOUNT = 'ACCOUNT';
+
   /**
    * Constants to determine to output mapping.
    *
    * @var REPOSITOY
    */
   const REPOSITORY = 'REPOSITORY';
+
+  /**
+   * Constants to determine to output mapping.
+   *
+   * @var REPOSITOY
+   */
+  const COLLABORATOR = 'COLLABORATOR';
+
   /**
    * Constants to determine to output mapping.
    *
@@ -37,10 +47,16 @@ abstract class SimpleGitConnector {
    */
   protected $mappings = [];
 
+  /**
+   * Constants to determine to output mapping.
+   *
+   * @var PULL_REQUEST
+   */
+  const USER = 'USER';
   /*const BRANCH = 'BRANCH';
   const PROJECTS = 'PROJECTS';
   const COMMIT = 'COMMIT';
-  const COLLABORATOR = 'COLLABORATOR';*/
+  */
 
   /**
    * SimpleGitConnector constructor.
@@ -103,7 +119,52 @@ abstract class SimpleGitConnector {
   public abstract function getPullRequest($params);
 
   /**
-   * Get the logged user account details.
+   * Get a concrete pull request.
+   *
+   * @param array $params
+   *   It needs the userInfo.
+   *
+   * @return array
+   *   Collaborators information.
+   */
+  public abstract function getCollaboratorsList($params);
+
+  /**
+   * Get a check a user is a collaborator.
+   *
+   * @param array $params
+   *   It needs the userInfo and repository.
+   *
+   * @return array
+   *   Response if user is a collaborator.
+   */
+  public abstract function checkIfUserCollaborator($params);
+
+  /**
+   * Put user as a collaborator.
+   *
+   * @param array $params
+   *   It needs the userInfo and repository.
+   *
+   * @return array
+   *   Response if user has been added.
+   * Note that to prevent abuse you are limited to 50 invitations per 24 hour period
+   */
+  public abstract function addCollaborator($params);
+
+  /**
+   * Delete user as a collaborator.
+   *
+   * @param array $params
+   *   It needs the userInfo and repository.
+   *
+   * @return array
+   *   Response if user has been removed.
+   */
+  public abstract function deleteCollaborator($params);
+
+  /**
+   * Get the logged user  account details.
    *
    * @param array $params
    *   It's an array that content depends on implementation.
@@ -112,6 +173,17 @@ abstract class SimpleGitConnector {
    *   With the account information.
    */
   public abstract function getAccount($params);
+
+  /**
+   * Get a single user details.
+   *
+   * @param string $user
+   *   It's an array that content depends on implementation.
+   *
+   * @return mixed
+   *   With the account information.
+   */
+  public abstract function getUserDetail($account, $user);
 
   /**
    * It checks if the repository exists.

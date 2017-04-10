@@ -9,6 +9,7 @@ use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
 use Drupal\simple_git\BusinessLogic\SimpleGitRepositoriesBusinessLogic;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Drupal\simple_git\Interfaces\ModuleConstantInterface;
 
 /**
  * Provides a Repository Resource.
@@ -17,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  *   id = "simple_git_repository_resource",
  *   label = @Translation("Git Repository Resource"),
  *   uri_paths = {
- *     "canonical" = "/api/simple_git/repository/{$account_id}/{$repository_id}",
+ *     "canonical" = "/api/simple_git/repository/{account_id}/{repository_id}",
  *     "https://www.drupal.org/link-relations/create" = "/api/simple_git/repository",
  *   }
  * )
@@ -93,7 +94,7 @@ class RepositoryResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    *   The response containing the Git account data.
    */
-  public function post(array $data = []) {
+  public function post($data = []) {
     if (!isset($data['account_id'])) {
       throw new HttpException(404, t('Missing account_id'));
     }
@@ -192,7 +193,6 @@ class RepositoryResource extends ResourceBase {
         );
       }
     }
-
     return new ResourceResponse($repositories);
   }
 
