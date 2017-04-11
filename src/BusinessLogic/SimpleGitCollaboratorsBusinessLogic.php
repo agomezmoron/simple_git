@@ -24,12 +24,12 @@ class SimpleGitCollaboratorsBusinessLogic {
    * @return array
    *   Contains collaborator's repository.
    */
-  public static function getCollaborators($account, $repo, $collaborator) {
+  public static function getCollaborators($account, $repo) {
     $collaborators = [];
     if (!empty($account)) {
       $params['userInfo'] = $account;
       $params['repository'] = $repo;
-      $params['collaborator']['username'] = $collaborator;
+      //$params['collaborator']['username'] = $collaborator;
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']
       );
@@ -49,11 +49,11 @@ class SimpleGitCollaboratorsBusinessLogic {
    * @param string $collaborator
    *   An collaborator name.
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return bool
    *   true if the repository exists.
    */
   public static function exists($account, $repository_info, $collaborator) {
-    //$exists = NULL;
+    $exists = false;
     if (!empty($account) && !empty($repository_info)
       && isset($repository_info['name'])
     ) {
@@ -64,8 +64,8 @@ class SimpleGitCollaboratorsBusinessLogic {
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']
       );
-
       $exists = $git_service->checkIfUserCollaborator($params);
+
     }
     return $exists;
   }

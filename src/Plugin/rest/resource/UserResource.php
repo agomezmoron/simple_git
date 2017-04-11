@@ -96,7 +96,6 @@ class UserResource extends ResourceBase {
     $userInfo = [];
 
     if ($account_id == ModuleConstantInterface::REST_ALL_OPTION) {
-      // Should be reviewed once it is pushed.
       $accounts = SimpleGitAccountBusinessLogic::getAccounts(
         $this->currentUser
       );

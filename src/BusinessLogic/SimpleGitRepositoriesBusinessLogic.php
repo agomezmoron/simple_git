@@ -56,7 +56,7 @@ class SimpleGitRepositoriesBusinessLogic {
         $position = array_search($repository['id'], $added_repos);
         $filtered_repositories[$position]['account'][] = ['account_id' => $repository['account'], 'canAdmin' => $repository['canAdmin'],];
         $filtered_repositories[$position]['canAdmin'] = $filtered_repositories[$position]['canAdmin'] || $repository['canAdmin'];
-        error_log('canAdmin'.print_r($filtered_repositories,TRUE));
+
       }
 
     }
@@ -82,12 +82,13 @@ class SimpleGitRepositoriesBusinessLogic {
       $user, $account_id
     );
     if (!empty($account)) {
+      $params = [];
       $params['userInfo'] = $account;
-      $params['repo'] = $repo;
+      $params['repository'] = array('name' => $repo);
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']
       );
-      $repository = $git_service->getRepositoriesList($params);
+      $repository = $git_service->getRepository($params);
     }
     return $repository;
   }

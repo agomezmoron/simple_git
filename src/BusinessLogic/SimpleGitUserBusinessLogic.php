@@ -14,18 +14,27 @@ abstract class SimpleGitUserBusinessLogic {
   /**
    * Returns user.
    *
-   * @param int $user
-   *   An associative array containing structure user.
+   * @param array $accounts
+   *   An associative array containing structure account.
+   * @param string $user
+   *   A name user.
    *
    * @return array
-   *   An associative array containing structure accounts
+   *   An associative array containing structure users
    */
-  public static function getUser($account, $user) {
+  public static function getUser($accounts, $user) {
     $userInfo = [];
-    $git_service = Service\SimpleGitConnectorFactory::getConnector(
-      $account['type']
-    );
-    $userInfo = $git_service->getUserDetail($account, $user);
+    foreach ($accounts as $account) {
+      $params['userInfo'] = $account;
+      $git_service = Service\SimpleGitConnectorFactory::getConnector(
+        $params['userInfo']['type']
+      );
+      if (!in_array($params['userInfo']['type'], array_column($userInfo, 'type'))) {
+        $userInfo[] = $git_service->getUserDetail($account, $user);
+      }
+
+    }
+
     return $userInfo;
   }
 

@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  *   id = "simple_git_collaborator_resource",
  *   label = @Translation("Git Collaborator Resource"),
  *   uri_paths = {
- *     "canonical" = "/api/simple_git/collaborator/{account_id}/{repository}/{repository_owner}/{collaborator}",
+ *     "canonical" = "/api/simple_git/collaborator/{account_id}/{repository}/{collaborator}",
  *     "https://www.drupal.org/link-relations/create" = "/api/simple_git/collaborator",
  *   }
  * )
@@ -112,7 +112,7 @@ class CollaboratorResource extends ResourceBase {
    *
    * @param int $account_id
    *   An id of account.
-   * @param array $repositories
+   * @param string $repository
    *   An associative array containing structure user.
    * @param string $collaborator
    *   A collaborator name.
@@ -121,21 +121,26 @@ class CollaboratorResource extends ResourceBase {
    *   The response containing all the collaborators or a requested one.
    */
   public function get($account_id, $repository, $collaborator) {
-    //$found = NULL;
+    $exists = false;
 
-    if ($account_id == ModuleConstantInterface::REST_ALL_OPTION) {
+    if ($collaborator == ModuleConstantInterface::REST_ALL_OPTION) {
       $accounts = SimpleGitAccountBusinessLogic::getAccounts(
         $this->currentUser
       );
-      $found = SimpleGitCollaboratorsBusinessLogic::exists($accounts, $repository, $collaborator);
+      $repo = SimpleGitRepositoriesBusinessLogic::getRepository($account_id,$repository,$this->currentUser);
+      $headers = SimpleGitCollaboratorsBusinessLogic::getCollaborators($accounts, $repo);
     }else{
       $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
         $this->currentUser, $account_id
       );
-      $found = SimpleGitCollaboratorsBusinessLogic::exists($accounts, $repository, $collaborator);
+      $repo = SimpleGitRepositoriesBusinessLogic::getRepository($account_id,$repository,$this->currentUser);
+
+      $exists = SimpleGitCollaboratorsBusinessLogic::exists($accounts, $repo, $collaborator);
+
 
     }
-     return new ResourceResponse($found);
+
+     return new ResourceResponse(array('status' => $exists));
   }
 
   /**
