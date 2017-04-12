@@ -20,15 +20,19 @@ class SimpleGitRepositoriesBusinessLogic {
    * @return array
    *   Contains user's repository.
    */
-  public static function getRepositories(array $accounts) {
+  static function getRepositories($accounts) {
     $repositories = [];
     foreach ($accounts as $account) {
       $params['userInfo'] = $account;
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $params['userInfo']['type']
       );
+      $repositoriesByAccount = $git_service->getRepositoriesList($params);
+      foreach($repositoriesByAccount as &$repository) {
+        $repository['accounts'] =  $account['account_id'];
+      }
       $repositories = array_merge(
-        $repositories, $git_service->getRepositoriesList($params)
+        $repositories, $repositoriesByAccount
       );
     }
 
@@ -37,12 +41,25 @@ class SimpleGitRepositoriesBusinessLogic {
     $added_repos = [];
 
     foreach ($repositories as $repository) {
+      $to_be_added = false;
       if (!in_array($repository['id'], $added_repos)) {
-        $filtered_repositories[] = $repository;
+        $to_be_added = true;
         $added_repos[] = $repository['id'];
+        $current_account = $repository['accounts'];
+        $repository['accounts'] = [];
+        $repository['accounts'][] = ['account_id' => $current_account, 'canAdmin' => $repository['canAdmin'],];
+        $filtered_repositories[] = $repository;
       }
-    }
 
+      // if the repositoy is duplicated, we add the next account with its admin permisisons
+      if (!$to_be_added) {
+        $position = array_search($repository['id'], $added_repos);
+        $filtered_repositories[$position]['accounts'][] = ['account_id' => $repository['accounts'], 'canAdmin' => $repository['canAdmin'],];
+        $filtered_repositories[$position]['canAdmin'] = $filtered_repositories[$position]['canAdmin'] || $repository['canAdmin'];
+
+      }
+
+    }
     return $filtered_repositories;
   }
 
@@ -59,18 +76,19 @@ class SimpleGitRepositoriesBusinessLogic {
    * @return array
    *   Contains user's repository.
    */
-  public static function getRepository($account_id, $repo, array $user) {
+  static function getRepository($account_id, $repo, $user) {
     $repository = [];
     $account = SimpleGitAccountBusinessLogic::getAccountByAccountId(
       $user, $account_id
     );
     if (!empty($account)) {
+      $params = [];
       $params['userInfo'] = $account;
-      $params['repo'] = $repo;
+      $params['repository'] = array('name' => $repo);
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']
       );
-      $repository = $git_service->getRepositoriesList($params);
+      $repository = $git_service->getRepository($params);
     }
     return $repository;
   }
@@ -86,10 +104,7 @@ class SimpleGitRepositoriesBusinessLogic {
    * @return array
    *   With the repositories associated to the given $account.
    */
-  public static function filterRepositoriesByAccount(
-    array $account,
-    array &$repositories
-  ) {
+   static function filterRepositoriesByAccount($account, &$repositories) {
     return array_filter(
       $repositories, function ($repository) use ($account) {
         return $repository['username'] == $account['username']
@@ -114,7 +129,7 @@ class SimpleGitRepositoriesBusinessLogic {
    * @return array
    *   With the created repository
    */
-  static function create($account, $repository_info) {
+  function create($account, $repository_info) {
     $repository = [];
     if (!empty($account) && !empty($repository_info)
       && isset($repository_info['name'])
@@ -141,7 +156,7 @@ class SimpleGitRepositoriesBusinessLogic {
    * @return bool
    *   true if the repository exists.
    */
-  public static function exists($account, $repository_info) {
+  static function exists($account, $repository_info) {
     $exists = FALSE;
     if (!empty($account) && !empty($repository_info)
       && isset($repository_info['name'])

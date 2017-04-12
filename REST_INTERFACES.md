@@ -38,3 +38,32 @@ REST service to link and retrieve accounts information.
 | Method  | Parameters | Response | Description |
 | ------------- | ------------- | ------------- | ------------- |
 | GET  | None  | [{"title": "Pull Request 1 Title", "description": "Pull Request description gfjdngfkjdnbjdkjnfvjdn", "userName": "UserName1", "date": "10 months", "commits": 312, "comments": 129, "count": 582, "from": "MB-1685-DEV_Fix", "to": "Master_branch_of_project" }] | Returns all the available Pull Requests.  |
+
+### Repository
+
+**Path:** /repository
+
+| Method  | Parameters | Response | Description |
+| ------------- | ------------- | ------------- | ------------- |
+| GET  |  **/{account_id}/{repository_id}** | All the associated accounts:  [{ "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" }] | It returns all the associated accounts  |
+| GET  |  **/all/all** | All the associated accounts:  [{ "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" }] | It returns all the associated accounts  |
+
+### User
+
+**Path:** /user
+
+| Method  | Parameters | Response | Description |
+| ------------- | ------------- | ------------- | ------------- |
+| GET  |  **/{account_id}/{user}** | All the associated accounts:  [{ "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" }] | It returns all the associated accounts  |
+| GET  |  **/all/{user}** | All the associated accounts:  [{ "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" }] | It returns all the associated accounts  |
+
+
+### Collaborator
+
+**Path:** /collaborator
+
+| Method  | Parameters | Response | Description |
+| ------------- | ------------- | ------------- | ------------- |
+| GET  |  **/{account_id}/{repository}/{collaborator}** | All the collaboratos of associated accounts:  ["id": 1, "username" => 'estefaniabarrera', 'photoUrl' => 'avatar_url',] | It returns all the collaboratorassociated accounts  |
+| DELETE  |  **/{account_id}/{repository}/{collaborator}** | NONE  |
+| PUT  |  **/{account_id}/{repository}/{collaborator}** | NONE  |

@@ -107,7 +107,6 @@ class AccountResource extends ResourceBase {
         401, t('An error occurred authorizing the user.')
       );
     }
-
     return new ResourceResponse($user_data);
 
   }
