@@ -29,7 +29,6 @@ class SimpleGitCollaboratorsBusinessLogic {
     if (!empty($account)) {
       $params['userInfo'] = $account;
       $params['repository'] = $repo;
-      //$params['collaborator']['username'] = $collaborator;
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']
       );
@@ -64,9 +63,11 @@ class SimpleGitCollaboratorsBusinessLogic {
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']
       );
-      $exists = $git_service->checkIfUserCollaborator($params);
+      $exists = $git_service->isCollaborator($params);
 
     }
+    // FIXME: we cannot rebuild all the caches, we have to fix it ASAP.
+    drupal_flush_all_caches();
     return $exists;
   }
 
@@ -84,23 +85,20 @@ class SimpleGitCollaboratorsBusinessLogic {
    *   With the created collaborators
    */
   static function addCollaborators($account, $repository, $collaborator) {
-      if (!empty($account) && !empty($repository)
+    $iscollaborator = false;
+    if (!empty($account) && !empty($repository)
         && isset($repository['name'])
       ) {
         $params = [];
         $params['userInfo'] = $account;
         $params['repository'] = $repository;
-        $params['collaborator']['username'] = $collaborator;
+        $params['collaborator'] = $collaborator;
         $git_service = Service\SimpleGitConnectorFactory::getConnector(
           $account['type']
         );
-        $existsRepo = SimpleGitRepositoriesBusinessLogic::exists($account,
-          $params);
-        if ($existsRepo) {
-          $collaborator = $git_service->addCollaborator($params);
-        }
+      $iscollaborator = $git_service->addCollaborator($params);
       }
-      return $collaborator;
+      return $iscollaborator;
   }
 
   /**
@@ -108,12 +106,12 @@ class SimpleGitCollaboratorsBusinessLogic {
    *
    * @param array $user
    *   An associative array containing structure account.
-   * @param array $repositories
+   * @param array $repository
    *   An associative array containing structure repository.
    * @param string $collaborator
    *   An collaborator name
    *
-   * @return array
+   * @return bool
    *   An associative array containing structure accounts
    */
   public static function deleteCollaborators(
@@ -121,6 +119,7 @@ class SimpleGitCollaboratorsBusinessLogic {
     $repository,
     $collaborator
   ) {
+    $delete = false;
       if (!empty($account) && !empty($repository)
         && isset($repository['name'])
       ) {
@@ -131,13 +130,10 @@ class SimpleGitCollaboratorsBusinessLogic {
         $git_service = Service\SimpleGitConnectorFactory::getConnector(
           $account['type']
         );
-        $existsRepo = SimpleGitRepositoriesBusinessLogic::exists($account,
-          $params);
-        if ($existsRepo) {
-          $collaborator = $git_service->deleteCollaborator($params);
-        }
+
+        $delete = $git_service->deleteCollaborator($params);
       }
-      return $collaborator;
+      return $delete;
     }
 
 }

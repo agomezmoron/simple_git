@@ -138,7 +138,7 @@ abstract class SimpleGitConnector {
    * @return array
    *   Response if user is a collaborator.
    */
-  public abstract function checkIfUserCollaborator($params);
+  public abstract function isCollaborator($params);
 
   /**
    * Put user as a collaborator.

@@ -29,7 +29,7 @@ class SimpleGitRepositoriesBusinessLogic {
       );
       $repositoriesByAccount = $git_service->getRepositoriesList($params);
       foreach($repositoriesByAccount as &$repository) {
-        $repository['account'] =  $account['account_id'];
+        $repository['accounts'] =  $account['account_id'];
       }
       $repositories = array_merge(
         $repositories, $repositoriesByAccount
@@ -45,16 +45,16 @@ class SimpleGitRepositoriesBusinessLogic {
       if (!in_array($repository['id'], $added_repos)) {
         $to_be_added = true;
         $added_repos[] = $repository['id'];
-        $current_account = $repository['account'];
-        $repository['account'] = [];
-        $repository['account'][] = ['account_id' => $current_account, 'canAdmin' => $repository['canAdmin'],];
+        $current_account = $repository['accounts'];
+        $repository['accounts'] = [];
+        $repository['accounts'][] = ['account_id' => $current_account, 'canAdmin' => $repository['canAdmin'],];
         $filtered_repositories[] = $repository;
       }
 
       // if the repositoy is duplicated, we add the next account with its admin permisisons
       if (!$to_be_added) {
         $position = array_search($repository['id'], $added_repos);
-        $filtered_repositories[$position]['account'][] = ['account_id' => $repository['account'], 'canAdmin' => $repository['canAdmin'],];
+        $filtered_repositories[$position]['accounts'][] = ['account_id' => $repository['accounts'], 'canAdmin' => $repository['canAdmin'],];
         $filtered_repositories[$position]['canAdmin'] = $filtered_repositories[$position]['canAdmin'] || $repository['canAdmin'];
 
       }

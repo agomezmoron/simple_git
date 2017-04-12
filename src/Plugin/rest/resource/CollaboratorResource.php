@@ -93,17 +93,18 @@ class CollaboratorResource extends ResourceBase {
    *
    * @param int $account_id
    *   An id of account.*
-   * @param array $repositories
-   *   An associative array containing structure account.
+   * @param string $repository
+   *   A repository name.
    * @param string $collaborator
    *   A collaborator name.
    *
    * @return \Drupal\rest\ResourceResponse
    *   The response with the result status.
    */
-  public function delete($account_id,$repository, $collaborator) {
+  public function delete($account_id, $repository, $collaborator) {
+    $repo = SimpleGitRepositoriesBusinessLogic::getRepository($account_id, $repository, $this->currentUser);
     SimpleGitCollaboratorsBusinessLogic::deleteCollaborators(SimpleGitAccountBusinessLogic::getAccountByAccountId($this->currentUser,
-      $account_id), $repository, $collaborator);
+      $account_id), $repo, $collaborator);
     return new ResourceResponse();
   }
 
@@ -113,7 +114,7 @@ class CollaboratorResource extends ResourceBase {
    * @param int $account_id
    *   An id of account.
    * @param string $repository
-   *   An associative array containing structure user.
+   *   A collaborator name.
    * @param string $collaborator
    *   A collaborator name.
    *
@@ -121,26 +122,27 @@ class CollaboratorResource extends ResourceBase {
    *   The response containing all the collaborators or a requested one.
    */
   public function get($account_id, $repository, $collaborator) {
-    $exists = false;
+    $isCollaborator = false;
+    $collaborators = [];
 
     if ($collaborator == ModuleConstantInterface::REST_ALL_OPTION) {
-      $accounts = SimpleGitAccountBusinessLogic::getAccounts(
-        $this->currentUser
+      $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
+        $this->currentUser, $account_id
       );
       $repo = SimpleGitRepositoriesBusinessLogic::getRepository($account_id,$repository,$this->currentUser);
-      $headers = SimpleGitCollaboratorsBusinessLogic::getCollaborators($accounts, $repo);
+      $collaborators = SimpleGitCollaboratorsBusinessLogic::getCollaborators($accounts, $repo);
     }else{
       $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
         $this->currentUser, $account_id
       );
       $repo = SimpleGitRepositoriesBusinessLogic::getRepository($account_id,$repository,$this->currentUser);
 
-      $exists = SimpleGitCollaboratorsBusinessLogic::exists($accounts, $repo, $collaborator);
-
+      $isCollaborator = SimpleGitCollaboratorsBusinessLogic::exists($accounts, $repo, $collaborator);
+      $collaborators = array('status' => $isCollaborator);
 
     }
 
-     return new ResourceResponse(array('status' => $exists));
+     return new ResourceResponse($collaborators);
   }
 
   /**
@@ -150,7 +152,7 @@ class CollaboratorResource extends ResourceBase {
    *
    * @param int $account_id
    *   An id of account.
-   * @param array $repositories
+   * @param string $repository
    *   An associative array containing structure user.
    * @param string $collaborator
    *   A collaborator name.
@@ -159,8 +161,8 @@ class CollaboratorResource extends ResourceBase {
    *   The response containing all the linked accounts.
    */
   public function put($account_id, $repository, $collaborator) {
-      SimpleGitCollaboratorsBusinessLogic::addCollaborators(SimpleGitAccountBusinessLogic::getAccountByAccountId($this->currentUser,
-        $account_id), $repository, $collaborator);
+   SimpleGitCollaboratorsBusinessLogic::addCollaborators(SimpleGitAccountBusinessLogic::getAccountByAccountId($this->currentUser,
+        $account_id), SimpleGitRepositoriesBusinessLogic::getRepository($account_id, $repository, $this->currentUser), $collaborator);
     return new ResourceResponse();
   }
 

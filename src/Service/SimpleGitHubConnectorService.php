@@ -75,7 +75,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $status_code = curl_getinfo($ch, CURLINFO_HTTP_COD);
       $response = $this->performCURL($ch);
       // Exposing the access token if it's necessary.
-      $access_token = $response['access_token'];
+      $access_token = $response['data']['access_token'];
       // Return the obtained access_token.
       return $access_token;
     }
@@ -107,6 +107,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
     }
 
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_HEADER, 1);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
     return $ch;
@@ -125,6 +126,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
     $headers = [];
     $headers[] = 'Accept: application/json';
     $headers[] = 'Accept: application/vnd.github.v3+json';
+//    $headers[] = 'Accept: application/vnd.github.swamp-thing-preview+json';
 
     // By default name.
     $app_name = 'GitHub Dashboard';
@@ -152,11 +154,22 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    */
   protected function performCURL(&$ch) {
     $data = curl_exec($ch);
+
+    $response = [];
+
+    list($header, $body) = explode("\r\n\r\n", $data, 2);
+    $header = curl_getinfo($ch);
     curl_close($ch);
-    if (!is_array($data) && is_string($data)) {
-      $data = json_decode($data, TRUE);
+
+    $response['header'] = $header;
+
+    if (!is_array($body) && is_string($body)) {
+      $response['data'] = json_decode($body, TRUE);
+    } else {
+      $response['data'] = $body;
     }
-    return $data;
+
+    return $response;
   }
 
   /**
@@ -172,9 +185,10 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
     $response = [];
     if ($params['userInfo']) {
       $user = $params['userInfo'];
-      $url = self::BASE_URL . 'user/repos?per_page=' . PER_PAGE;
+      $url = self::BASE_URL . 'user/repos?per_page=' . self::PER_PAGE;
       $ch = $this->getConfiguredCURL($url, $user);
       $repositories = $this->performCURL($ch);
+      $repositories = $repositories['data'];
       foreach ($repositories as $repo) {
         $repo['parent'] = $repo['parent'] ? TRUE : FALSE;
         $repo = $this->buildResponse($repo, self::REPOSITORY);
@@ -200,10 +214,11 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
     if ($params['userInfo'] && $params['repository']) {
       $user = $params['userInfo'];
       $repository = $params['repository'];
-      $url = self::BASE_URL .'/repos/' .$user['username'] . '/'
+      $url = self::BASE_URL .'repos/' .$user['username'] . '/'
         . $repository['name'];
       $ch = $this->getConfiguredCURL($url, $user);
       $repo = $this->performCURL($ch);
+      $repo = $repo['data'];
       $response = $this->buildResponse($repo, self::REPOSITORY);
       $response['account'] = $user['username'];
     }
@@ -228,6 +243,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
         . $repository['name'];
       $ch = $this->getConfiguredCURL($url, $user);
       $repo = $this->performCURL($ch);
+      $repo = $repo['data'];
       $response = $this->buildResponse($repo, self::REPOSITORY);
       $response['account'] = $user['username'];
     }
@@ -252,9 +268,10 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
 
       foreach ($repositories as $repository) {
         $url = self::BASE_URL . 'repos/' . $repository['username'] . '/'
-          . $repository['name'] . '/pulls?per_page=' . PER_PAGE;
+          . $repository['name'] . '/pulls?per_page=' . self::PER_PAGE;
         $ch = $this->getConfiguredCURL($url, $user);
         $prs = $this->performCURL($ch);
+        $prs = $prs['data'];
         foreach ($prs as $pr) {
           $pull_requests[] = $this->buildResponse($pr,
             self::PULL_REQUEST);
@@ -284,6 +301,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
         . $repository['name'] . '/pulls/' . $pr_id;
       $ch = $this->getConfiguredCURL($url, $user);
       $pr = $this->performCURL($ch);
+      $pr = $pr['data'];
       return $this->buildResponse($pr, self::PULL_REQUEST);
     }
   }
@@ -303,6 +321,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $url = self::BASE_URL . 'user';
       $ch = $this->getConfiguredCURL($url, $user);
       $account = $this->performCURL($ch);
+      $account = $account['data'];
       $account['number_of_repos'] = $account['total_private_repos']
         + $account['public_repos'];
       return $this->buildResponse($account, self::ACCOUNT);
@@ -332,6 +351,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $url = self::BASE_URL . 'users/' . $user;
       $ch = $this->getConfiguredCURL($url, $account);
       $response = $this->performCURL($ch);
+      $response = $response['data'];
       return $this->buildResponse($response, self::USER);
   }
 
@@ -353,6 +373,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       . '/pulls/' . $pr_id . '/commits';
     $ch = $this->getConfiguredCURL($url, $user);
     $response = $this->performCURL($ch);
+    $response = $response['data'];
     return $response;
   }
 
@@ -371,9 +392,10 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    */
   protected function getPullRequestComments($user, $repo, $pr_id) {
     $url = self::BASE_URL . 'repos/' . $user['username'] . '/' . $repo
-      . '/pulls/' . $pr_id . '/comments?per_page=' . PER_PAGE;
+      . '/pulls/' . $pr_id . '/comments?per_page=' . self::PER_PAGE;
     $ch = $this->getConfiguredCURL($url, $user);
     $response = $this->performCURL($ch);
+    $response = $response['data'];
     return $response;
   }
 
@@ -394,12 +416,11 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $url = self::BASE_URL . 'repos/' . $repository['username'] . '/' . $repository['name'].'/collaborators';
       $ch = $this->getConfiguredCURL($url, $user);
       $collaborators = $this->performCURL($ch);
+      $collaborators = $collaborators['data'];
       foreach ($collaborators as $collaborator) {
-        $collaborator = $this->buildResponse($collaborator, self::COLLABORATOR);
-        array_push($response, $collaborator);
+        $response[] = $this->buildResponse($collaborator, self::COLLABORATOR);
       }
     }
-
     return $response;
   }
 
@@ -410,12 +431,12 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    * @param array $params
    *   It needs the userInfo and repository.
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return integer
    *   Response if user is a collaborator.
    */
-  public function checkIfUserCollaborator($params) {
-    $response = '';
-    if ($params['userInfo']&& $params['repository']) {
+  public function isCollaborator($params) {
+    $isCollaborator = false;
+    if ($params['userInfo'] && $params['repository']) {
       $user = $params['userInfo'];
       $repository = $params['repository'];
       $collaborator = $params['collaborator'];
@@ -423,10 +444,11 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $ch = $this->getConfiguredCURL($url, $user);
       $response = $this->performCURL($ch);
 
+      if ($response['header']['http_code'] == 204) {
+        $isCollaborator = true;
+      }
     }
-
-    error_log('collaborator-----',print_r($response,TRUE));
-    return $response;
+    return $isCollaborator;
   }
 
   /**
@@ -441,15 +463,20 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    */
   public function addCollaborator($params) {
     $response =[];
+    $isCollaborator = false;
     if ($params['userInfo']&& $params['repository']) {
       $user = $params['userInfo'];
       $repository = $params['repository'];
       $collaborator = $params['collaborator'];
-      $url = self::BASE_URL . 'repos/' . $repository['username'] . '/' . $repository['name'].'/collaborators/'.$collaborator['username'];
+      $url = self::BASE_URL . 'repos/' . $repository['username'] . '/' . $repository['name'].'/collaborators/'.$collaborator;
       $ch = $this->getConfiguredCURL($url, $user);
+      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
       $response = $this->performCURL($ch);
+      if ($response['header']['http_code'] == 204) {
+        $isCollaborator = true;
+      }
     }
-    return $response;
+    return $isCollaborator;
   }
 
   /**
@@ -462,6 +489,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    *   Collaborators information.
    */
   public function deleteCollaborator($params) {
+    $isCollaborator = false;
     $response =[];
     if ($params['userInfo']&& $params['repository']) {
       $user = $params['userInfo'];
@@ -469,9 +497,14 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $collaborator = $params['collaborator'];
       $url = self::BASE_URL . 'repos/' . $user['username'] . '/' . $repository['name'].'/collaborators/'.$collaborator['username'];
       $ch = $this->getConfiguredCURL($url, $user);
+      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
       $response = $this->performCURL($ch);
+
+      if ($response['header']['http_code'] == 204) {
+        $isCollaborator = true;
+      }
     }
-    return $response;
+    return $isCollaborator;
   }
 
   /**
@@ -506,10 +539,10 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       // It is autocalculated on getAccount method.
     );
     $this->mappings[self::USER] = array(
+      'id' => 'id',
       'fullname' => array('name', 'login'),
       'username' => 'login',
       'photoUrl' => 'avatar_url',
-      'id' => 'id',
       'email' => 'email',
     );
     $this->mappings[self::REPOSITORY] = array(
