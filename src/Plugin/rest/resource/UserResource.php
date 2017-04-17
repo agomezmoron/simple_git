@@ -106,7 +106,9 @@ class UserResource extends ResourceBase {
         $this->currentUser, $account_id
       );
       $userInfo = SimpleGitUserBusinessLogic::getUser($accounts,$user);
+
     }
+    error_log('userInfo', print_r($userInfo,TRUE));
     return new ResourceResponse($userInfo);
   }
 
