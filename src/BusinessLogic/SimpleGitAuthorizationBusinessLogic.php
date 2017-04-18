@@ -1,17 +1,8 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\simple_git\BusinessLogic\SimpleGitAuthorizationBusinessLogic.
- * @author  Alejandro Gómez Morón <amoron@emergya.com>
- * @author  Estefania Barrrera Berengeno <ebarrera@emergya.com>
- * @version PHP: 7
- */
-
 namespace Drupal\simple_git\BusinessLogic;
 
 use Drupal\simple_git\Service;
-
 
 /**
  * The base class for all authorization business logic.
@@ -23,27 +14,31 @@ abstract class SimpleGitAuthorizationBusinessLogic {
   /**
    * Check user authorization.
    *
-   * @param array $user
+   * @param mixed $user
    *   A user object.
-   *
-   * @param array $params
+   * @param mixed[] $params
    *   An associative array containing params service.
    *
-   * @return array|mixed
+   * @return mixed[]
+   *   An associative array with element 'account_id'.
    */
-  static function authorize($user, $params) {
-    $git_service = Service\SimpleGitConnectorFactory::getConnector(
-      $params['type']
-    );
-
+  public static function authorize($user, array $params) {
+    $git_service
+      = Service\SimpleGitConnectorFactory::getConnector($params['type']);
     $auth_info = $git_service->authorize($params);
-    $result = array();
+    $result = [];
 
-    // 'access_token'
+    // 'Access_token'.
     if (!empty($auth_info)) {
 
       $auth_info
-        = array('userInfo' => array('access_info' => array('token' => $auth_info)));
+        = array(
+          'userInfo' => array(
+            'access_info' => array(
+              'token' => $auth_info,
+            ),
+          ),
+        );
       $git_account = $git_service->getAccount($auth_info);
 
       if (isset($git_account['username'])) {
@@ -61,7 +56,7 @@ abstract class SimpleGitAuthorizationBusinessLogic {
     }
 
     return $result;
-  }
 
+  }
 
 }

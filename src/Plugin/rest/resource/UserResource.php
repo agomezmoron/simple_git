@@ -5,22 +5,27 @@ namespace Drupal\simple_git\Plugin\rest\resource;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
+use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
+use Drupal\simple_git\BusinessLogic\SimpleGitAuthorizationBusinessLogic;
+use Drupal\simple_git\BusinessLogic\SimpleGitUserBusinessLogic;
 use Drupal\simple_git\Interfaces\ModuleConstantInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Provides a Connector Resource.
  *
  * @package Drupal\simple_git\Plugin\rest\resource
  * @RestResource(
- *   id = "simple_git_connector_resource",
- *   label = @Translation("Git Connector Resource"),
+ *   id = "simple_git_user_resource",
+ *   label = @Translation("Git User Resource"),
  *   uri_paths = {
- *     "canonical" = "/api/simple_git/connector"
+ *     "canonical" = "/api/simple_git/user/{account_id}/{user}",
+ *     "https://www.drupal.org/link-relations/create" = "/api/simple_git/user",
  *   }
  * )
  */
-class ConnectorResource extends ResourceBase {
+class UserResource extends ResourceBase {
 
   /**
    * A current user instance.
@@ -84,44 +89,27 @@ class ConnectorResource extends ResourceBase {
    * Responds to the GET request.
    *
    * @return \Drupal\rest\ResourceResponse
-   *   The configured connectors.
+   *   The response containing all the linked accounts.
    */
-  public function get() {
-    $connectors = array();
+  public function get($account_id = NULL , $user) {
+    $accounts = [];
+    $userInfo = [];
 
-    $git_settings = \Drupal::config('simple_git.settings');
-
-    // GitHub connector
-    if (!empty(
-    $git_settings->get(
-      GIT_TYPE_GITHUB
-    )['app_id']
-    )
-    ) {
-      $connectors[] = array(
-        'client_id' => $git_settings->get(
-          ModuleConstantInterface::GIT_TYPE_GITHUB
-        )['app_id'],
-        'type' => ModuleConstantInterface::GIT_TYPE_GITHUB
+    if ($account_id == ModuleConstantInterface::REST_ALL_OPTION) {
+      $accounts = SimpleGitAccountBusinessLogic::getAccounts(
+        $this->currentUser
       );
+      $userInfo = SimpleGitUserBusinessLogic::getUser($accounts,$user);
     }
-
-    // GitLab connector.
-    if (!empty(
-    $git_settings->get(
-      ModuleConstantInterface::GIT_TYPE_GITLAB
-    )['app_id']
-    )
-    ) {
-      $connectors[] = array(
-        'client_id' => $git_settings->get(
-          ModuleConstantInterface::GIT_TYPE_GITLAB
-        )['app_id'],
-        'type' => ModuleConstantInterface::GIT_TYPE_GITLAB
+    else {
+      $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
+        $this->currentUser, $account_id
       );
-    }
+      $userInfo = SimpleGitUserBusinessLogic::getUser($accounts,$user);
 
-    return new ResourceResponse($connectors);
+    }
+    error_log('userInfo', print_r($userInfo,TRUE));
+    return new ResourceResponse($userInfo);
   }
 
 }

@@ -1,21 +1,15 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\simple_git\Plugin\rest\resource\RepositoryResource.php
- */
-
 namespace Drupal\simple_git\Plugin\rest\resource;
 
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
-use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
 use Drupal\simple_git\BusinessLogic\SimpleGitRepositoriesBusinessLogic;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Drupal\simple_git\BusinessLogic\SimpleGitAuthorizationBusinessLogic;
-use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
+use Drupal\simple_git\Interfaces\ModuleConstantInterface;
 
 /**
  * Provides a Repository Resource.
@@ -24,7 +18,7 @@ use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
  *   id = "simple_git_repository_resource",
  *   label = @Translation("Git Repository Resource"),
  *   uri_paths = {
- *     "canonical" = "/api/simple_git/repository/{$account_id}/{$repository_id}",
+ *     "canonical" = "/api/simple_git/repository/{account_id}/{repository_id}",
  *     "https://www.drupal.org/link-relations/create" = "/api/simple_git/repository",
  *   }
  * )
@@ -32,46 +26,51 @@ use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
 class RepositoryResource extends ResourceBase {
 
   /**
-   *  A current user instance.
+   * A current user instance.
    *
    * @var \Drupal\Core\Session\AccountProxyInterface
    */
-  protected $current_user;
+
+  protected $currentUser;
 
   /**
    * Constructs a Drupal\rest\Plugin\ResourceBase object.
    *
-   * @param array     $configuration
+   * @param array $configuration
    *   A configuration array containing information about the plugin instance.
-   *
-   * @param string    $plugin_id
+   * @param string $plugin_id
    *   The plugin_id for the plugin instance.
-   *
-   * @param mixed     $plugin_definition
+   * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   *
-   * @param array     $serializer_formats
+   * @param array $serializer_formats
    *   The available serialization formats.
-   *
-   * @param \Psr\Log\ $logger
+   * @param \Psr\Log $logger
    *   A logger instance.
+   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
+   *   The current account.
    */
   public function __construct(
-    array $configuration, $plugin_id, $plugin_definition,
-    array $serializer_formats, $logger, AccountProxyInterface $current_user
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    array $serializer_formats,
+    $logger,
+    AccountProxyInterface $current_user
   ) {
     parent::__construct(
       $configuration, $plugin_id, $plugin_definition, $serializer_formats,
       $logger
     );
-    $this->current_user = $current_user;
+    $this->currentUser = $current_user;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(
-    ContainerInterface $container, array $configuration, $plugin_id,
+    ContainerInterface $container,
+    array $configuration,
+    $plugin_id,
     $plugin_definition
   ) {
     return new static(
@@ -90,22 +89,22 @@ class RepositoryResource extends ResourceBase {
    * It creates a repository in the associated Git service.
    *
    * @param array $data
-   *  Request data.
+   *   Request data.
    *
    * @return \Drupal\rest\ResourceResponse
    *   The response containing the Git account data.
    */
-  public function post(array $data = []) {
+  public function post($data = []) {
     if (!isset($data['account_id'])) {
       throw new HttpException(404, t('Missing account_id'));
     }
 
     $account = SimpleGitAccountBusinessLogic::getAccountByAccountId(
-      $this->current_user, $data['account_id']
+      $this->currentUser, $data['account_id']
     );
 
     if (empty($account)) {
-      throw new HttpException(404, t('The account doesn\'t exist.'));
+      throw new HttpException(404, t('The account "doesn\'t" exist.'));
     }
 
     if (SimpleGitRepositoriesBusinessLogic::exists(
@@ -114,8 +113,8 @@ class RepositoryResource extends ResourceBase {
     ) {
       throw new HttpException(
         401, t(
-        'There is a repository with the provided name in the current account.'
-      )
+          'There is a repository with the provided name in the current account.'
+        )
       );
     }
     else {
@@ -139,28 +138,26 @@ class RepositoryResource extends ResourceBase {
    *
    * It deletes the sent repository from the provided account.
    *
-   * @param $account_id
-   *  An id of account
-   * @param $repository_id
-   *  A repository id.
+   * @param mixed $account_id
+   *   An id of account.
+   * @param int $repository_id
+   *   A repository id.
    *
    * @return \Drupal\rest\ResourceResponse
    *   The response with the result status.
    */
   public function delete($account_id, $repository_id) {
     // TODO: Check if it works
-
-
     return new ResourceResponse();
   }
 
   /**
    * Responds to the GET request.
    *
-   * @param $account_id
-   *  An id of account
-   * @param $repository_id
-   *  A repository id.
+   * @param int $account_id
+   *   An id of account.
+   * @param int $repository_id
+   *   A repository id.
    *
    * @return \Drupal\rest\ResourceResponse
    *   The response containing all the repositoryes or a requested one.
@@ -169,15 +166,15 @@ class RepositoryResource extends ResourceBase {
     $repositories = [];
 
     if ($account_id == ModuleConstantInterface::REST_ALL_OPTION) {
-      // should be reviewed once it is pushed!
+      // Should be reviewed once it is pushed!
       $repositories = SimpleGitRepositoriesBusinessLogic::getRepositories(
-        SimpleGitAccountBusinessLogic::getAccounts($this->current_user)
+        SimpleGitAccountBusinessLogic::getAccounts($this->currentUser)
       );
     }
     else {
       if ($repository_id == ModuleConstantInterface::REST_ALL_OPTION) {
         $account = SimpleGitAccountBusinessLogic::getAccountByAccountId(
-          $this->current_user, $account_id
+          $this->currentUser, $account_id
         );
         if (!empty($account)) {
           $repositories = SimpleGitRepositoriesBusinessLogic::getRepositories(
@@ -186,17 +183,16 @@ class RepositoryResource extends ResourceBase {
         }
         else {
           throw new \HttpException(
-            404, t('The provided account doesn\'t exist')
+            404, t('The provided account "doesn\'t" exist')
           );
         }
       }
       else {
         $repositories = SimpleGitRepositoriesBusinessLogic::getRepository(
-          $account_id, $repository_id, $this->current_user
+          $account_id, $repository_id, $this->currentUser
         );
       }
     }
-
     return new ResourceResponse($repositories);
   }
 
