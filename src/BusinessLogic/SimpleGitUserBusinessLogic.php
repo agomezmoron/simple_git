@@ -34,6 +34,9 @@ abstract class SimpleGitUserBusinessLogic {
       }
 
     }
+    if(in_array(NULL,$userInfo)){
+      $userInfo = [];
+    }
 
     return $userInfo;
   }
