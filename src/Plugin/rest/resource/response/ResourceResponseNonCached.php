@@ -3,6 +3,7 @@
 namespace Drupal\simple_git\Plugin\rest\resource\response;
 
 use Drupal\rest\ResourceResponse;
+use \Drupal\Core\Cache\CacheableMetadata;
 
 /**
  * It overrides the ResourceResponse invalidating the page caching.
@@ -20,7 +21,7 @@ class ResourceResponseNonCached extends ResourceResponse {
    *   An array of response headers.
    */
   public function __construct($data = NULL, $status = 200, $headers = array()) {
-    parent::__construct('', $status, $headers);
+    parent::__construct($data, $status, $headers);
     $this->disableCache();
   }
 
