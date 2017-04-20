@@ -19,7 +19,8 @@ use Drupal\simple_git\Interfaces\ModuleConstantInterface;
  *   label = @Translation("Git Repository Resource"),
  *   uri_paths = {
  *     "canonical" = "/api/simple_git/repository/{account_id}/{repository_id}",
- *     "https://www.drupal.org/link-relations/create" = "/api/simple_git/repository",
+ *     "https://www.drupal.org/link-relations/create" =
+ *   "/api/simple_git/repository",
  *   }
  * )
  */
@@ -178,7 +179,7 @@ class RepositoryResource extends ResourceBase {
         );
         if (!empty($account)) {
           $repositories = SimpleGitRepositoriesBusinessLogic::getRepositories(
-            array($account)
+            [$account]
           );
         }
         else {

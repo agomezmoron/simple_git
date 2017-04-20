@@ -20,7 +20,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  *   label = @Translation("Git Account Resource"),
  *   uri_paths = {
  *     "canonical" = "/api/simple_git/account/{account_id}",
- *     "https://www.drupal.org/link-relations/create" = "/api/simple_git/account",
+ *     "https://www.drupal.org/link-relations/create" =
+ *   "/api/simple_git/account",
  *   }
  * )
  */
@@ -97,9 +98,11 @@ class AccountResource extends ResourceBase {
    *   The response containing the Git account data.
    */
   public function post(array $data = []) {
+    $status = 200;
     $user_data = SimpleGitAuthorizationBusinessLogic::authorize(
       $this->currentUser, $data
     );
+
 
     // An error occurred authenticating.
     if (empty($user_data)) {
@@ -107,7 +110,11 @@ class AccountResource extends ResourceBase {
         401, t('An error occurred authorizing the user.')
       );
     }
-    return new ResourceResponse($user_data);
+    elseif ($user_data['status'] == 409) {
+      $status = 409;
+    }
+    error_log('status' . print_r($user_data . TRUE));
+    return new ResourceResponse($user_data, $status);
 
   }
 

@@ -46,14 +46,14 @@ class SimpleGitSettingsForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
 
-    $form = array();
+    $form = [];
     // Add the GitHub configuration.
     $this->buildGitHubForm($form);
 
     // Add the GitHub configuration.
     $this->buildGitLabForm($form);
 
-    $form['#submit'][] = array($this, 'submitForm');
+    $form['#submit'][] = [$this, 'submitForm'];
 
     return parent::buildForm($form, $form_state);
   }
@@ -67,48 +67,48 @@ class SimpleGitSettingsForm extends ConfigFormBase {
   private function buildGitHubForm(&$form) {
     $git_settings = $this->configFactory->get('simple_git.settings');
 
-    $form['git_hub'] = array(
+    $form['git_hub'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('GitHub settings'),
       '#collapsible' => TRUE,
       '#collapsed' => FALSE,
-    );
+    ];
 
-    $form['git_hub']['git_hub_app_id'] = array(
+    $form['git_hub']['git_hub_app_id'] = [
       '#type' => 'textfield',
       '#title' => $this->t('GitHub App Id'),
       '#description' => $this->t('GitHub App Id value'),
       '#default_value' => $git_settings->get(
         ModuleConstantInterface::GIT_TYPE_GITHUB
       )['app_id'],
-    );
+    ];
 
-    $form['git_hub']['git_hub_app_secret'] = array(
+    $form['git_hub']['git_hub_app_secret'] = [
       '#type' => 'textfield',
       '#title' => $this->t('GitHub App Secret'),
       '#description' => $this->t('GitHub App Secret value'),
       '#default_value' => $git_settings->get(
         ModuleConstantInterface::GIT_TYPE_GITHUB
       )['app_secret'],
-    );
+    ];
 
-    $form['git_hub']['git_hub_app_url_redirect'] = array(
+    $form['git_hub']['git_hub_app_url_redirect'] = [
       '#type' => 'textfield',
       '#title' => $this->t('GitHub URL Redirect'),
       '#description' => $this->t('GitHub URL Redirect value'),
       '#default_value' => $git_settings->get(
         ModuleConstantInterface::GIT_TYPE_GITHUB
       )['app_url_redirect'],
-    );
+    ];
 
-    $form['git_hub']['git_hub_app_name'] = array(
+    $form['git_hub']['git_hub_app_name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('GitHub App Name'),
       '#description' => $this->t('GitHub App Name'),
       '#default_value' => $git_settings->get(
         ModuleConstantInterface::GIT_TYPE_GITHUB
       )['app_name'],
-    );
+    ];
 
   }
 
@@ -121,39 +121,39 @@ class SimpleGitSettingsForm extends ConfigFormBase {
   private function buildGitLabForm(&$form) {
     $git_settings = $this->configFactory->get('simple_git.settings');
 
-    $form['git_lab'] = array(
+    $form['git_lab'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('GitLab settings'),
       '#collapsible' => TRUE,
       '#collapsed' => FALSE,
-    );
+    ];
 
-    $form['git_lab']['git_lab_app_id'] = array(
+    $form['git_lab']['git_lab_app_id'] = [
       '#type' => 'textfield',
       '#title' => $this->t('GitLab App Id'),
       '#description' => $this->t('GitLab App Id value'),
       '#default_value' => $git_settings->get(
         ModuleConstantInterface::GIT_TYPE_GITLAB
-      )['app_id']
-    );
+      )['app_id'],
+    ];
 
-    $form['git_lab']['git_lab_app_secret'] = array(
+    $form['git_lab']['git_lab_app_secret'] = [
       '#type' => 'textfield',
       '#title' => $this->t('GitLab App Secret'),
       '#description' => $this->t('GitLab App Secret value'),
       '#default_value' => $git_settings->get(
         ModuleConstantInterface::GIT_TYPE_GITLAB
       )['app_secret'],
-    );
+    ];
 
-    $form['git_lab']['git_lab_app_url_redirect'] = array(
+    $form['git_lab']['git_lab_app_url_redirect'] = [
       '#type' => 'textfield',
       '#title' => $this->t('GitLab URL Redirect'),
       '#description' => $this->t('GitLab URL Redirect value'),
       '#default_value' => $git_settings->get(
         ModuleConstantInterface::GIT_TYPE_GITLAB
       )['app_url_redirect'],
-    );
+    ];
 
   }
 
@@ -170,19 +170,19 @@ class SimpleGitSettingsForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    $values = array();
-    $values['git_hub'] = array(
+    $values = [];
+    $values['git_hub'] = [
       'app_id' => $form_state->getValue('git_hub_app_id'),
       'app_secret' => $form_state->getValue('git_hub_app_secret'),
       'app_url_redirect' => $form_state->getValue('git_hub_app_url_redirect'),
-      'app_name' => $form_state->getValue('git_hub_app_name')
-    );
+      'app_name' => $form_state->getValue('git_hub_app_name'),
+    ];
 
-    $values['git_lab'] = array(
+    $values['git_lab'] = [
       'app_id' => $form_state->getValue('git_lab_app_id'),
       'app_secret' => $form_state->getValue('git_lab_app_secret'),
       'app_url_redirect' => $form_state->getValue('git_lab_app_url_redirect'),
-    );
+    ];
 
     \Drupal::configFactory()->getEditable('simple_git.settings')
       ->set(ModuleConstantInterface::GIT_TYPE_GITHUB, $values['git_hub'])

@@ -20,8 +20,10 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  *   id = "simple_git_collaborator_resource",
  *   label = @Translation("Git Collaborator Resource"),
  *   uri_paths = {
- *     "canonical" = "/api/simple_git/collaborator/{account_id}/{repository}/{collaborator}",
- *     "https://www.drupal.org/link-relations/create" = "/api/simple_git/collaborator",
+ *     "canonical" =
+ *   "/api/simple_git/collaborator/{account_id}/{owner}/{repository}/{collaborator}",
+ *     "https://www.drupal.org/link-relations/create" =
+ *   "/api/simple_git/collaborator",
  *   }
  * )
  */
@@ -102,9 +104,11 @@ class CollaboratorResource extends ResourceBase {
    *   The response with the result status.
    */
   public function delete($account_id, $repository, $collaborator) {
-    $repo = SimpleGitRepositoriesBusinessLogic::getRepository($account_id, $repository, $this->currentUser);
-    SimpleGitCollaboratorsBusinessLogic::deleteCollaborators(SimpleGitAccountBusinessLogic::getAccountByAccountId($this->currentUser,
-      $account_id), $repo, $collaborator);
+    $repo = SimpleGitRepositoriesBusinessLogic::getRepository($account_id,
+      $repository, $this->currentUser);
+    SimpleGitCollaboratorsBusinessLogic::deleteCollaborators(
+      SimpleGitAccountBusinessLogic::getAccountByAccountId(
+        $this->currentUser, $account_id), $repo, $collaborator);
     return new ResourceResponse();
   }
 
@@ -121,28 +125,33 @@ class CollaboratorResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    *   The response containing all the collaborators or a requested one.
    */
-  public function get($account_id, $repository, $collaborator) {
-    $isCollaborator = false;
+  public function get($account_id, $owner, $repository, $collaborator) {
+    $isCollaborator = FALSE;
     $collaborators = [];
 
     if ($collaborator == ModuleConstantInterface::REST_ALL_OPTION) {
       $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
         $this->currentUser, $account_id
       );
-      $repo = SimpleGitRepositoriesBusinessLogic::getRepository($account_id,$repository,$this->currentUser);
-      $collaborators = SimpleGitCollaboratorsBusinessLogic::getCollaborators($accounts, $repo);
-    }else{
+      //$repo = SimpleGitRepositoriesBusinessLogic::getRepository($account_id,
+      // $repository, $this->currentUser);
+      $collaborators = SimpleGitCollaboratorsBusinessLogic::getCollaborators(
+        $accounts, $owner, $repository);
+    }
+    else {
       $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
         $this->currentUser, $account_id
       );
-      $repo = SimpleGitRepositoriesBusinessLogic::getRepository($account_id,$repository,$this->currentUser);
+      $repo = SimpleGitRepositoriesBusinessLogic::getRepository($account_id,
+        $repository, $this->currentUser);
 
-      $isCollaborator = SimpleGitCollaboratorsBusinessLogic::exists($accounts, $repo, $collaborator);
-      $collaborators = array('status' => $isCollaborator);
+      $isCollaborator = SimpleGitCollaboratorsBusinessLogic::exists($accounts,
+        $repo, $collaborator);
+      $collaborators = ['status' => $isCollaborator];
 
     }
 
-     return new ResourceResponse($collaborators);
+    return new ResourceResponse($collaborators);
   }
 
   /**
@@ -161,8 +170,11 @@ class CollaboratorResource extends ResourceBase {
    *   The response containing all the linked accounts.
    */
   public function put($account_id, $repository, $collaborator) {
-   SimpleGitCollaboratorsBusinessLogic::addCollaborators(SimpleGitAccountBusinessLogic::getAccountByAccountId($this->currentUser,
-        $account_id), SimpleGitRepositoriesBusinessLogic::getRepository($account_id, $repository, $this->currentUser), $collaborator);
+    SimpleGitCollaboratorsBusinessLogic::addCollaborators(
+      SimpleGitAccountBusinessLogic::getAccountByAccountId(
+        $this->currentUser, $account_id),
+      SimpleGitRepositoriesBusinessLogic::getRepository($account_id,
+        $repository, $this->currentUser), $collaborator);
     return new ResourceResponse();
   }
 

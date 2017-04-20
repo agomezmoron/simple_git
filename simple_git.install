@@ -11,7 +11,7 @@ use Drupal\Core\Database\Database;
  * Implements hook_requirements().
  */
 function simple_git_requirements($phase) {
-  $requirements = array();
+  $requirements = [];
   // Non extra requirements detected by now.
   return $requirements;
 }

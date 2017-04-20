@@ -21,19 +21,19 @@ class SimpleGitRepositoriesBusinessLogic {
    *   Contains user's repository.
    */
   static function getRepositories($accounts) {
-    $repositories = [];
+    //    $repositories = [];
     foreach ($accounts as $account) {
       $params['userInfo'] = $account;
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $params['userInfo']['type']
       );
-      $repositoriesByAccount = $git_service->getRepositoriesList($params);
-      foreach ($repositoriesByAccount as &$repository) {
+      $repositories = $git_service->getRepositoriesList($params);
+      foreach ($repositories as &$repository) {
         $repository['accountId'] = $account['account_id'];
       }
-      $repositories = array_merge(
-        $repositories, $repositoriesByAccount
-      );
+      /*$repositories = array_merge(
+        $repositories, $repositoriesByAccount*/
+      //);
     }
 
     // Removing duplicated repositories.
@@ -55,9 +55,13 @@ class SimpleGitRepositoriesBusinessLogic {
         // if the repositoy is duplicated, we add the next account with its admin permisisons
         if (!$to_be_added) {
           $position = array_search($repository['id'], $added_repos);
-          if ($filtered_repositories[$position]['canAdmin'] == FALSE && $repository['canAdmin'] == TRUE) {
-            $filtered_repositories[$position]['accountId'] = $repository['accountId'];
-            $filtered_repositories[$position]['canAdmin'] = $repository['canAdmin'];
+          if ($filtered_repositories[$position]['canAdmin'] == FALSE &&
+            $repository['canAdmin'] == TRUE
+          ) {
+            $filtered_repositories[$position]['accountId'] =
+              $repository['accountId'];
+            $filtered_repositories[$position]['canAdmin'] =
+              $repository['canAdmin'];
           }
         }
       }
@@ -86,7 +90,7 @@ class SimpleGitRepositoriesBusinessLogic {
     if (!empty($account)) {
       $params = [];
       $params['userInfo'] = $account;
-      $params['repository'] = array('name' => $repo);
+      $params['repository'] = ['name' => $repo];
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']
       );
@@ -170,7 +174,8 @@ class SimpleGitRepositoriesBusinessLogic {
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']
       );
-      // @TODO: add this to the git service interface $repository = $git_service->createRepository($params);
+      // @TODO: add this to the git service interface
+      // $repository = $git_service->createRepository($params);
     }
     return $repository;
   }

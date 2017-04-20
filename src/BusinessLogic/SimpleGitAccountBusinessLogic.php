@@ -216,23 +216,23 @@ abstract class SimpleGitAccountBusinessLogic {
     $access_info = [];
     switch ($account['type']) {
       case ModuleConstantInterface::GIT_TYPE_GITHUB:
-        $access_info = array(
+        $access_info = [
           'token' => $account['access_info']['token'],
-        );
+        ];
         break;
 
       case ModuleConstantInterface::GIT_TYPE_GITLAB:
-        $access_info = array(
+        $access_info = [
           'token' => $account['access_info']['token'],
           'expires_in' => $account['access_info']['expires_in'],
           'refresh_token' => $account['access_info']['refresh_token'],
-        );
+        ];
         break;
 
       default:
-        $access_info = array(
+        $access_info = [
           'token' => $account['access_info']['token'],
-        );
+        ];
         break;
     }
     return $access_info;
