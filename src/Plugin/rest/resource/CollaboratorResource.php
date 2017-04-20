@@ -5,6 +5,7 @@ namespace Drupal\simple_git\Plugin\rest\resource;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
+use Drupal\simple_git\Plugin\rest\resource\response\ResourceResponseNonCached;
 use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
 use Drupal\simple_git\BusinessLogic\SimpleGitRepositoriesBusinessLogic;
 use Drupal\simple_git\BusinessLogic\SimpleGitCollaboratorsBusinessLogic;
@@ -142,7 +143,7 @@ class CollaboratorResource extends ResourceBase {
 
     }
 
-     return new ResourceResponse($collaborators);
+     return new ResourceResponseNonCached($collaborators);
   }
 
   /**
