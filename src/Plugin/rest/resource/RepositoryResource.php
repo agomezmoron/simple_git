@@ -110,14 +110,8 @@ class RepositoryResource extends ResourceBase {
     }
 
     if (SimpleGitRepositoriesBusinessLogic::exists(
-      $account, $data['repository']
-    )
-    ) {
-      throw new HttpException(
-        401, t(
-          'There is a repository with the provided name in the current account.'
-        )
-      );
+      $account, $data['repository'])) {
+        $response = new ResourceResponse(null,401);
     }
     else {
       $repository = SimpleGitRepositoriesBusinessLogic::create(
@@ -125,14 +119,13 @@ class RepositoryResource extends ResourceBase {
       );
 
       if (empty($repository)) {
-        throw new HttpException(
-          500, t('An error occurred creating the repository')
-        );
+          $response = new ResourceResponse(null,500);
       }
       else {
-        return new ResourceResponse($repository);
+          $response = new ResourceResponse($repository);
       }
     }
+      return $response;
   }
 
   /**
@@ -142,15 +135,23 @@ class RepositoryResource extends ResourceBase {
    *
    * @param mixed $accountId
    *   An id of account.
-   * @param int $repository_id
-   *   A repository id.
+   * @param int $repository
+   *   A repository name.
    *
    * @return \Drupal\rest\ResourceResponse
    *   The response with the result status.
    */
-  public function delete($accountId, $repository_id) {
-    // TODO: Check if it works
-    return new ResourceResponse();
+  public function delete($accountId, $repository) {
+      $isDeleted = false;
+      $isDeleted = SimpleGitRepositoriesBusinessLogic::deleteRepository(
+          SimpleGitAccountBusinessLogic::getAccountByAccountId(
+              $this->currentUser, $accountId), $repository);
+      if(!$isDeleted){
+          $response = new ResourceResponse(null, 404);
+      }else{
+          $response = new ResourceResponse();
+      }
+      return $response;
   }
 
   /**
@@ -158,13 +159,13 @@ class RepositoryResource extends ResourceBase {
    *
    * @param int $accountId
    *   An id of account.
-   * @param int $repository_id
+   * @param int $repository
    *   A repository id.
    *
    * @return \Drupal\rest\ResourceResponse
    *   The response containing all the repositoryes or a requested one.
    */
-  public function get($accountId = NULL, $repository_id = NULL) {
+  public function get($accountId = NULL, $repository = NULL) {
     $repositories = [];
 
     if ($accountId == ModuleConstantInterface::REST_ALL_OPTION) {
@@ -174,7 +175,7 @@ class RepositoryResource extends ResourceBase {
       );
     }
     else {
-      if ($repository_id == ModuleConstantInterface::REST_ALL_OPTION) {
+      if ($repository == ModuleConstantInterface::REST_ALL_OPTION) {
         $account = SimpleGitAccountBusinessLogic::getAccountByAccountId(
           $this->currentUser, $accountId
         );
@@ -191,11 +192,39 @@ class RepositoryResource extends ResourceBase {
       }
       else {
         $repositories = SimpleGitRepositoriesBusinessLogic::getRepository(
-          $accountId, $repository_id, $this->currentUser
+          $accountId, $repository, $this->currentUser
         );
       }
     }
     return new ResourceResponseNonCached($repositories);
   }
+
+    /**
+     * Responds to the PUT request.
+     *
+     * It add the sent repository.
+     *
+     * @param int $accountId
+     *   An id of account.
+     * @param string $repository
+     *   An associative array containing structure user.
+     * @param string $collaborator
+     *   A collaborator name.
+     *
+     * @return \Drupal\rest\ResourceResponse
+     *   The response containing all the linked accounts.
+     */
+    public function put($accountId, $repository) {
+        $isCollaborator = SimpleGitRepositoriesBusinessLogic::create(
+            SimpleGitAccountBusinessLogic::getAccountByAccountId(
+                $this->currentUser, $accountId), $repository);
+        if($isCollaborator){
+            //The server successfully processed the request and is not returning any content
+            $response = new ResourceResponseNonCached(null, 204);
+        }else{
+            $response = new ResourceResponseNonCached(null, 404);
+        }
+        return $response;
+    }
 
 }

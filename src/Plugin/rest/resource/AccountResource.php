@@ -99,18 +99,29 @@ class AccountResource extends ResourceBase {
    *   The response containing the Git account data.
    */
   public function post(array $data = []) {
+      $accountsOld = [];
+      $accounts = [];
+      $accountsOld = SimpleGitAccountBusinessLogic::getAccounts(
+          $this->currentUser);
     $user_data = SimpleGitAuthorizationBusinessLogic::authorize(
       $this->currentUser, $data
     );
-    // An error occurred authenticating.
+      $accounts = SimpleGitAccountBusinessLogic::getAccounts(
+          $this->currentUser);
+
     if (empty($user_data)) {
+        // An error occurred authenticating (Unauthorized).
       $reponse = new ResourceResponse(NULL, 401);
     }
     elseif ($user_data['status'] == 409) {
+        //An error Conflict
       $reponse = new ResourceResponse(NULL, 409);
     }
-    else {
-      $reponse = new ResourceResponse($user_data);
+    elseif ((sizeof($accountsOld) + 1) == sizeof($accounts)) {
+        //The request has been fulfilled, resulting in the creation of a new account.
+        $reponse = new ResourceResponse($user_data,201);
+    }else {
+          $reponse = new ResourceResponse($user_data);
     }
     return $reponse;
   }
@@ -140,16 +151,16 @@ class AccountResource extends ResourceBase {
     $current_accounts = SimpleGitAccountBusinessLogic::setAccounts(
       $this->currentUser, $current_accounts
     );
-    //error_log('current_account>>>' . print_r($current_accounts, TRUE));
-    //error_log('sizeof>>>>' . print_r((sizeof($accounts) - 1), TRUE));
-    //error_log('sizeof>>>>' . print_r(sizeof($current_accounts), TRUE));
     if ((sizeof($accounts) - 1) == sizeof($current_accounts)) {
+        //Deleted correctly
       $response = new ResourceResponse();
     }
     elseif (!empty($current_accounts)) {
+        //Account not found
       $response = new ResourceResponse(NULL, 404);
     }
     else {
+        // Internal Server Error
       $response = new ResourceResponse(NULL, 500);
     }
 
@@ -174,13 +185,21 @@ class AccountResource extends ResourceBase {
       $accounts = SimpleGitAccountBusinessLogic::getAccounts(
         $this->currentUser
       );
-      $response = new ResourceResponseNonCached($accounts);
+        if (empty($accounts)) {
+            //The server successfully processed the request and is not returning any content
+            $response = new ResourceResponseNonCached(NULL, 204);
+        }else{
+            $response = new ResourceResponseNonCached($accounts);
+        }
     }
     else {
       $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
         $this->currentUser, $accountId);
       if (empty($accounts)) {
-        $response = new ResourceResponseNonCached(NULL, 404);
+          //The server successfully processed the request and is not returning any content
+        $response = new ResourceResponseNonCached(NULL, 204);
+      }else{
+          $response = new ResourceResponseNonCached($accounts);
       }
     }
 

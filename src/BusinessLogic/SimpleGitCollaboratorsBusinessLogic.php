@@ -16,19 +16,19 @@ class SimpleGitCollaboratorsBusinessLogic {
    *
    * @param int $account
    *   An associative array containing structure account.
-   * @param string $repo
-   *   An associative array containing structure repository.
+   * @param string $repository
+   *   An repository name.
    * @param string $owner
    *   An owner name.
    *
    * @return array
    *   Contains collaborator's repository.
    */
-  public static function getCollaborators($account, $owner, $repo) {
+  public static function getCollaborators($account, $owner, $repository) {
     $collaborators = [];
     if (!empty($account)) {
       $params['userInfo'] = $account;
-      $params['repository']['name'] = $repo;
+      $params['repository']['name'] = $repository;
       $params['repository']['username'] = $owner;
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']
@@ -44,22 +44,23 @@ class SimpleGitCollaboratorsBusinessLogic {
    *
    * @param array $account
    *   An associative array containing structure account.
-   * @param array $repository_info
-   *   The repository info to be checked. The key "name" is needed.
+   * @param string $repository
+   *   The repository name.
    * @param string $collaborator
    *   An collaborator name.
+   * @param string $owner
+   *   An owner name.
    *
    * @return bool
    *   true if the repository exists.
    */
-  public static function exists($account, $repository_info, $collaborator) {
+  public static function exists($account, $owner, $repository, $collaborator) {
     $exists = FALSE;
-    if (!empty($account) && !empty($repository_info)
-      && isset($repository_info['name'])
-    ) {
+    if (!empty($account) && !empty($repository)&& !empty($owner)) {
       $params = [];
       $params['userInfo'] = $account;
-      $params['repository'] = $repository_info;
+        $params['repository']['name'] = $repository;
+        $params['repository']['username'] = $owner;
       $params['collaborator']['username'] = $collaborator;
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']
@@ -90,9 +91,7 @@ class SimpleGitCollaboratorsBusinessLogic {
   static function addCollaborators($account, $owner, $repository,
     $collaborator) {
     $iscollaborator = FALSE;
-    if (!empty($account) && !empty($repository)
-      && isset($repository['name'])
-    ) {
+    if (!empty($account) && !empty($repository) && !empty($owner)) {
       $params = [];
       $params['userInfo'] = $account;
       $params['repository']['name'] = $repository;

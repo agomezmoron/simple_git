@@ -245,6 +245,33 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
     return $response;
   }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param array $params
+     *   It needs the userInfo and the name of the repository requested.
+     *
+     * @return array
+     *   Information about the repository.
+     */
+    public function deleteRepository($params) {
+        $isDeleted = false;
+        if ($params['userInfo'] && $params['repository']) {
+            $user = $params['userInfo'];
+            $repository = $params['repository'];
+            $url = self::BASE_URL . $repository['username'] . '/'
+                . $repository['name'];
+            $ch = $this->getConfiguredCURL($url, $user);
+            $repo = $this->performCURL($ch);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+            $response = $this->performCURL($ch);
+            if ($response['header']['http_code'] == 204) {
+                $isDeleted = TRUE;
+            }
+        }
+        return $isDeleted;
+    }
+
   /**
    * {@inheritdoc}
    *
@@ -436,7 +463,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       if ($response['header']['http_code'] == 204) {
         $isCollaborator = TRUE;
       }
-      error_log('add collaborator>>>>'.print_r($response,TRUE));
+      //error_log('add collaborator>>>>'.print_r($response,TRUE));
     }
     return $isCollaborator;
   }

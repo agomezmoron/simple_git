@@ -157,7 +157,7 @@ class SimpleGitRepositoriesBusinessLogic {
    * @return array
    *   With the created repository
    */
-  function create($account, $repository_info) {
+  public static function create($account, $repository_info) {
     $repository = [];
     if (!empty($account) && !empty($repository_info)
       && isset($repository_info['name'])
@@ -168,10 +168,39 @@ class SimpleGitRepositoriesBusinessLogic {
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']
       );
-      // @TODO: add this to the git service interface
-      // $repository = $git_service->createRepository($params);
+       $repository = $git_service->addRepository($params);
     }
     return $repository;
   }
+
+    /**
+     * Delete a repository.
+     *
+     * @param array $account
+     *   An associative array containing structure account.
+     * @param array $repository
+     *   An associative array containing structure repository.
+     * @param string $collaborator
+     *   An collaborator name
+     *
+     * @return bool
+     *   An associative array containing structure accounts
+     */
+    public static function deleteRepository($account, $repository) {
+        $delete = FALSE;
+        if (!empty($account) && !empty($repository)
+            && isset($repository['name'])
+        ) {
+            $params = [];
+            $params['userInfo'] = $account;
+            $params['repository']['name'] = $repository;
+            $git_service = Service\SimpleGitConnectorFactory::getConnector(
+                $account['type']
+            );
+
+            $delete = $git_service->deleteRepository($params);
+        }
+        return $delete;
+    }
 
 }

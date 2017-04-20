@@ -104,10 +104,17 @@ class CollaboratorResource extends ResourceBase {
    *   The response with the result status.
    */
   public function delete($accountId, $owner, $repository, $collaborator) {
-    SimpleGitCollaboratorsBusinessLogic::deleteCollaborators(
+    $isDeleted = false;
+
+    $isDeleted = SimpleGitCollaboratorsBusinessLogic::deleteCollaborators(
       SimpleGitAccountBusinessLogic::getAccountByAccountId(
         $this->currentUser, $accountId), $owner, $repository, $collaborator);
-    return new ResourceResponse();
+    if(!$isDeleted){
+        $response = new ResourceResponse(null, 404);
+    }else{
+        $response = new ResourceResponse();
+    }
+    return $response;
   }
 
   /**
@@ -130,25 +137,25 @@ class CollaboratorResource extends ResourceBase {
     if ($collaborator == ModuleConstantInterface::REST_ALL_OPTION) {
       $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
         $this->currentUser, $accountId);
-      //$repo = SimpleGitRepositoriesBusinessLogic::getRepository($accountId,
-      // $repository, $this->currentUser);
       $collaborators = SimpleGitCollaboratorsBusinessLogic::getCollaborators(
         $accounts, $owner, $repository);
+        $response = new ResourceResponseNonCached($collaborators);
     }
     else {
       $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
         $this->currentUser, $accountId
       );
-      $repo = SimpleGitRepositoriesBusinessLogic::getRepository($accountId,
-        $repository, $this->currentUser);
-
-      $isCollaborator = SimpleGitCollaboratorsBusinessLogic::exists($accounts,
-        $repo, $collaborator);
-      $collaborators = ['status' => $isCollaborator];
-
+      $isCollaborator = SimpleGitCollaboratorsBusinessLogic::exists($accounts, $owner,
+          $repository, $collaborator);
+      if($isCollaborator){
+          //The server successfully processed the request and is not returning any content
+          $response = new ResourceResponseNonCached(null, 204);
+      }else{
+          $response = new ResourceResponseNonCached(null, 404);
+      }
     }
 
-    return new ResourceResponseNonCached($collaborators);
+    return $response;
   }
 
   /**
@@ -167,14 +174,16 @@ class CollaboratorResource extends ResourceBase {
    *   The response containing all the linked accounts.
    */
   public function put($accountId, $owner, $repository, $collaborator) {
-    error_log('add accountID>>>>'.print_r($accountId,TRUE));
-    error_log('add owner>>>>'.print_r($owner,TRUE));
-    error_log('add repository>>>>'.print_r($repository,TRUE));
-    error_log('add collaborator>>>>'.print_r($collaborator,TRUE));
-    SimpleGitCollaboratorsBusinessLogic::addCollaborators(
+    $isCollaborator = SimpleGitCollaboratorsBusinessLogic::addCollaborators(
       SimpleGitAccountBusinessLogic::getAccountByAccountId(
         $this->currentUser, $accountId), $owner, $repository, $collaborator);
-    return new ResourceResponse();
+      if($isCollaborator){
+          //The server successfully processed the request and is not returning any content
+          $response = new ResourceResponseNonCached(null, 204);
+      }else{
+          $response = new ResourceResponseNonCached(null, 404);
+      }
+    return $response;
   }
 
 }

@@ -41,7 +41,6 @@ class SimpleGitPullRequestsBusinessLogic {
       $pull_requests_by_account
         = $git_service->getPullRequestsList($params);
 
-
       if (!empty($pull_requests_by_account)) {
         $pull_requests = array_merge($pull_requests,
           $pull_requests_by_account);

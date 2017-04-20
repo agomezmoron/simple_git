@@ -60,9 +60,6 @@ abstract class SimpleGitAuthorizationBusinessLogic {
           = SimpleGitAccountBusinessLogic::addOrUpdateAccount(
           $user, $git_account
         );
-        //error_log('result>>>>>>>>'. print_r($result,TRUE));
-        error_log('account_info>>>>>>>>'. print_r
-          ($account_info,TRUE));
         $result['accountId'] = array_column($account_info, 'accountId');
       }
     }
