@@ -5,6 +5,7 @@ namespace Drupal\simple_git\Plugin\rest\resource;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
+use Drupal\simple_git\Plugin\rest\resource\response\ResourceResponseNonCached;
 use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
 use Drupal\simple_git\BusinessLogic\SimpleGitPullRequestsBusinessLogic;
 use Drupal\simple_git\BusinessLogic\SimpleGitRepositoriesBusinessLogic;
@@ -99,7 +100,7 @@ class PullRequestResource extends ResourceBase {
     $pr = SimpleGitPullRequestsBusinessLogic::getPullRequests(
       $accounts, $repositories
     );
-    return new ResourceResponse($pr);
+    return new ResourceResponseNonCached($pr);
   }
 
 }

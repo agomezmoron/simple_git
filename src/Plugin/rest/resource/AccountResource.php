@@ -5,6 +5,7 @@ namespace Drupal\simple_git\Plugin\rest\resource;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
+use Drupal\simple_git\Plugin\rest\resource\response\ResourceResponseNonCached;
 use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
 use Drupal\simple_git\BusinessLogic\SimpleGitAuthorizationBusinessLogic;
 use Drupal\simple_git\Interfaces\ModuleConstantInterface;
@@ -160,7 +161,7 @@ class AccountResource extends ResourceBase {
       );
     }
 
-    return new ResourceResponse($accounts);
+    return new ResourceResponseNonCached($accounts);
   }
 
 }
