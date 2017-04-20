@@ -334,8 +334,10 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
   /**
    * Obtain the user detail of a non-logged user.
    *
-   * @param mixed[] $params
+   * @param array[] $account
    *   It needs the userName.
+   * @param array[] $user
+   *   It needs the user.
    *
    * @return mixed
    *   Information about the user.(Non-logged user).
@@ -372,8 +374,6 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $repository = $params['repository'];
       $url = self::BASE_URL . 'repos/' . $repository['username'] . '/' .
         $repository['name'] . '/collaborators';
-      error_log('url' . print_r($url, TRUE));
-      error_log('repository' . print_r($repository, TRUE));
       $ch = $this->getConfiguredCURL($url, $user);
       $collaborators = $this->performCURL($ch);
       $collaborators = $collaborators['data'];
@@ -436,6 +436,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       if ($response['header']['http_code'] == 204) {
         $isCollaborator = TRUE;
       }
+      error_log('add collaborator>>>>'.print_r($response,TRUE));
     }
     return $isCollaborator;
   }

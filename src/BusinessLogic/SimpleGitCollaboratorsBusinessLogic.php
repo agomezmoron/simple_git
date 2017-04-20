@@ -75,24 +75,28 @@ class SimpleGitCollaboratorsBusinessLogic {
   /**
    * It creates a collaborator in the provided repository.
    *
-   * @param array $user
+   * @param array $account
    *   An associative array containing structure account.
-   * @param array $repository_info
+   * @param array $repository
    *   An associative array containing structure repository.
    * @param string $collaborator
    *   An collaborator name
+   * @param string $owner
+   *   An owner name.
    *
    * @return array
    *   With the created collaborators
    */
-  static function addCollaborators($account, $repository, $collaborator) {
+  static function addCollaborators($account, $owner, $repository,
+    $collaborator) {
     $iscollaborator = FALSE;
     if (!empty($account) && !empty($repository)
       && isset($repository['name'])
     ) {
       $params = [];
       $params['userInfo'] = $account;
-      $params['repository'] = $repository;
+      $params['repository']['name'] = $repository;
+      $params['repository']['username'] = $owner;
       $params['collaborator'] = $collaborator;
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']
@@ -105,7 +109,7 @@ class SimpleGitCollaboratorsBusinessLogic {
   /**
    * Delete a collaborators.
    *
-   * @param array $user
+   * @param array $account
    *   An associative array containing structure account.
    * @param array $repository
    *   An associative array containing structure repository.
@@ -115,18 +119,16 @@ class SimpleGitCollaboratorsBusinessLogic {
    * @return bool
    *   An associative array containing structure accounts
    */
-  public static function deleteCollaborators(
-    $account,
-    $repository,
-    $collaborator
-  ) {
+  public static function deleteCollaborators($account, $owner, $repository,
+    $collaborator) {
     $delete = FALSE;
     if (!empty($account) && !empty($repository)
       && isset($repository['name'])
     ) {
       $params = [];
       $params['userInfo'] = $account;
-      $params['repository'] = $repository;
+      $params['repository']['name'] = $repository;
+      $params['repository']['username'] = $owner;
       $params['collaborator']['username'] = $collaborator;
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']

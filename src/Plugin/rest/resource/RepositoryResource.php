@@ -140,7 +140,7 @@ class RepositoryResource extends ResourceBase {
    *
    * It deletes the sent repository from the provided account.
    *
-   * @param mixed $account_id
+   * @param mixed $accountId
    *   An id of account.
    * @param int $repository_id
    *   A repository id.
@@ -148,7 +148,7 @@ class RepositoryResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    *   The response with the result status.
    */
-  public function delete($account_id, $repository_id) {
+  public function delete($accountId, $repository_id) {
     // TODO: Check if it works
     return new ResourceResponse();
   }
@@ -156,7 +156,7 @@ class RepositoryResource extends ResourceBase {
   /**
    * Responds to the GET request.
    *
-   * @param int $account_id
+   * @param int $accountId
    *   An id of account.
    * @param int $repository_id
    *   A repository id.
@@ -164,10 +164,10 @@ class RepositoryResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    *   The response containing all the repositoryes or a requested one.
    */
-  public function get($account_id = NULL, $repository_id = NULL) {
+  public function get($accountId = NULL, $repository_id = NULL) {
     $repositories = [];
 
-    if ($account_id == ModuleConstantInterface::REST_ALL_OPTION) {
+    if ($accountId == ModuleConstantInterface::REST_ALL_OPTION) {
       // Should be reviewed once it is pushed!
       $repositories = SimpleGitRepositoriesBusinessLogic::getRepositories(
         SimpleGitAccountBusinessLogic::getAccounts($this->currentUser)
@@ -176,7 +176,7 @@ class RepositoryResource extends ResourceBase {
     else {
       if ($repository_id == ModuleConstantInterface::REST_ALL_OPTION) {
         $account = SimpleGitAccountBusinessLogic::getAccountByAccountId(
-          $this->currentUser, $account_id
+          $this->currentUser, $accountId
         );
         if (!empty($account)) {
           $repositories = SimpleGitRepositoriesBusinessLogic::getRepositories(
@@ -191,7 +191,7 @@ class RepositoryResource extends ResourceBase {
       }
       else {
         $repositories = SimpleGitRepositoriesBusinessLogic::getRepository(
-          $account_id, $repository_id, $this->currentUser
+          $accountId, $repository_id, $this->currentUser
         );
       }
     }

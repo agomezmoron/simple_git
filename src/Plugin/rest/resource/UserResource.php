@@ -91,11 +91,11 @@ class UserResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    *   The response containing all the linked accounts.
    */
-  public function get($account_id = NULL, $user) {
+  public function get($accountId = NULL, $user) {
     $accounts = [];
     $userInfo = [];
 
-    if ($account_id == ModuleConstantInterface::REST_ALL_OPTION) {
+    if ($accountId == ModuleConstantInterface::REST_ALL_OPTION) {
       $accounts = SimpleGitAccountBusinessLogic::getAccounts(
         $this->currentUser
       );
@@ -103,7 +103,7 @@ class UserResource extends ResourceBase {
     }
     else {
       $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
-        $this->currentUser, $account_id
+        $this->currentUser, $accountId
       );
       $userInfo = SimpleGitUserBusinessLogic::getUser($accounts, $user);
 

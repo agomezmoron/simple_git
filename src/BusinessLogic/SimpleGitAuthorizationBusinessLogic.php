@@ -20,7 +20,7 @@ abstract class SimpleGitAuthorizationBusinessLogic {
    *   An associative array containing params service.
    *
    * @return mixed[]
-   *   An associative array with element 'account_id'.
+   *   An associative array with element 'accountId'.
    */
   public static function authorize($user, array $params) {
     $git_service
@@ -60,7 +60,10 @@ abstract class SimpleGitAuthorizationBusinessLogic {
           = SimpleGitAccountBusinessLogic::addOrUpdateAccount(
           $user, $git_account
         );
-        $result['account_id'] = $account_info['account_id'];
+        //error_log('result>>>>>>>>'. print_r($result,TRUE));
+        error_log('account_info>>>>>>>>'. print_r
+          ($account_info,TRUE));
+        $result['accountId'] = array_column($account_info, 'accountId');
       }
     }
     return $result;

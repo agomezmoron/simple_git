@@ -21,37 +21,31 @@ class SimpleGitRepositoriesBusinessLogic {
    *   Contains user's repository.
    */
   static function getRepositories($accounts) {
-    //    $repositories = [];
+    $repositories = [];
     foreach ($accounts as $account) {
       $params['userInfo'] = $account;
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $params['userInfo']['type']
       );
-      $repositories = $git_service->getRepositoriesList($params);
-      foreach ($repositories as &$repository) {
-        $repository['accountId'] = $account['account_id'];
+      $repositoriesByAccount = $git_service->getRepositoriesList($params);
+      foreach ($repositoriesByAccount as &$repository) {
+        $repository['accountId'] = $account['accountId'];
       }
-      /*$repositories = array_merge(
-        $repositories, $repositoriesByAccount*/
-      //);
+      $repositories = array_merge(
+        $repositories, $repositoriesByAccount
+      );
     }
-
     // Removing duplicated repositories.
     $filtered_repositories = [];
     $added_repos = [];
-
     foreach ($repositories as $repository) {
       $to_be_added = FALSE;
       if (!in_array($repository['id'], $added_repos)) {
-
-
         $to_be_added = TRUE;
         $added_repos[] = $repository['id'];
-
         $filtered_repositories[] = $repository;
       }
       if ($repository['canAdmin'] == TRUE) {
-
         // if the repositoy is duplicated, we add the next account with its admin permisisons
         if (!$to_be_added) {
           $position = array_search($repository['id'], $added_repos);
@@ -72,7 +66,7 @@ class SimpleGitRepositoriesBusinessLogic {
   /**
    * Get repository.
    *
-   * @param int $account_id
+   * @param int $accountId
    *   A id account.
    * @param string $repo
    *   A string with URL of the repositories.
@@ -82,10 +76,10 @@ class SimpleGitRepositoriesBusinessLogic {
    * @return array
    *   Contains user's repository.
    */
-  static function getRepository($account_id, $repo, $user) {
+  static function getRepository($accountId, $repo, $user) {
     $repository = [];
     $account = SimpleGitAccountBusinessLogic::getAccountByAccountId(
-      $user, $account_id
+      $user, $accountId
     );
     if (!empty($account)) {
       $params = [];

@@ -20,9 +20,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  * @RestResource(
  *   id = "simple_git_collaborator_resource",
  *   label = @Translation("Git Collaborator Resource"),
- *   uri_paths = {
- *     "canonical" =
- *   "/api/simple_git/collaborator/{account_id}/{owner}/{repository}/{collaborator}",
+ *   uri_paths = {"canonical" =
+ *   "/api/simple_git/collaborator/{accountId}/{owner}/{repository}/{collaborator}",
  *     "https://www.drupal.org/link-relations/create" =
  *   "/api/simple_git/collaborator",
  *   }
@@ -94,7 +93,7 @@ class CollaboratorResource extends ResourceBase {
    *
    * It deletes the sent collaborator.
    *
-   * @param int $account_id
+   * @param int $accountId
    *   An id of account.*
    * @param string $repository
    *   A repository name.
@@ -104,19 +103,17 @@ class CollaboratorResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    *   The response with the result status.
    */
-  public function delete($account_id, $repository, $collaborator) {
-    $repo = SimpleGitRepositoriesBusinessLogic::getRepository($account_id,
-      $repository, $this->currentUser);
+  public function delete($accountId, $owner, $repository, $collaborator) {
     SimpleGitCollaboratorsBusinessLogic::deleteCollaborators(
       SimpleGitAccountBusinessLogic::getAccountByAccountId(
-        $this->currentUser, $account_id), $repo, $collaborator);
+        $this->currentUser, $accountId), $owner, $repository, $collaborator);
     return new ResourceResponse();
   }
 
   /**
    * Responds to the GET request.
    *
-   * @param int $account_id
+   * @param int $accountId
    *   An id of account.
    * @param string $repository
    *   A collaborator name.
@@ -126,24 +123,23 @@ class CollaboratorResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    *   The response containing all the collaborators or a requested one.
    */
-  public function get($account_id, $owner, $repository, $collaborator) {
+  public function get($accountId, $owner, $repository, $collaborator) {
     $isCollaborator = FALSE;
     $collaborators = [];
 
     if ($collaborator == ModuleConstantInterface::REST_ALL_OPTION) {
       $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
-        $this->currentUser, $account_id
-      );
-      //$repo = SimpleGitRepositoriesBusinessLogic::getRepository($account_id,
+        $this->currentUser, $accountId);
+      //$repo = SimpleGitRepositoriesBusinessLogic::getRepository($accountId,
       // $repository, $this->currentUser);
       $collaborators = SimpleGitCollaboratorsBusinessLogic::getCollaborators(
         $accounts, $owner, $repository);
     }
     else {
       $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
-        $this->currentUser, $account_id
+        $this->currentUser, $accountId
       );
-      $repo = SimpleGitRepositoriesBusinessLogic::getRepository($account_id,
+      $repo = SimpleGitRepositoriesBusinessLogic::getRepository($accountId,
         $repository, $this->currentUser);
 
       $isCollaborator = SimpleGitCollaboratorsBusinessLogic::exists($accounts,
@@ -152,7 +148,7 @@ class CollaboratorResource extends ResourceBase {
 
     }
 
-     return new ResourceResponseNonCached($collaborators);
+    return new ResourceResponseNonCached($collaborators);
   }
 
   /**
@@ -160,7 +156,7 @@ class CollaboratorResource extends ResourceBase {
    *
    * It add the sent collaborator.
    *
-   * @param int $account_id
+   * @param int $accountId
    *   An id of account.
    * @param string $repository
    *   An associative array containing structure user.
@@ -170,12 +166,14 @@ class CollaboratorResource extends ResourceBase {
    * @return \Drupal\rest\ResourceResponse
    *   The response containing all the linked accounts.
    */
-  public function put($account_id, $repository, $collaborator) {
+  public function put($accountId, $owner, $repository, $collaborator) {
+    error_log('add accountID>>>>'.print_r($accountId,TRUE));
+    error_log('add owner>>>>'.print_r($owner,TRUE));
+    error_log('add repository>>>>'.print_r($repository,TRUE));
+    error_log('add collaborator>>>>'.print_r($collaborator,TRUE));
     SimpleGitCollaboratorsBusinessLogic::addCollaborators(
       SimpleGitAccountBusinessLogic::getAccountByAccountId(
-        $this->currentUser, $account_id),
-      SimpleGitRepositoriesBusinessLogic::getRepository($account_id,
-        $repository, $this->currentUser), $collaborator);
+        $this->currentUser, $accountId), $owner, $repository, $collaborator);
     return new ResourceResponse();
   }
 

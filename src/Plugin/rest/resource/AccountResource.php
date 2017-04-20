@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  *   id = "simple_git_account_resource",
  *   label = @Translation("Git Account Resource"),
  *   uri_paths = {
- *     "canonical" = "/api/simple_git/account/{account_id}",
+ *     "canonical" = "/api/simple_git/account/{accountId}",
  *     "https://www.drupal.org/link-relations/create" =
  *   "/api/simple_git/account",
  *   }
@@ -99,24 +99,20 @@ class AccountResource extends ResourceBase {
    *   The response containing the Git account data.
    */
   public function post(array $data = []) {
-    $status = 200;
     $user_data = SimpleGitAuthorizationBusinessLogic::authorize(
       $this->currentUser, $data
     );
-
-
     // An error occurred authenticating.
     if (empty($user_data)) {
-      throw new HttpException(
-        401, t('An error occurred authorizing the user.')
-      );
+      $reponse = new ResourceResponse(NULL, 401);
     }
     elseif ($user_data['status'] == 409) {
-      $status = 409;
+      $reponse = new ResourceResponse(NULL, 409);
     }
-    error_log('status' . print_r($user_data . TRUE));
-    return new ResourceResponse($user_data, $status);
-
+    else {
+      $reponse = new ResourceResponse($user_data);
+    }
+    return $reponse;
   }
 
   /**
@@ -124,13 +120,13 @@ class AccountResource extends ResourceBase {
    *
    * It deletes the sent account.
    *
-   * @param $account_id
+   * @param $accountId
    *   A id of account.
    *
    * @return \Drupal\rest\ResourceResponse
    *   The response with the result status.
    */
-  public function delete($account_id) {
+  public function delete($accountId) {
     $accounts = [];
     $current_accounts = [];
 
@@ -138,37 +134,57 @@ class AccountResource extends ResourceBase {
       $this->currentUser
     );
     $current_accounts = SimpleGitAccountBusinessLogic::deleteAccount(
-      $accounts, $account_id
-    );
-    SimpleGitAccountBusinessLogic::setAccounts(
-      $this->currentUser, $current_accounts
+      $accounts, $accountId
     );
 
-    return new ResourceResponse();
+    $current_accounts = SimpleGitAccountBusinessLogic::setAccounts(
+      $this->currentUser, $current_accounts
+    );
+    //error_log('current_account>>>' . print_r($current_accounts, TRUE));
+    //error_log('sizeof>>>>' . print_r((sizeof($accounts) - 1), TRUE));
+    //error_log('sizeof>>>>' . print_r(sizeof($current_accounts), TRUE));
+    if ((sizeof($accounts) - 1) == sizeof($current_accounts)) {
+      $response = new ResourceResponse();
+    }
+    elseif (!empty($current_accounts)) {
+      $response = new ResourceResponse(NULL, 404);
+    }
+    else {
+      $response = new ResourceResponse(NULL, 500);
+    }
+
+    return $response;
   }
 
   /**
    * Responds to the GET request.
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @param $accountId
+   *   A id of account
+   *
+   * @return \Drupal\simple_git\Plugin\rest\resource\response
+   * \ResourceResponseNonCached
    *   The response containing all the linked accounts.
    */
-  public function get($account_id = NULL) {
+  public function get($accountId = NULL) {
     $accounts = [];
 
-    if ($account_id == ModuleConstantInterface::REST_ALL_OPTION) {
+    if ($accountId == ModuleConstantInterface::REST_ALL_OPTION) {
       // Should be reviewed once it is pushed.
       $accounts = SimpleGitAccountBusinessLogic::getAccounts(
         $this->currentUser
       );
+      $response = new ResourceResponseNonCached($accounts);
     }
     else {
       $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
-        $this->currentUser, $account_id
-      );
+        $this->currentUser, $accountId);
+      if (empty($accounts)) {
+        $response = new ResourceResponseNonCached(NULL, 404);
+      }
     }
 
-    return new ResourceResponseNonCached($accounts);
+    return $response;
   }
 
 }
