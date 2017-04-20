@@ -5,6 +5,7 @@ namespace Drupal\simple_git\Plugin\rest\resource;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
+use Drupal\simple_git\Plugin\rest\resource\response\ResourceResponseNonCached;
 use Drupal\simple_git\Interfaces\ModuleConstantInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -121,7 +122,7 @@ class ConnectorResource extends ResourceBase {
       ];
     }
 
-    return new ResourceResponse($connectors);
+    return new ResourceResponseNonCached($connectors);
   }
 
 }

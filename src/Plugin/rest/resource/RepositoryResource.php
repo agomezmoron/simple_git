@@ -5,6 +5,7 @@ namespace Drupal\simple_git\Plugin\rest\resource;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
+use Drupal\simple_git\Plugin\rest\resource\response\ResourceResponseNonCached;
 use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
 use Drupal\simple_git\BusinessLogic\SimpleGitRepositoriesBusinessLogic;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -194,7 +195,7 @@ class RepositoryResource extends ResourceBase {
         );
       }
     }
-    return new ResourceResponse($repositories);
+    return new ResourceResponseNonCached($repositories);
   }
 
 }

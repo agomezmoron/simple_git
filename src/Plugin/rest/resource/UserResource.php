@@ -5,8 +5,8 @@ namespace Drupal\simple_git\Plugin\rest\resource;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
+use Drupal\simple_git\Plugin\rest\resource\response\ResourceResponseNonCached;
 use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
-use Drupal\simple_git\BusinessLogic\SimpleGitAuthorizationBusinessLogic;
 use Drupal\simple_git\BusinessLogic\SimpleGitUserBusinessLogic;
 use Drupal\simple_git\Interfaces\ModuleConstantInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -108,8 +108,9 @@ class UserResource extends ResourceBase {
       $userInfo = SimpleGitUserBusinessLogic::getUser($accounts, $user);
 
     }
-    error_log('userInfo', print_r($userInfo, TRUE));
-    return new ResourceResponse($userInfo);
+
+    return new ResourceResponseNonCached($userInfo);
+
   }
 
 }
