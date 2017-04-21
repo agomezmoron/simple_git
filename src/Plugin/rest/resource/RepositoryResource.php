@@ -110,8 +110,9 @@ class RepositoryResource extends ResourceBase {
     }
 
     if (SimpleGitRepositoriesBusinessLogic::exists(
-      $account, $data['repository'])) {
-        $response = new ResourceResponse(null,401);
+      $account, $data['repository'])
+    ) {
+      $response = new ResourceResponse(NULL, 401);
     }
     else {
       $repository = SimpleGitRepositoriesBusinessLogic::create(
@@ -119,13 +120,13 @@ class RepositoryResource extends ResourceBase {
       );
 
       if (empty($repository)) {
-          $response = new ResourceResponse(null,500);
+        $response = new ResourceResponse(NULL, 500);
       }
       else {
-          $response = new ResourceResponse($repository);
+        $response = new ResourceResponse($repository);
       }
     }
-      return $response;
+    return $response;
   }
 
   /**
@@ -142,16 +143,17 @@ class RepositoryResource extends ResourceBase {
    *   The response with the result status.
    */
   public function delete($accountId, $repository) {
-      $isDeleted = false;
-      $isDeleted = SimpleGitRepositoriesBusinessLogic::deleteRepository(
-          SimpleGitAccountBusinessLogic::getAccountByAccountId(
-              $this->currentUser, $accountId), $repository);
-      if(!$isDeleted){
-          $response = new ResourceResponse(null, 404);
-      }else{
-          $response = new ResourceResponse();
-      }
-      return $response;
+    $isDeleted = FALSE;
+    $isDeleted = SimpleGitRepositoriesBusinessLogic::deleteRepository(
+      SimpleGitAccountBusinessLogic::getAccountByAccountId(
+        $this->currentUser, $accountId), $repository);
+    if (!$isDeleted) {
+      $response = new ResourceResponse(NULL, 404);
+    }
+    else {
+      $response = new ResourceResponse();
+    }
+    return $response;
   }
 
   /**
@@ -162,7 +164,7 @@ class RepositoryResource extends ResourceBase {
    * @param int $repository
    *   A repository id.
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return\Drupal\simple_git\Plugin\rest\resource\response
    *   The response containing all the repositoryes or a requested one.
    */
   public function get($accountId = NULL, $repository = NULL) {
@@ -199,32 +201,24 @@ class RepositoryResource extends ResourceBase {
     return new ResourceResponseNonCached($repositories);
   }
 
-    /**
-     * Responds to the PUT request.
-     *
-     * It add the sent repository.
-     *
-     * @param int $accountId
-     *   An id of account.
-     * @param string $repository
-     *   An associative array containing structure user.
-     * @param string $collaborator
-     *   A collaborator name.
-     *
-     * @return \Drupal\rest\ResourceResponse
-     *   The response containing all the linked accounts.
-     */
-    public function put($accountId, $repository) {
-        $isCollaborator = SimpleGitRepositoriesBusinessLogic::create(
-            SimpleGitAccountBusinessLogic::getAccountByAccountId(
-                $this->currentUser, $accountId), $repository);
-        if($isCollaborator){
-            //The server successfully processed the request and is not returning any content
-            $response = new ResourceResponseNonCached(null, 204);
-        }else{
-            $response = new ResourceResponseNonCached(null, 404);
-        }
-        return $response;
-    }
+  /**
+   * Responds to the PUT request.
+   *
+   * It add the sent repository.
+   *
+   * @param int $accountId
+   *   An id of account.
+   * @param string $repository
+   *   An name of repository.
+   *
+   * @return \Drupal\rest\ResourceResponse
+   *   The response containing all the linked accounts.
+   */
+  public function put($accountId, $repository) {
+    SimpleGitRepositoriesBusinessLogic::create(
+      SimpleGitAccountBusinessLogic::getAccountByAccountId(
+        $this->currentUser, $accountId), $repository);
+    return new ResourceResponseNonCached();
+  }
 
 }

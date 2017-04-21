@@ -97,27 +97,27 @@ abstract class SimpleGitConnector {
    */
   public abstract function getRepositoriesList($params);
 
-    /**
-     * Post create repository.
-     *
-     * @param array $params
-     *   It needs the userInfo and repository.
-     *
-     * @return array
-     *   Response if user has been added.
-     */
-    public abstract function addRepository($params);
+  /**
+   * Post create repository.
+   *
+   * @param array $params
+   *   It needs the userInfo and repository.
+   *
+   * @return array
+   *   Response if user has been added.
+   */
+  public abstract function addRepository($params);
 
-    /**
-     * Delete user as a repository.
-     *
-     * @param array $params
-     *   It needs the userInfo and repository.
-     *
-     * @return array
-     *   Response if user has been removed.
-     */
-    public abstract function deleteRepository($params);
+  /**
+   * Delete user as a repository.
+   *
+   * @param array $params
+   *   It needs the userInfo and repository.
+   *
+   * @return array
+   *   Response if user has been removed.
+   */
+  public abstract function deleteRepository($params);
 
   /**
    * Get the list of pull request associated to the selected repository.

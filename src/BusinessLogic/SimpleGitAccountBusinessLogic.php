@@ -193,7 +193,7 @@ abstract class SimpleGitAccountBusinessLogic {
    *   'access_info' for create account.
    */
   public static function createAccount($accounts, $request_account) {
-    // Getting the maximim accountId.
+    // Getting the maximum accountId.
     $max_accountId = max(array_column($accounts, 'accountId'));
 
     $request_account['accountId'] = $max_accountId + 1;

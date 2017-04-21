@@ -97,13 +97,7 @@ class PullRequestResource extends ResourceBase {
     $pr = SimpleGitPullRequestsBusinessLogic::getPullRequests(
       $accounts, $repositories
     );
-    if(empty($pr)){
-        $response = new ResourceResponseNonCached(null,204);
-    }else{
-        $response = new ResourceResponseNonCached($pr);
-    }
-
-    return $response;
+    return new ResourceResponseNonCached($pr);
   }
 
 }

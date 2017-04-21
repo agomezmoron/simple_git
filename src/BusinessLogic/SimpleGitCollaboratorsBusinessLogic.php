@@ -56,11 +56,11 @@ class SimpleGitCollaboratorsBusinessLogic {
    */
   public static function exists($account, $owner, $repository, $collaborator) {
     $exists = FALSE;
-    if (!empty($account) && !empty($repository)&& !empty($owner)) {
+    if (!empty($account) && !empty($repository) && !empty($owner)) {
       $params = [];
       $params['userInfo'] = $account;
-        $params['repository']['name'] = $repository;
-        $params['repository']['username'] = $owner;
+      $params['repository']['name'] = $repository;
+      $params['repository']['username'] = $owner;
       $params['collaborator']['username'] = $collaborator;
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']
@@ -88,8 +88,12 @@ class SimpleGitCollaboratorsBusinessLogic {
    * @return array
    *   With the created collaborators
    */
-  static function addCollaborators($account, $owner, $repository,
-    $collaborator) {
+  static function addCollaborators(
+    $account,
+    $owner,
+    $repository,
+    $collaborator
+  ) {
     $iscollaborator = FALSE;
     if (!empty($account) && !empty($repository) && !empty($owner)) {
       $params = [];
@@ -118,8 +122,12 @@ class SimpleGitCollaboratorsBusinessLogic {
    * @return bool
    *   An associative array containing structure accounts
    */
-  public static function deleteCollaborators($account, $owner, $repository,
-    $collaborator) {
+  public static function deleteCollaborators(
+    $account,
+    $owner,
+    $repository,
+    $collaborator
+  ) {
     $delete = FALSE;
     if (!empty($account) && !empty($repository)
       && isset($repository['name'])
