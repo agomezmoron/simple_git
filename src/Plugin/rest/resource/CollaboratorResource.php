@@ -106,11 +106,18 @@ class CollaboratorResource extends ResourceBase {
    *   The response with the result status.
    */
   public function delete($accountId, $owner, $repository, $collaborator) {
-    SimpleGitCollaboratorsBusinessLogic::deleteCollaborators(
+    $isDeleted = FALSE;
+
+    $isDeleted = SimpleGitCollaboratorsBusinessLogic::deleteCollaborators(
       SimpleGitAccountBusinessLogic::getAccountByAccountId(
         $this->currentUser, $accountId), $owner, $repository, $collaborator);
+    if($isDeleted){
+      $response = new ResourceResponse();
+    }else{
+      $response = new ResourceResponse(null, 204);
+    }
 
-    return new ResourceResponse();
+    return $response;
   }
 
   /**
@@ -168,9 +175,16 @@ class CollaboratorResource extends ResourceBase {
    *   The response containing all the linked accounts.
    */
   public function put($accountId, $owner, $repository, $collaborator) {
-    SimpleGitCollaboratorsBusinessLogic::addCollaborators(SimpleGitAccountBusinessLogic::getAccountByAccountId($this->currentUser,
+    $isAdded = FALSE;
+    $isAdded = SimpleGitCollaboratorsBusinessLogic::addCollaborators
+    (SimpleGitAccountBusinessLogic::getAccountByAccountId($this->currentUser,
       $accountId), $owner, $repository, $collaborator);
-    return new ResourceResponse();
+    if($isAdded){
+      $response = new ResourceResponse();
+    }else{
+      $response = new ResourceResponse(null, 204);
+    }
+    return $response;
   }
 
 }
