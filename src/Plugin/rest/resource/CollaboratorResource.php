@@ -94,7 +94,9 @@ class CollaboratorResource extends ResourceBase {
    * It deletes the sent collaborator.
    *
    * @param int $accountId
-   *   An id of account.*
+   *   An id of account.
+   *  @param string owner
+   *   An name of owner
    * @param string $repository
    *   A repository name.
    * @param string $collaborator
@@ -104,18 +106,11 @@ class CollaboratorResource extends ResourceBase {
    *   The response with the result status.
    */
   public function delete($accountId, $owner, $repository, $collaborator) {
-    $isDeleted = FALSE;
-
-    $isDeleted = SimpleGitCollaboratorsBusinessLogic::deleteCollaborators(
+    SimpleGitCollaboratorsBusinessLogic::deleteCollaborators(
       SimpleGitAccountBusinessLogic::getAccountByAccountId(
         $this->currentUser, $accountId), $owner, $repository, $collaborator);
-    if (!$isDeleted) {
-      $response = new ResourceResponse(NULL, 404);
-    }
-    else {
-      $response = new ResourceResponse();
-    }
-    return $response;
+
+    return new ResourceResponse();
   }
 
   /**
@@ -123,6 +118,8 @@ class CollaboratorResource extends ResourceBase {
    *
    * @param int $accountId
    *   An id of account.
+   *  @param string owner
+   *   An name of owner
    * @param string $repository
    *   A collaborator name.
    * @param string $collaborator
@@ -132,6 +129,7 @@ class CollaboratorResource extends ResourceBase {
    *   The response containing all the collaborators or a requested one.
    */
   public function get($accountId, $owner, $repository, $collaborator) {
+
     $isCollaborator = FALSE;
     $collaborators = [];
     if ($collaborator == ModuleConstantInterface::REST_ALL_OPTION) {
@@ -159,6 +157,8 @@ class CollaboratorResource extends ResourceBase {
    *
    * @param int $accountId
    *   An id of account.
+   *  @param string owner
+   *   An name of owner.
    * @param string $repository
    *   An associative array containing structure user.
    * @param string $collaborator
@@ -169,9 +169,7 @@ class CollaboratorResource extends ResourceBase {
    */
   public function put($accountId, $owner, $repository, $collaborator) {
     SimpleGitCollaboratorsBusinessLogic::addCollaborators(SimpleGitAccountBusinessLogic::getAccountByAccountId($this->currentUser,
-      $accountId),
-      SimpleGitRepositoriesBusinessLogic::getRepository($accountId, $repository,
-        $this->currentUser), $collaborator);
+      $accountId), $owner, $repository, $collaborator);
     return new ResourceResponse();
   }
 

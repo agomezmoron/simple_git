@@ -26,7 +26,7 @@ class SimpleGitCollaboratorsBusinessLogic {
    */
   public static function getCollaborators($account, $owner, $repository) {
     $collaborators = [];
-    if (!empty($account)) {
+    if (!empty($account) && !empty($owner)  && !empty($repository)) {
       $params['userInfo'] = $account;
       $params['repository']['name'] = $repository;
       $params['repository']['username'] = $owner;
@@ -56,7 +56,7 @@ class SimpleGitCollaboratorsBusinessLogic {
    */
   public static function exists($account, $owner, $repository, $collaborator) {
     $exists = FALSE;
-    if (!empty($account) && !empty($repository) && !empty($owner)) {
+    if (!empty($account) && !empty($repository) && !empty($owner) && !empty($collaborator)) {
       $params = [];
       $params['userInfo'] = $account;
       $params['repository']['name'] = $repository;
@@ -78,12 +78,12 @@ class SimpleGitCollaboratorsBusinessLogic {
    *
    * @param array $account
    *   An associative array containing structure account.
-   * @param array $repository
+   * @param string $owner
+   *   An owner name.
+   * @param string $repository
    *   An associative array containing structure repository.
    * @param string $collaborator
    *   An collaborator name
-   * @param string $owner
-   *   An owner name.
    *
    * @return array
    *   With the created collaborators
@@ -95,7 +95,7 @@ class SimpleGitCollaboratorsBusinessLogic {
     $collaborator
   ) {
     $iscollaborator = FALSE;
-    if (!empty($account) && !empty($repository) && !empty($owner)) {
+    if (!empty($account) && !empty($repository) && !empty($owner) && !empty($collaborator)) {
       $params = [];
       $params['userInfo'] = $account;
       $params['repository']['name'] = $repository;
@@ -114,8 +114,10 @@ class SimpleGitCollaboratorsBusinessLogic {
    *
    * @param array $account
    *   An associative array containing structure account.
+   * @param string $owner
+   *   An owner name.
    * @param array $repository
-   *   An associative array containing structure repository.
+   *   An name repository.
    * @param string $collaborator
    *   An collaborator name
    *
@@ -129,9 +131,7 @@ class SimpleGitCollaboratorsBusinessLogic {
     $collaborator
   ) {
     $delete = FALSE;
-    if (!empty($account) && !empty($repository)
-      && isset($repository['name'])
-    ) {
+    if (!empty($account) && !empty($repository) && !empty($owner) && !empty($collaborator)) {
       $params = [];
       $params['userInfo'] = $account;
       $params['repository']['name'] = $repository;

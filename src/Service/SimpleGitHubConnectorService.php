@@ -483,7 +483,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
       $user = $params['userInfo'];
       $repository = $params['repository'];
       $collaborator = $params['collaborator'];
-      $url = self::BASE_URL . 'repos/' . $user['username'] . '/' .
+      $url = self::BASE_URL . 'repos/' . $repository['username'] . '/' .
         $repository['name']
         . '/collaborators/' . $collaborator['username'];
       $ch = $this->getConfiguredCURL($url, $user);

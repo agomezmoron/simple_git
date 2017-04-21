@@ -54,7 +54,6 @@ abstract class SimpleGitAuthorizationBusinessLogic {
       }
       elseif (isset($git_account['username'])) {
         $result = $git_account;
-        error_log('result' . print_r($result, TRUE));
         $git_account['access_info']
           = $auth_info['userInfo']['access_info'];
         $account_info
