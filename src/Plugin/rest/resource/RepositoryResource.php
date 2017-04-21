@@ -5,6 +5,7 @@ namespace Drupal\simple_git\Plugin\rest\resource;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
+use Drupal\simple_git\Plugin\rest\resource\response\ResourceResponseNonCached;
 use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
 use Drupal\simple_git\BusinessLogic\SimpleGitRepositoriesBusinessLogic;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -19,7 +20,8 @@ use Drupal\simple_git\Interfaces\ModuleConstantInterface;
  *   label = @Translation("Git Repository Resource"),
  *   uri_paths = {
  *     "canonical" = "/api/simple_git/repository/{account_id}/{repository_id}",
- *     "https://www.drupal.org/link-relations/create" = "/api/simple_git/repository",
+ *     "https://www.drupal.org/link-relations/create" =
+ *   "/api/simple_git/repository",
  *   }
  * )
  */
@@ -108,14 +110,9 @@ class RepositoryResource extends ResourceBase {
     }
 
     if (SimpleGitRepositoriesBusinessLogic::exists(
-      $account, $data['repository']
-    )
+      $account, $data['repository'])
     ) {
-      throw new HttpException(
-        401, t(
-          'There is a repository with the provided name in the current account.'
-        )
-      );
+      $response = new ResourceResponse(NULL, 401);
     }
     else {
       $repository = SimpleGitRepositoriesBusinessLogic::create(
@@ -123,14 +120,13 @@ class RepositoryResource extends ResourceBase {
       );
 
       if (empty($repository)) {
-        throw new HttpException(
-          500, t('An error occurred creating the repository')
-        );
+        $response = new ResourceResponse(NULL, 500);
       }
       else {
-        return new ResourceResponse($repository);
+        $response = new ResourceResponse($repository);
       }
     }
+    return $response;
   }
 
   /**
@@ -138,47 +134,56 @@ class RepositoryResource extends ResourceBase {
    *
    * It deletes the sent repository from the provided account.
    *
-   * @param mixed $account_id
+   * @param mixed $accountId
    *   An id of account.
-   * @param int $repository_id
-   *   A repository id.
+   * @param int $repository
+   *   A repository name.
    *
    * @return \Drupal\rest\ResourceResponse
    *   The response with the result status.
    */
-  public function delete($account_id, $repository_id) {
-    // TODO: Check if it works
-    return new ResourceResponse();
+  public function delete($accountId, $repository) {
+    $isDeleted = FALSE;
+    $isDeleted = SimpleGitRepositoriesBusinessLogic::deleteRepository(
+      SimpleGitAccountBusinessLogic::getAccountByAccountId(
+        $this->currentUser, $accountId), $repository);
+    if (!$isDeleted) {
+      $response = new ResourceResponse(NULL, 404);
+    }
+    else {
+      $response = new ResourceResponse();
+    }
+    return $response;
   }
 
   /**
    * Responds to the GET request.
    *
-   * @param int $account_id
+   * @param int $accountId
    *   An id of account.
-   * @param int $repository_id
+   * @param int $repository
    *   A repository id.
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return\Drupal\simple_git\Plugin\rest\resource\response
    *   The response containing all the repositoryes or a requested one.
    */
-  public function get($account_id = NULL, $repository_id = NULL) {
+  public function get($accountId = NULL, $repository = NULL) {
     $repositories = [];
 
-    if ($account_id == ModuleConstantInterface::REST_ALL_OPTION) {
+    if ($accountId == ModuleConstantInterface::REST_ALL_OPTION) {
       // Should be reviewed once it is pushed!
       $repositories = SimpleGitRepositoriesBusinessLogic::getRepositories(
         SimpleGitAccountBusinessLogic::getAccounts($this->currentUser)
       );
     }
     else {
-      if ($repository_id == ModuleConstantInterface::REST_ALL_OPTION) {
+      if ($repository == ModuleConstantInterface::REST_ALL_OPTION) {
         $account = SimpleGitAccountBusinessLogic::getAccountByAccountId(
-          $this->currentUser, $account_id
+          $this->currentUser, $accountId
         );
         if (!empty($account)) {
           $repositories = SimpleGitRepositoriesBusinessLogic::getRepositories(
-            array($account)
+            [$account]
           );
         }
         else {
@@ -189,11 +194,31 @@ class RepositoryResource extends ResourceBase {
       }
       else {
         $repositories = SimpleGitRepositoriesBusinessLogic::getRepository(
-          $account_id, $repository_id, $this->currentUser
+          $accountId, $repository, $this->currentUser
         );
       }
     }
-    return new ResourceResponse($repositories);
+    return new ResourceResponseNonCached($repositories);
+  }
+
+  /**
+   * Responds to the PUT request.
+   *
+   * It add the sent repository.
+   *
+   * @param int $accountId
+   *   An id of account.
+   * @param string $repository
+   *   An name of repository.
+   *
+   * @return \Drupal\rest\ResourceResponse
+   *   The response containing all the linked accounts.
+   */
+  public function put($accountId, $repository) {
+    SimpleGitRepositoriesBusinessLogic::create(
+      SimpleGitAccountBusinessLogic::getAccountByAccountId(
+        $this->currentUser, $accountId), $repository);
+    return new ResourceResponseNonCached();
   }
 
 }

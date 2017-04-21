@@ -16,13 +16,13 @@ abstract class SimpleGitAccountBusinessLogic {
    *
    * @param int $user
    *   An associative array containing structure user.
-   * @param int $account_id
+   * @param int $accountId
    *   A id of account.
    *
    * @return array
-   *   An associative array with element 'account_id'.
+   *   An associative array with element '$accountId'.
    */
-  public static function getAccountByAccountId($user, $account_id) {
+  public static function getAccountByAccountId($user, $accountId) {
 
     // Get user_data, variable "accounts".
     $accounts = [];
@@ -30,10 +30,10 @@ abstract class SimpleGitAccountBusinessLogic {
     $accounts = self::getAccounts($user);
 
     // We have to check if there is an account with the given
-    // $account['account_id'] for this $account_id.
+    // $account['accountId'] for this $accountId.
     foreach ($accounts as &$account) {
       // If it exists, we have to update it.
-      if ($account['account_id'] == $account_id) {
+      if ($account['accountId'] == $accountId) {
         $result = $account;
         break;
       }
@@ -68,19 +68,19 @@ abstract class SimpleGitAccountBusinessLogic {
    *
    * @param array $accounts
    *   An associative array containing structure account.
-   * @param int $account_id
+   * @param int $accountId
    *   A id of account.
    *
    * @return array
    *   An associative array containing structure accounts
    */
-  public static function deleteAccount($accounts, $account_id) {
+  public static function deleteAccount($accounts, $accountId) {
 
     $filtered_accounts = [];
     // We have to check if there is an account with the given
-    // $account['account_id'] for this $account_id.
+    // $account['accountId'] for this $accountId.
     foreach ($accounts as $account) {
-      if ($account['account_id'] != $account_id) {
+      if ($account['accountId'] != $accountId) {
         $filtered_accounts[] = $account;
       }
     }
@@ -101,7 +101,7 @@ abstract class SimpleGitAccountBusinessLogic {
   public static function addOrUpdateAccount($user, $git_account) {
     $db_accounts = self::getAccounts($user);
     $db_accounts = self::checkAndUpdateUserData($db_accounts, $git_account);
-    return self::setAccounts($user, $db_accounts);
+    return self::setAccounts($user, $db_accounts);;
   }
 
   /**
@@ -136,7 +136,6 @@ abstract class SimpleGitAccountBusinessLogic {
       $new_user = self::createAccount($db_users, $new_user);
       $db_users[] = $new_user;
     }
-
     return $db_users;
   }
 
@@ -190,14 +189,14 @@ abstract class SimpleGitAccountBusinessLogic {
    *   An associative array containing sctructure request account.
    *
    * @return array
-   *   An associative array with element 'account_id', 'type', 'name',
+   *   An associative array with element 'accountId', 'type', 'name',
    *   'access_info' for create account.
    */
   public static function createAccount($accounts, $request_account) {
-    // Getting the maximim account_id.
-    $max_account_id = max(array_column($accounts, 'account_id'));
+    // Getting the maximum accountId.
+    $max_accountId = max(array_column($accounts, 'accountId'));
 
-    $request_account['account_id'] = $max_account_id + 1;
+    $request_account['accountId'] = $max_accountId + 1;
     $request_account['access_info'] = self::setAccessInfo($request_account);
 
     return $request_account;
@@ -216,23 +215,23 @@ abstract class SimpleGitAccountBusinessLogic {
     $access_info = [];
     switch ($account['type']) {
       case ModuleConstantInterface::GIT_TYPE_GITHUB:
-        $access_info = array(
+        $access_info = [
           'token' => $account['access_info']['token'],
-        );
+        ];
         break;
 
       case ModuleConstantInterface::GIT_TYPE_GITLAB:
-        $access_info = array(
+        $access_info = [
           'token' => $account['access_info']['token'],
           'expires_in' => $account['access_info']['expires_in'],
           'refresh_token' => $account['access_info']['refresh_token'],
-        );
+        ];
         break;
 
       default:
-        $access_info = array(
+        $access_info = [
           'token' => $account['access_info']['token'],
-        );
+        ];
         break;
     }
     return $access_info;
@@ -247,7 +246,7 @@ abstract class SimpleGitAccountBusinessLogic {
    *   An associative array containing structure account.
    *
    * @return array
-   *   An associative array with element 'account_id', 'type', 'name',
+   *   An associative array with element 'accountId', 'type', 'name',
    *   'access_info' for create account.
    */
   public static function setAccounts($user, $accounts) {

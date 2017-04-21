@@ -5,6 +5,7 @@ namespace Drupal\simple_git\Plugin\rest\resource;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
+use Drupal\simple_git\Plugin\rest\resource\response\ResourceResponseNonCached;
 use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
 use Drupal\simple_git\BusinessLogic\SimpleGitPullRequestsBusinessLogic;
 use Drupal\simple_git\BusinessLogic\SimpleGitRepositoriesBusinessLogic;
@@ -17,10 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @RestResource(
  *   id = "simple_git_pull_request_resource",
  *   label = @Translation("Git Pull Request Resource"),
- *   uri_paths = {
- *     "canonical" = "/api/simple_git/pull_request"
- *   }
- * )
+ *   uri_paths = { "canonical" = "/api/simple_git/pull_request" } )
  */
 class PullRequestResource extends ResourceBase {
 
@@ -99,7 +97,7 @@ class PullRequestResource extends ResourceBase {
     $pr = SimpleGitPullRequestsBusinessLogic::getPullRequests(
       $accounts, $repositories
     );
-    return new ResourceResponse($pr);
+    return new ResourceResponseNonCached($pr);
   }
 
 }

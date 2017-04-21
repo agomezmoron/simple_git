@@ -1,17 +1,17 @@
 {
-  "name": "agomezmoron/simple_git",
-  "description": "Drupal module to have a simple interface to connect your Git services accounts.",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Alejandro Gómez Morón",
-      "email": "amoron@emergya.com"
-    },
-    {
-      "name": "Estefanía Barrera Berengeno",
-      "email": "ebarrera@emergya.com"
-    }
-  ],
-  "type": "drupal-module",
-  "require": {}
+    "name": "agomezmoron/simple_git",
+    "description": "Drupal module to have a simple interface to connect your Git services accounts.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alejandro Gómez Morón",
+            "email": "amoron@emergya.com"
+        },
+        {
+            "name": "Estefanía Barrera Berengeno",
+            "email": "ebarrera@emergya.com"
+        }
+    ],
+    "type": "drupal-module",
+    "require": {}
 }

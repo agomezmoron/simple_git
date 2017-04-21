@@ -29,12 +29,14 @@ abstract class SimpleGitUserBusinessLogic {
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $params['userInfo']['type']
       );
-      if (!in_array($params['userInfo']['type'], array_column($userInfo, 'type'))) {
+      if (!in_array($params['userInfo']['type'],
+        array_column($userInfo, 'type'))
+      ) {
         $userInfo[] = $git_service->getUserDetail($account, $user);
       }
 
     }
-    if(in_array(NULL,$userInfo)){
+    if (in_array(NULL, $userInfo)) {
       $userInfo = [];
     }
 
