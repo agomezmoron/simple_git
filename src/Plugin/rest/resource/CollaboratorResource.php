@@ -138,8 +138,6 @@ class CollaboratorResource extends ResourceBase {
       $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
         $this->currentUser, $accountId
       );
-      //$repo = SimpleGitRepositoriesBusinessLogic::getRepository($accountId,
-      //$repository,$this->currentUser);
       $collaborators = SimpleGitCollaboratorsBusinessLogic::getCollaborators
       ($accounts, $owner, $repository);
     }
@@ -147,8 +145,6 @@ class CollaboratorResource extends ResourceBase {
       $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
         $this->currentUser, $accountId
       );
-      $repo = SimpleGitRepositoriesBusinessLogic::getRepository($accountId,
-        $repository, $this->currentUser);
       $isCollaborator = SimpleGitCollaboratorsBusinessLogic::exists
       ($accounts, $owner, $repository, $collaborator);
       $collaborators = ['status' => $isCollaborator];
