@@ -41,7 +41,6 @@ class SimpleGitPullRequestsBusinessLogic {
       $pull_requests_by_account
         = $git_service->getPullRequestsList($params);
 
-
       if (!empty($pull_requests_by_account)) {
         $pull_requests = array_merge($pull_requests,
           $pull_requests_by_account);
@@ -64,7 +63,7 @@ class SimpleGitPullRequestsBusinessLogic {
   /**
    * Get pull request.
    *
-   * @param int $account_id
+   * @param int $accountId
    *   A id account.
    * @param string $repo
    *   A string with URL of the repositories.
@@ -76,10 +75,10 @@ class SimpleGitPullRequestsBusinessLogic {
    * @return array
    *   Contains user's pull request.
    */
-  static function getPullRequest($account_id, $repo, $id, $user) {
+  static function getPullRequest($accountId, $repo, $id, $user) {
     $pr = [];
     $account = SimpleGitAccountBusinessLogic::getAccountByAccountId(
-      $user, $account_id
+      $user, $accountId
     );
     if (!empty($account)) {
       $params['userInfo'] = $account;

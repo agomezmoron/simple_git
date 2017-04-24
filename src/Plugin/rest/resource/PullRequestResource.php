@@ -18,10 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @RestResource(
  *   id = "simple_git_pull_request_resource",
  *   label = @Translation("Git Pull Request Resource"),
- *   uri_paths = {
- *     "canonical" = "/api/simple_git/pull_request"
- *   }
- * )
+ *   uri_paths = { "canonical" = "/api/simple_git/pull_request" } )
  */
 class PullRequestResource extends ResourceBase {
 

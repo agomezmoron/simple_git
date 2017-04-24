@@ -20,8 +20,9 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  *   id = "simple_git_account_resource",
  *   label = @Translation("Git Account Resource"),
  *   uri_paths = {
- *     "canonical" = "/api/simple_git/account/{account_id}",
- *     "https://www.drupal.org/link-relations/create" = "/api/simple_git/account",
+ *     "canonical" = "/api/simple_git/account/{accountId}",
+ *     "https://www.drupal.org/link-relations/create" =
+ *   "/api/simple_git/account",
  *   }
  * )
  */
@@ -98,18 +99,31 @@ class AccountResource extends ResourceBase {
    *   The response containing the Git account data.
    */
   public function post(array $data = []) {
+    $accountsOld = [];
+    $accounts = [];
+    $accountsOld = SimpleGitAccountBusinessLogic::getAccounts(
+      $this->currentUser);
     $user_data = SimpleGitAuthorizationBusinessLogic::authorize(
       $this->currentUser, $data
     );
+    $accounts = SimpleGitAccountBusinessLogic::getAccounts($this->currentUser);
 
-    // An error occurred authenticating.
     if (empty($user_data)) {
-      throw new HttpException(
-        401, t('An error occurred authorizing the user.')
-      );
+      // An error occurred authenticating (Unauthorized).
+      $reponse = new ResourceResponse(NULL, 401);
     }
-    return new ResourceResponse($user_data);
-
+    elseif ($user_data['status'] == 409) {
+      //An error Conflict
+      $reponse = new ResourceResponse(NULL, 409);
+    }
+    elseif ((sizeof($accountsOld) + 1) == sizeof($accounts)) {
+      //The request has been fulfilled, resulting in the creation of a new account.
+      $reponse = new ResourceResponse($user_data, 201);
+    }
+    else {
+      $reponse = new ResourceResponse($user_data);
+    }
+    return $reponse;
   }
 
   /**
@@ -117,13 +131,13 @@ class AccountResource extends ResourceBase {
    *
    * It deletes the sent account.
    *
-   * @param $account_id
+   * @param $accountId
    *   A id of account.
    *
    * @return \Drupal\rest\ResourceResponse
    *   The response with the result status.
    */
-  public function delete($account_id) {
+  public function delete($accountId) {
     $accounts = [];
     $current_accounts = [];
 
@@ -131,37 +145,56 @@ class AccountResource extends ResourceBase {
       $this->currentUser
     );
     $current_accounts = SimpleGitAccountBusinessLogic::deleteAccount(
-      $accounts, $account_id
-    );
-    SimpleGitAccountBusinessLogic::setAccounts(
-      $this->currentUser, $current_accounts
+      $accounts, $accountId
     );
 
-    return new ResourceResponse();
+    $current_accounts = SimpleGitAccountBusinessLogic::setAccounts(
+      $this->currentUser, $current_accounts
+    );
+    if ((sizeof($accounts) - 1) == sizeof($current_accounts)) {
+      //Deleted correctly
+      $response = new ResourceResponse();
+    }
+    elseif (!empty($current_accounts)) {
+      //Account not found
+      $response = new ResourceResponse(NULL, 204);
+    }
+    else {
+      // Internal Server Error
+      $response = new ResourceResponse(NULL, 500);
+    }
+
+    return $response;
   }
 
   /**
    * Responds to the GET request.
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @param $accountId
+   *   A id of account
+   *
+   * @return \Drupal\simple_git\Plugin\rest\resource\response
+   * \ResourceResponseNonCached
    *   The response containing all the linked accounts.
    */
-  public function get($account_id = NULL) {
+  public function get($accountId = NULL) {
     $accounts = [];
 
-    if ($account_id == ModuleConstantInterface::REST_ALL_OPTION) {
+    if ($accountId == ModuleConstantInterface::REST_ALL_OPTION) {
       // Should be reviewed once it is pushed.
       $accounts = SimpleGitAccountBusinessLogic::getAccounts(
         $this->currentUser
       );
+
+      $response = new ResourceResponseNonCached($accounts);
     }
     else {
       $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
-        $this->currentUser, $account_id
-      );
+        $this->currentUser, $accountId);
+      $response = new ResourceResponseNonCached($accounts);
     }
 
-    return new ResourceResponseNonCached($accounts);
+    return $response;
   }
 
 }

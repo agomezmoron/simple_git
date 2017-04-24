@@ -49,13 +49,13 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
       // Url to attack.
       $url = self::BASE_URL . '/oauth/authorize';
       // Set parameters.
-      $parameters = array(
+      $parameters = [
         'client_id' => $settings['app_id'],
         'client_secret' => $settings['app_secret'],
         'redirect_uri' => $settings['redirect_uri'],
         'response_type' => $code,
         'state' => $state,
-      );
+      ];
       // Open curl stream.
       $ch = $this->getConfiguredCURL($url);
       // Set the url, number of POST vars, POSTdata.
@@ -155,7 +155,7 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
       $url = self::BASE_URL . '/projects/' . $id . '/repository/branches';
       $ch = $this->getConfiguredCURL($url, $user);
       $repositories = $this->performCURL($ch);
-      $response = array();
+      $response = [];
       foreach ($repositories as $repo) {
         $repo['parent'] = $repo['parent'] ? TRUE : FALSE;
         array_push(
@@ -186,7 +186,7 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
         . $branch;
       $ch = $this->getConfiguredCURL($url, $user);
       $repos = $this->performCURL($ch);
-      $response = array();
+      $response = [];
       foreach ($repos as $repo) {
         $repo['parent'] = $repo['parent'] ? TRUE : FALSE;
         array_push(
@@ -214,7 +214,7 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
       $url = self::BASE_URL . '/projects/' . $id . '/repository/commits';
       $ch = $this->getConfiguredCURL($url, $user);
       $repos = $this->performCURL($ch);
-      $response = array();
+      $response = [];
       foreach ($repos as $repo) {
         $repo['parent'] = $repo['parent'] ? TRUE : FALSE;
         array_push(
@@ -284,7 +284,7 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
       $url = self::BASE_URL . '/projects/' . $id . '/repository/tree';
       $ch = $this->getConfiguredCURL($url, $user);
       $repos = $this->performCURL($ch);
-      $response = array();
+      $response = [];
       foreach ($repos as $repo) {
         $repo['parent'] = $repo['parent'] ? TRUE : FALSE;
         array_push(
@@ -455,7 +455,7 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
    * {@inheritdoc}
    */
   protected function buildCustomMappings() {
-    $this->mappings[self::PULL_REQUEST] = array(
+    $this->mappings[self::PULL_REQUEST] = [
       'pr_id' => 'id',
       'pr_iid' => 'iid',
       'pr_target_branch' => 'target_branch',
@@ -469,35 +469,35 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
       'assignee_username' => 'assignee->username',
       'assignee_name' => 'assignee->name',
       'assignee_created_at' => 'assignee->created_at',
-    );
-    $this->mappings[self::ACCOUNT] = array(
+    ];
+    $this->mappings[self::ACCOUNT] = [
       'name' => 'name',
       'user' => 'username',
       'photo' => 'avatar_url',
       'id' => 'id',
       'location' => 'location',
-    );
-    $this->mappings[self::REPOSITORY] = array(
+    ];
+    $this->mappings[self::REPOSITORY] = [
       'id' => 'id',
       'name' => 'name',
       'type' => 'type',
       'path' => 'path',
-    );
-    $this->mappings[self::BRANCH] = array(
+    ];
+    $this->mappings[self::BRANCH] = [
       'name_branch' => 'name',
       'commit_author' => 'commit->author_name',
       'commit_title' => 'commit->author_title',
       'commit_parentsIds' => 'commit->parent_ids',
-    );
-    $this->mappings[self::COMMIT] = array(
+    ];
+    $this->mappings[self::COMMIT] = [
       'id' => 'id',
       'title' => 'title',
       'author' => 'author',
       'committed_date' => 'committed_date',
       'created_at' => 'created_at',
       'parent_ids' => 'parent_ids',
-    );
-    $this->mappings[self::PROJECTS] = array(
+    ];
+    $this->mappings[self::PROJECTS] = [
       'id_project' => 'id',
       'description' => 'description',
       'visibility_level' => 'visibility',
@@ -507,7 +507,7 @@ class SimpleGitLabConnectorService extends SimpleGitConnector {
       'tag_list' => 'tag_list',
       'owner_id' => 'owner->id',
       'owner_name' => 'owner->name',
-    );
+    ];
   }
 
 }

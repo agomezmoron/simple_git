@@ -43,16 +43,17 @@ abstract class SimpleGitConnector {
   /**
    * Constants to determine to output mapping.
    *
-   * @var mappings
+   * @var PULL_REQUEST
    */
-  protected $mappings = [];
+  const USER = 'USER';
 
   /**
    * Constants to determine to output mapping.
    *
-   * @var PULL_REQUEST
+   * @var mappings
    */
-  const USER = 'USER';
+  protected $mappings = [];
+
   /*const BRANCH = 'BRANCH';
   const PROJECTS = 'PROJECTS';
   const COMMIT = 'COMMIT';
@@ -95,6 +96,28 @@ abstract class SimpleGitConnector {
    *   With all the repositories available.
    */
   public abstract function getRepositoriesList($params);
+
+  /**
+   * Post create repository.
+   *
+   * @param array $params
+   *   It needs the userInfo and repository.
+   *
+   * @return array
+   *   Response if user has been added.
+   */
+  public abstract function addRepository($params);
+
+  /**
+   * Delete user as a repository.
+   *
+   * @param array $params
+   *   It needs the userInfo and repository.
+   *
+   * @return array
+   *   Response if user has been removed.
+   */
+  public abstract function deleteRepository($params);
 
   /**
    * Get the list of pull request associated to the selected repository.
@@ -148,7 +171,8 @@ abstract class SimpleGitConnector {
    *
    * @return array
    *   Response if user has been added.
-   * Note that to prevent abuse you are limited to 50 invitations per 24 hour period
+   * Note that to prevent abuse you are limited to 50 invitations per 24 hour
+   *   period
    */
   public abstract function addCollaborator($params);
 
@@ -243,7 +267,7 @@ abstract class SimpleGitConnector {
    *   With the correct format to send to client apps.
    */
   protected final function buildResponse($data, $entity_type) {
-    $response = array();
+    $response = [];
 
     if (isset($this->mappings[$entity_type])
       && is_array(

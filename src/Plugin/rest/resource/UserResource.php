@@ -4,13 +4,11 @@ namespace Drupal\simple_git\Plugin\rest\resource;
 
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
-use Drupal\rest\ResourceResponse;
 use Drupal\simple_git\Plugin\rest\resource\response\ResourceResponseNonCached;
 use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
 use Drupal\simple_git\BusinessLogic\SimpleGitUserBusinessLogic;
 use Drupal\simple_git\Interfaces\ModuleConstantInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Provides a Connector Resource.
@@ -88,28 +86,36 @@ class UserResource extends ResourceBase {
   /**
    * Responds to the GET request.
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\simple_git\Plugin\rest\resource\response
+   * \ResourceResponseNonCached
    *   The response containing all the linked accounts.
    */
-  public function get($account_id = NULL , $user) {
+  public function get($accountId = NULL, $user) {
     $accounts = [];
     $userInfo = [];
 
-    if ($account_id == ModuleConstantInterface::REST_ALL_OPTION) {
+    if ($accountId == ModuleConstantInterface::REST_ALL_OPTION) {
       $accounts = SimpleGitAccountBusinessLogic::getAccounts(
         $this->currentUser
       );
-      $userInfo = SimpleGitUserBusinessLogic::getUser($accounts,$user);
+      $userInfo = SimpleGitUserBusinessLogic::getUser($accounts, $user);
     }
     else {
       $accounts = SimpleGitAccountBusinessLogic::getAccountByAccountId(
-        $this->currentUser, $account_id
+        $this->currentUser, $accountId
       );
-      $userInfo = SimpleGitUserBusinessLogic::getUser($accounts,$user);
+      $userInfo = SimpleGitUserBusinessLogic::getUser($accounts, $user);
 
     }
-    error_log('userInfo', print_r($userInfo,TRUE));
-    return new ResourceResponseNonCached($userInfo);
+    if (in_array(NULL, $userInfo)) {
+      $response = new ResourceResponseNonCached(NULL, 404);
+    }
+    else {
+      $response = new ResourceResponseNonCached($userInfo);
+    }
+
+    return $response;
+
   }
 
 }

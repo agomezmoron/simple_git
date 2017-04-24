@@ -88,7 +88,7 @@ class ConnectorResource extends ResourceBase {
    *   The configured connectors.
    */
   public function get() {
-    $connectors = array();
+    $connectors = [];
 
     $git_settings = \Drupal::config('simple_git.settings');
 
@@ -99,12 +99,12 @@ class ConnectorResource extends ResourceBase {
     )['app_id']
     )
     ) {
-      $connectors[] = array(
+      $connectors[] = [
         'client_id' => $git_settings->get(
           ModuleConstantInterface::GIT_TYPE_GITHUB
         )['app_id'],
-        'type' => ModuleConstantInterface::GIT_TYPE_GITHUB
-      );
+        'type' => ModuleConstantInterface::GIT_TYPE_GITHUB,
+      ];
     }
 
     // GitLab connector.
@@ -114,12 +114,12 @@ class ConnectorResource extends ResourceBase {
     )['app_id']
     )
     ) {
-      $connectors[] = array(
+      $connectors[] = [
         'client_id' => $git_settings->get(
           ModuleConstantInterface::GIT_TYPE_GITLAB
         )['app_id'],
-        'type' => ModuleConstantInterface::GIT_TYPE_GITLAB
-      );
+        'type' => ModuleConstantInterface::GIT_TYPE_GITLAB,
+      ];
     }
 
     return new ResourceResponseNonCached($connectors);

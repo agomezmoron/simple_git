@@ -20,7 +20,7 @@ abstract class SimpleGitAuthorizationBusinessLogic {
    *   An associative array containing params service.
    *
    * @return mixed[]
-   *   An associative array with element 'account_id'.
+   *   An associative array with element 'accountId'.
    */
   public static function authorize($user, array $params) {
     $git_service
@@ -32,31 +32,43 @@ abstract class SimpleGitAuthorizationBusinessLogic {
     if (!empty($auth_info)) {
 
       $auth_info
-        = array(
-          'userInfo' => array(
-            'access_info' => array(
-              'token' => $auth_info,
-            ),
-          ),
-        );
+        = [
+        'userInfo' => [
+          'access_info' => [
+            'token' => $auth_info,
+          ],
+        ],
+      ];
+      $accounts = SimpleGitAccountBusinessLogic::getAccounts($user);
       $git_account = $git_service->getAccount($auth_info);
-
-      if (isset($git_account['username'])) {
+      $exist = FALSE;
+      foreach ($accounts as &$account) {
+        if ($account['username'] == $git_account['username']
+          && $account['type'] == $git_account['type']
+        ) {
+          $exist = TRUE;
+        }
+      }
+      if ($exist) {
+        $result['status'] = 409;
+      }
+      elseif (isset($git_account['username'])) {
         $result = $git_account;
-
         $git_account['access_info']
           = $auth_info['userInfo']['access_info'];
         $account_info
           = SimpleGitAccountBusinessLogic::addOrUpdateAccount(
           $user, $git_account
         );
-
-        $result['account_id'] = $account_info['account_id'];
+        $accountIDs = [];
+        $accountIDs = array_column($account_info, 'accountId');
+        $result['accountId'] = end($accountIDs);
       }
     }
-
     return $result;
-
   }
 
 }
+
+
+

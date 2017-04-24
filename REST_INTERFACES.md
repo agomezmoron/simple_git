@@ -27,9 +27,9 @@ REST service to link and retrieve accounts information.
 | Method  | Parameters | Response | Description |
 | ------------- | ------------- | ------------- | ------------- |
 | GET  |  **/all** | All the associated accounts:  [{ "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" }] | It returns all the associated accounts  |
-| GET  | **/{account_id}** | { "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" } | It returns the associated account  |
-| POST  | { "code": "ABCD", "nonce": "EDFG", "type": "GITHUB"} | { "id": 3, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" } | It connects to GitHub and returns the linked account information.  **If the authentication fails, an error with a 401 status code will be raised.** | 
-| DELETE  | **/{account_id}** | NONE | It deletes the provided {account_id}. |
+| GET  | **/{accountId}** | { "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" } | It returns the associated account  |
+| POST  | { "code": "ABCD", "nonce": "EDFG", "type": "GITHUB"} | { "id": 3, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" } | It connects to GitHub and returns the linked account information.  **Response code: [{If the authentication fails, 401},{Conflict with the current state of the target resource, 409},{The request has been fulfilled, resulting in the creation of a new account, 201}]** | 
+| DELETE  | **/{accountId}** | NONE | It deletes the provided {account_id}. **Response code: [{If internal server error, 500},{If account not fount, 204},{The request has been fulfilled, 200}]** |
 
 ### Pull Requests
 
@@ -45,8 +45,9 @@ REST service to link and retrieve accounts information.
 
 | Method  | Parameters | Response | Description |
 | ------------- | ------------- | ------------- | ------------- |
-| GET  |  **/{account_id}/{repository_id}** | All the associated accounts:  [{ "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" }] | It returns all the associated accounts  |
-| GET  |  **/all/all** | All the associated accounts:  [{ "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" }] | It returns all the associated accounts  |
+| GET  |  **/{accountId}/{repository_id}** | All the associated accounts:  [{ "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" }] | It returns all the associated accounts  **Response code: [{If the account doesn't exist, 404},{The request has been fulfilled, 200}]**|
+| GET  |  **/all/all** | All the associated accounts:  [{ "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" }] | It returns all the associated accounts  **Response code: [{The request has been fulfilled, 200}]**|
+| PUT  |  **/{accountId}/{$repository}** NONE |
 
 ### User
 
@@ -54,8 +55,8 @@ REST service to link and retrieve accounts information.
 
 | Method  | Parameters | Response | Description |
 | ------------- | ------------- | ------------- | ------------- |
-| GET  |  **/{account_id}/{user}** | All the associated accounts:  [{ "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" }] | It returns all the associated accounts  |
-| GET  |  **/all/{user}** | All the associated accounts:  [{ "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" }] | It returns all the associated accounts  |
+| GET  |  **/{accountId}/{user}** | All the associated accounts:  [{ "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" }] | It returns all the associated accounts  **Response code: [{If the account doesn't exist, 404},{The request has been fulfilled, 200}]**|
+| GET  |  **/all/{user}** | All the associated accounts:  [{ "id": 1, "fullname": "Alejandro Gómez Morón", "username": "agomezmoron", "email": "amoron@emergya.com", "photoUrl": "http://lorempixel.com/200/200/", "repoNumber": 10, "organization": "Emergya", "location": "Sevilla" }] | It returns all the associated accounts  **Response code: [{If the account doesn't exist, 404},{The request has been fulfilled, 200}]**|
 
 
 ### Collaborator
@@ -64,6 +65,6 @@ REST service to link and retrieve accounts information.
 
 | Method  | Parameters | Response | Description |
 | ------------- | ------------- | ------------- | ------------- |
-| GET  |  **/{account_id}/{repository}/{collaborator}** | All the collaboratos of associated accounts:  ["id": 1, "username" => 'estefaniabarrera', 'photoUrl' => 'avatar_url',] | It returns all the collaboratorassociated accounts  |
-| DELETE  |  **/{account_id}/{repository}/{collaborator}** | NONE  |
-| PUT  |  **/{account_id}/{repository}/{collaborator}** | NONE  |
+| GET  |  **/{accountId}/{owner}/{repository}/{collaborator}** | All the collaboratos of associated accounts:  [{"id": 1, "username" => "agomezmoron", "photoUrl": "http://lorempixel.com/200/200/"}] | It returns all the collaborator associated accounts  |
+| DELETE  |  **/{accountId}/{owner}/{repository}/{collaborator}** | NONE  | **Response code: [{If The server has fulfilled the request but does not need to return an entity-body, 204},{The request has been fulfilled, 200}]**
+| PUT  |  **/{accountId}/{owner}/{repository}/{collaborator}** | NONE  | **Response code: [{If The server has fulfilled the request but does not need to return an entity-body, 204},{The request has been fulfilled, 200}]**

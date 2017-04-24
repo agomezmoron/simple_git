@@ -29,35 +29,33 @@ class SimpleGitRepositoriesBusinessLogic {
       );
       $repositoriesByAccount = $git_service->getRepositoriesList($params);
       foreach ($repositoriesByAccount as &$repository) {
-        $repository['accountId'] = $account['account_id'];
+        $repository['accountId'] = $account['accountId'];
       }
       $repositories = array_merge(
         $repositories, $repositoriesByAccount
       );
     }
-
     // Removing duplicated repositories.
     $filtered_repositories = [];
     $added_repos = [];
-
     foreach ($repositories as $repository) {
       $to_be_added = FALSE;
       if (!in_array($repository['id'], $added_repos)) {
-
-
         $to_be_added = TRUE;
         $added_repos[] = $repository['id'];
-
         $filtered_repositories[] = $repository;
       }
       if ($repository['canAdmin'] == TRUE) {
-
         // if the repositoy is duplicated, we add the next account with its admin permisisons
         if (!$to_be_added) {
           $position = array_search($repository['id'], $added_repos);
-          if ($filtered_repositories[$position]['canAdmin'] == FALSE && $repository['canAdmin'] == TRUE) {
-            $filtered_repositories[$position]['accountId'] = $repository['accountId'];
-            $filtered_repositories[$position]['canAdmin'] = $repository['canAdmin'];
+          if ($filtered_repositories[$position]['canAdmin'] == FALSE &&
+            $repository['canAdmin'] == TRUE
+          ) {
+            $filtered_repositories[$position]['accountId'] =
+              $repository['accountId'];
+            $filtered_repositories[$position]['canAdmin'] =
+              $repository['canAdmin'];
           }
         }
       }
@@ -68,7 +66,7 @@ class SimpleGitRepositoriesBusinessLogic {
   /**
    * Get repository.
    *
-   * @param int $account_id
+   * @param int $accountId
    *   A id account.
    * @param string $repo
    *   A string with URL of the repositories.
@@ -78,15 +76,15 @@ class SimpleGitRepositoriesBusinessLogic {
    * @return array
    *   Contains user's repository.
    */
-  static function getRepository($account_id, $repo, $user) {
+  static function getRepository($accountId, $repo, $user) {
     $repository = [];
     $account = SimpleGitAccountBusinessLogic::getAccountByAccountId(
-      $user, $account_id
+      $user, $accountId
     );
     if (!empty($account)) {
       $params = [];
       $params['userInfo'] = $account;
-      $params['repository'] = array('name' => $repo);
+      $params['repository'] = ['name' => $repo];
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']
       );
@@ -159,7 +157,7 @@ class SimpleGitRepositoriesBusinessLogic {
    * @return array
    *   With the created repository
    */
-  function create($account, $repository_info) {
+  public static function create($account, $repository_info) {
     $repository = [];
     if (!empty($account) && !empty($repository_info)
       && isset($repository_info['name'])
@@ -170,9 +168,39 @@ class SimpleGitRepositoriesBusinessLogic {
       $git_service = Service\SimpleGitConnectorFactory::getConnector(
         $account['type']
       );
-      // @TODO: add this to the git service interface $repository = $git_service->createRepository($params);
+      $repository = $git_service->addRepository($params);
     }
     return $repository;
+  }
+
+  /**
+   * Delete a repository.
+   *
+   * @param array $account
+   *   An associative array containing structure account.
+   * @param array $repository
+   *   An associative array containing structure repository.
+   * @param string $collaborator
+   *   An collaborator name
+   *
+   * @return bool
+   *   An associative array containing structure accounts
+   */
+  public static function deleteRepository($account, $repository) {
+    $delete = FALSE;
+    if (!empty($account) && !empty($repository)
+      && isset($repository['name'])
+    ) {
+      $params = [];
+      $params['userInfo'] = $account;
+      $params['repository']['name'] = $repository;
+      $git_service = Service\SimpleGitConnectorFactory::getConnector(
+        $account['type']
+      );
+
+      $delete = $git_service->deleteRepository($params);
+    }
+    return $delete;
   }
 
 }
