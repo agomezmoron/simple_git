@@ -164,7 +164,8 @@ class RepositoryResource extends ResourceBase {
    * @param int $repository
    *   A repository id.
    *
-   * @return\Drupal\simple_git\Plugin\rest\resource\response
+   * @return \Drupal\simple_git\Plugin\rest\resource\response
+   * \ResourceResponseNonCached
    *   The response containing all the repositoryes or a requested one.
    */
   public function get($accountId = NULL, $repository = NULL) {
@@ -175,6 +176,7 @@ class RepositoryResource extends ResourceBase {
       $repositories = SimpleGitRepositoriesBusinessLogic::getRepositories(
         SimpleGitAccountBusinessLogic::getAccounts($this->currentUser)
       );
+      $reponse = new ResourceResponseNonCached($repositories);
     }
     else {
       if ($repository == ModuleConstantInterface::REST_ALL_OPTION) {
@@ -185,20 +187,20 @@ class RepositoryResource extends ResourceBase {
           $repositories = SimpleGitRepositoriesBusinessLogic::getRepositories(
             [$account]
           );
+          $reponse = new ResourceResponseNonCached($repositories);
         }
         else {
-          throw new \HttpException(
-            404, t('The provided account "doesn\'t" exist')
-          );
+          $reponse = new ResourceResponseNonCached(NULL, 404);
         }
       }
       else {
         $repositories = SimpleGitRepositoriesBusinessLogic::getRepository(
           $accountId, $repository, $this->currentUser
         );
+        $reponse = new ResourceResponseNonCached($repositories);
       }
     }
-    return new ResourceResponseNonCached($repositories);
+    return $reponse;
   }
 
   /**

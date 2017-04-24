@@ -4,13 +4,11 @@ namespace Drupal\simple_git\Plugin\rest\resource;
 
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
-use Drupal\rest\ResourceResponse;
 use Drupal\simple_git\Plugin\rest\resource\response\ResourceResponseNonCached;
 use Drupal\simple_git\BusinessLogic\SimpleGitAccountBusinessLogic;
 use Drupal\simple_git\BusinessLogic\SimpleGitUserBusinessLogic;
 use Drupal\simple_git\Interfaces\ModuleConstantInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Provides a Connector Resource.
@@ -88,7 +86,8 @@ class UserResource extends ResourceBase {
   /**
    * Responds to the GET request.
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\simple_git\Plugin\rest\resource\response
+   * \ResourceResponseNonCached
    *   The response containing all the linked accounts.
    */
   public function get($accountId = NULL, $user) {
@@ -108,8 +107,14 @@ class UserResource extends ResourceBase {
       $userInfo = SimpleGitUserBusinessLogic::getUser($accounts, $user);
 
     }
+    if (in_array(NULL, $userInfo)) {
+      $response = new ResourceResponseNonCached(NULL, 404);
+    }
+    else {
+      $response = new ResourceResponseNonCached($userInfo);
+    }
 
-    return new ResourceResponseNonCached($userInfo);
+    return $response;
 
   }
 
