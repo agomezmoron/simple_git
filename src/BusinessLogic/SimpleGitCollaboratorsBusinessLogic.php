@@ -26,7 +26,7 @@ class SimpleGitCollaboratorsBusinessLogic {
    */
   public static function getCollaborators($account, $owner, $repository) {
     $collaborators = [];
-    if (!empty($account) && !empty($owner)  && !empty($repository)) {
+    if (!empty($account) && !empty($owner) && !empty($repository)) {
       $params['userInfo'] = $account;
       $params['repository']['name'] = $repository;
       $params['repository']['username'] = $owner;
@@ -56,7 +56,9 @@ class SimpleGitCollaboratorsBusinessLogic {
    */
   public static function exists($account, $owner, $repository, $collaborator) {
     $exists = FALSE;
-    if (!empty($account) && !empty($repository) && !empty($owner) && !empty($collaborator)) {
+    if (!empty($account) && !empty($repository) && !empty($owner) &&
+      !empty($collaborator)
+    ) {
       $params = [];
       $params['userInfo'] = $account;
       $params['repository']['name'] = $repository;
@@ -95,7 +97,9 @@ class SimpleGitCollaboratorsBusinessLogic {
     $collaborator
   ) {
     $iscollaborator = FALSE;
-    if (!empty($account) && !empty($repository) && !empty($owner) && !empty($collaborator)) {
+    if (!empty($account) && !empty($repository) && !empty($owner) &&
+      !empty($collaborator)
+    ) {
       $params = [];
       $params['userInfo'] = $account;
       $params['repository']['name'] = $repository;
@@ -131,7 +135,9 @@ class SimpleGitCollaboratorsBusinessLogic {
     $collaborator
   ) {
     $delete = FALSE;
-    if (!empty($account) && !empty($repository) && !empty($owner) && !empty($collaborator)) {
+    if (!empty($account) && !empty($repository) && !empty($owner) &&
+      !empty($collaborator)
+    ) {
       $params = [];
       $params['userInfo'] = $account;
       $params['repository']['name'] = $repository;

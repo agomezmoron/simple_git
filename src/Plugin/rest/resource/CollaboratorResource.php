@@ -95,7 +95,7 @@ class CollaboratorResource extends ResourceBase {
    *
    * @param int $accountId
    *   An id of account.
-   *  @param string owner
+   * @param string owner
    *   An name of owner
    * @param string $repository
    *   A repository name.
@@ -111,10 +111,11 @@ class CollaboratorResource extends ResourceBase {
     $isDeleted = SimpleGitCollaboratorsBusinessLogic::deleteCollaborators(
       SimpleGitAccountBusinessLogic::getAccountByAccountId(
         $this->currentUser, $accountId), $owner, $repository, $collaborator);
-    if($isDeleted){
+    if ($isDeleted) {
       $response = new ResourceResponse();
-    }else{
-      $response = new ResourceResponse(null, 204);
+    }
+    else {
+      $response = new ResourceResponse(NULL, 204);
     }
 
     return $response;
@@ -125,14 +126,15 @@ class CollaboratorResource extends ResourceBase {
    *
    * @param int $accountId
    *   An id of account.
-   *  @param string owner
+   * @param string owner
    *   An name of owner
    * @param string $repository
    *   A collaborator name.
    * @param string $collaborator
    *   A collaborator name.
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return \Drupal\simple_git\Plugin\rest\resource\response
+   * \ResourceResponseNonCached
    *   The response containing all the collaborators or a requested one.
    */
   public function get($accountId, $owner, $repository, $collaborator) {
@@ -164,7 +166,7 @@ class CollaboratorResource extends ResourceBase {
    *
    * @param int $accountId
    *   An id of account.
-   *  @param string owner
+   * @param string owner
    *   An name of owner.
    * @param string $repository
    *   An associative array containing structure user.
@@ -179,10 +181,11 @@ class CollaboratorResource extends ResourceBase {
     $isAdded = SimpleGitCollaboratorsBusinessLogic::addCollaborators
     (SimpleGitAccountBusinessLogic::getAccountByAccountId($this->currentUser,
       $accountId), $owner, $repository, $collaborator);
-    if($isAdded){
+    if ($isAdded) {
       $response = new ResourceResponse();
-    }else{
-      $response = new ResourceResponse(null, 204);
+    }
+    else {
+      $response = new ResourceResponse(NULL, 204);
     }
     return $response;
   }
