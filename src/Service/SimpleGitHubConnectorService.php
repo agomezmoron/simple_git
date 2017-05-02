@@ -382,7 +382,6 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
     else {
       $response = NULL;
     }
-error_log('response'.print_r($response,TRUE));
     return $response;
   }
 
