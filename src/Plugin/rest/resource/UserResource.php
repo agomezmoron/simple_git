@@ -109,6 +109,8 @@ class UserResource extends ResourceBase {
     }
     if (in_array(NULL, $userInfo)) {
       $response = new ResourceResponseNonCached(NULL, 404);
+    }elseif (in_array('Bad Request',$userInfo)){
+      $response = new ResourceResponseNonCached(NULL, 400);
     }
     else {
       $response = new ResourceResponseNonCached($userInfo);
