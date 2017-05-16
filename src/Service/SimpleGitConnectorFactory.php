@@ -26,17 +26,17 @@ abstract class SimpleGitConnectorFactory {
     $connector = NULL;
     switch ($type) {
       case ModuleConstantInterface::GIT_TYPE_GITHUB:
+      case ModuleConstantInterface::GIT_TYPE_GITHUBM:
         $connector = \Drupal::service(
           'simple_git.github_connector.service'
         );
         break;
 
       case ModuleConstantInterface::GIT_TYPE_GITLAB:
+      case ModuleConstantInterface::GIT_TYPE_GITLABM:
         $connector = \Drupal::service(
           'simple_git.gitlab_connector.service'
         );
-        break;
-
       default:
         $connector = \Drupal::service(
           'simple_git.github_connector.service'

@@ -239,9 +239,9 @@ abstract class SimpleGitConnector {
    * @return string
    *   With the connector type associated.
    */
-  protected final function getConnectorConfig() {
+  protected final function getConnectorConfig($params) {
     $git_settings = \Drupal::config('simple_git.settings');
-    return $git_settings->get($this->getConnectorType());
+    return $git_settings->get($this->getConnectorType($params));
   }
 
   /**
@@ -250,7 +250,7 @@ abstract class SimpleGitConnector {
    * @return mixed
    *   With the conenctor type.
    */
-  public abstract function getConnectorType();
+  public abstract function getConnectorType($params);
 
   /**
    * Configure the response, based in the corresponding mapping.
