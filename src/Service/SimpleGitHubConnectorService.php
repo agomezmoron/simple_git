@@ -54,7 +54,7 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
     if ($params['code'] && $params['state']) {
       $code = $params['code'];
       $state = $params['state'];
-      $settings = $this->getConnectorConfig();
+      $settings = $this->getConnectorConfig($params);
       // Url to user.
       $url = 'https://github.com/login/oauth/access_token';
       // Set parameters.
@@ -354,8 +354,13 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    * @return string
    *   Information about the type connector
    */
-  public function getConnectorType() {
-    return ModuleConstantInterface::GIT_TYPE_GITHUB;
+  public function getConnectorType($params) {
+    if ($params['type'] ===
+      ModuleConstantInterface::GIT_TYPE_GITHUBM) {
+      return ModuleConstantInterface::GIT_TYPE_GITHUBM;
+    } else {
+      return ModuleConstantInterface::GIT_TYPE_GITHUB;
+    }
   }
 
   /**
