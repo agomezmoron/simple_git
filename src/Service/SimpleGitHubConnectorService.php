@@ -373,10 +373,13 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
     $url = self::BASE_URL . 'users/' . $user;
     $ch = $this->getConfiguredCURL($url, $account);
     $response = $this->performCURL($ch);
-    if ($response['header']['http_code'] != 404 && $response['header']['http_code'] != 400) {
+    if ($response['header']['http_code'] != 404 &&
+      $response['header']['http_code'] != 400
+    ) {
       $response = $response['data'];
       $response = $this->buildResponse($response, self::USER);
-    }elseif ($response['header']['http_code'] == 400){
+    }
+    elseif ($response['header']['http_code'] == 400) {
       $response = 'Bad Request';
     }
     else {

@@ -92,10 +92,10 @@ class ConnectorResource extends ResourceBase {
 
     $git_settings = \Drupal::config('simple_git.settings');
 
-    // GitHub connector
+    // GitHub Web connector
     if (!empty(
     $git_settings->get(
-      GIT_TYPE_GITHUB
+      ModuleConstantInterface::GIT_TYPE_GITHUB
     )['app_id']
     )
     ) {
@@ -107,7 +107,7 @@ class ConnectorResource extends ResourceBase {
       ];
     }
 
-    // GitLab connector.
+    // GitLab Web connector.
     if (!empty(
     $git_settings->get(
       ModuleConstantInterface::GIT_TYPE_GITLAB
@@ -122,6 +122,35 @@ class ConnectorResource extends ResourceBase {
       ];
     }
 
+    // GitHub Mobile connector
+    if (!empty(
+    $git_settings->get(
+      ModuleConstantInterface::GIT_TYPE_GITHUBM
+    )['app_id']
+    )
+    ) {
+      $connectors[] = [
+        'client_id' => $git_settings->get(
+          ModuleConstantInterface::GIT_TYPE_GITHUBM
+        )['app_id'],
+        'type' => ModuleConstantInterface::GIT_TYPE_GITHUBM,
+      ];
+    }
+
+    // GitLab Mobile connector.
+    if (!empty(
+    $git_settings->get(
+      ModuleConstantInterface::GIT_TYPE_GITLABM
+    )['app_id']
+    )
+    ) {
+      $connectors[] = [
+        'client_id' => $git_settings->get(
+          ModuleConstantInterface::GIT_TYPE_GITLABM
+        )['app_id'],
+        'type' => ModuleConstantInterface::GIT_TYPE_GITLABM,
+      ];
+    }
     return new ResourceResponseNonCached($connectors);
   }
 
