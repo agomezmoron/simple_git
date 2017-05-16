@@ -355,12 +355,13 @@ class SimpleGitHubConnectorService extends SimpleGitConnector {
    *   Information about the type connector
    */
   public function getConnectorType($params) {
+    $type = ModuleConstantInterface::GIT_TYPE_GITHUB;
     if ($params['type'] ===
-      ModuleConstantInterface::GIT_TYPE_GITHUBM) {
-      return ModuleConstantInterface::GIT_TYPE_GITHUBM;
-    } else {
-      return ModuleConstantInterface::GIT_TYPE_GITHUB;
+      ModuleConstantInterface::GIT_TYPE_GITHUBM
+    ) {
+      $type = ModuleConstantInterface::GIT_TYPE_GITHUBM;
     }
+    return $type;
   }
 
   /**
